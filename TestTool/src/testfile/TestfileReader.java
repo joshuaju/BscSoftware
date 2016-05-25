@@ -146,7 +146,7 @@ public class TestfileReader {
 						try {
 							testfile.addSetupLine(line);
 						} catch (TestfileSyntaxException e) {
-							throw ExceptionHandler.InvalidCharacterException(i + 1, line);
+							throw ExceptionHandler.InvalidCharacter(i + 1, line);
 						}
 					}
 				}
@@ -161,7 +161,7 @@ public class TestfileReader {
 						try {
 							testfile.addTestLine(line);
 						} catch (TestfileSyntaxException e) {
-							throw ExceptionHandler.InvalidCharacterException(i + 1, line);
+							throw ExceptionHandler.InvalidCharacter(i + 1, line);
 						}
 					}
 				}
@@ -176,12 +176,12 @@ public class TestfileReader {
 						try {
 							testfile.addTeardownLine(line);
 						} catch (TestfileSyntaxException e) {
-							throw ExceptionHandler.InvalidCharacterException(i + 1, line);
+							throw ExceptionHandler.InvalidCharacter(i + 1, line);
 						}
 					}
 				}
 			} else {
-				throw ExceptionHandler.InvalidLineException(i + 1, line);
+				throw ExceptionHandler.InvalidLine(i + 1, line);
 			}
 		}
 
@@ -223,7 +223,7 @@ public class TestfileReader {
 		}
 
 		if (errorMessages.size() > 0) {
-			throw ExceptionHandler.InvalidContentException(errorMessages.toArray(new String[0]));
+			throw ExceptionHandler.InvalidContent(errorMessages.toArray(new String[0]));
 		}
 	}
 
@@ -241,11 +241,11 @@ public class TestfileReader {
 	private File getFileFromPath(String path) throws FileNotFoundException {
 		File file = new File(path);
 		if (!file.exists()) {
-			throw new FileNotFoundException("Die Datei wurde nicht gefunden");
+			throw ExceptionHandler.FileNotFound(file);
 		}
 
 		if (!file.isFile()) {
-			throw new FileNotFoundException("Der angegebene Pfad führt nicht zu einer Datei");
+			throw ExceptionHandler.FileIsDirectory(file);
 		}
 		return file;
 	}
