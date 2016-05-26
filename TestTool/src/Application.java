@@ -27,7 +27,7 @@ public class Application {
 		Keyword kw = lib.getKeywordByName("Setze Wert auf");
 		System.out.println("Keyword gefunden? " + kw != null);
 		System.out.println(kw);
-		kw.invoke(lib.getInstance(), 2);
+		kw.invoke(lib.getInstance(), "2");
 		
 		kw = lib.getKeywordByName("Lese Wert");		
 		System.out.println(kw);

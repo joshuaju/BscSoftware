@@ -52,5 +52,13 @@ public class ExceptionHandler {
 	public static KeywordLibraryException MethodIsNotAKeywordMethod(String name){
 		return new KeywordLibraryException("Die Methode ist keine gültig Schlüsselwort-Methode: " + name);
 	}
+	
+	public static IllegalArgumentException TooManyArguments(String keyword){
+		return new IllegalArgumentException("Die Anzahl der Argumente für das Schlüsselwort ist ungültig: " + keyword);
+	}
+	
+	public static IllegalArgumentException WrongArgument(String keyword, int argNumber){
+		return new IllegalArgumentException("Das Argument ist nicht für das Schlüsselwort gültig: "+ keyword + ", Argument " + argNumber);
+	}
 
 }

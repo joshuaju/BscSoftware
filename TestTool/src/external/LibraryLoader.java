@@ -15,7 +15,7 @@ public class LibraryLoader {
 	
 	/**
 	 * Läd eine KeywordLibrary aus dem angegebenen Jar-Verzeichnis. Der
-	 * Dateiname entspricht dem Namen der Klasse der Bibliothek
+	 * Dateiname entspricht dem Namen des Jar-Verzeichnisses
 	 * 
 	 * @param path
 	 *            Pfad zur Jar-Datei
