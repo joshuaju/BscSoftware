@@ -1,5 +1,6 @@
 package testfile;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -9,12 +10,17 @@ public class Testfile {
 	private String author;
 	private String testname;
 	private String description;
+	private String path;
 
 	private ArrayList<String> libPaths;
 	private ArrayList<String> setupLines;
 	private ArrayList<String> testLines;
 	private ArrayList<String> teardownLines;
-
+	
+	private ArrayList<Integer> setupLineNumber;
+	private ArrayList<Integer> testLineNumber;
+	private ArrayList<Integer> teardownLineNumber;
+	
 	public static final String TAG_FIRST_CHAR = "[";
 	public static final String TAG_AUTHOR = "[AUTHOR]";
 	public static final String TAG_TESTNAME = "[TESTNAME]";
@@ -31,10 +37,22 @@ public class Testfile {
 		author = "";
 		testname = "";
 		description = "";
+		path = "";
 		libPaths = new ArrayList<>();
 		setupLines = new ArrayList<>();
 		testLines = new ArrayList<>();
 		teardownLines = new ArrayList<>();
+		setupLineNumber = new ArrayList<>();
+		testLineNumber = new ArrayList<>();
+		teardownLineNumber = new ArrayList<>();
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(File f) {
+		this.path = f.getAbsolutePath();
 	}
 
 	public String getAuthor() {
@@ -89,47 +107,74 @@ public class Testfile {
 		return setupLines.toArray(new String[0]);
 	}
 
-	void addSetupLine(String line) throws TestfileSyntaxException {		
+	void addSetupLine(String line, int lineNumber) throws TestfileSyntaxException {		
 		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)){
 			throw new TestfileSyntaxException("Ungültiges Zeichen");
 		}
 		setupLines.add(line);
+		addSetupLineNumber(lineNumber);
 	}
 
 	public boolean hasSetupLines() {
 		return setupLines.size() > 0;
 	}
 
+	public Integer getSetupLineNumber(int index) {
+		return setupLineNumber.get(index);
+	}
+
+	private void addSetupLineNumber(int number) {
+		this.setupLineNumber.add(number);
+	}
+
 	public String[] getTestLines() {
 		return testLines.toArray(new String[0]);
 	}
 
-	void addTestLine(String line) throws TestfileSyntaxException {
+	void addTestLine(String line, int lineNumber) throws TestfileSyntaxException {
 		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)){
 			throw new TestfileSyntaxException("Ungültiges Zeichen");
 		}
 		testLines.add(line);
+		addTestLineNumber(lineNumber);
 	}
 
 	public boolean hasTestLines() {
 		return testLines.size() > 0;
 	}
 
+	public Integer getTestLineNumber(int index) {
+		return testLineNumber.get(index);
+	}
+
+	private void addTestLineNumber(int number) {
+		this.testLineNumber.add(number);
+	}
+
 	public String[] getTeardownLines() {
 		return teardownLines.toArray(new String[0]);
 	}
 
-	void addTeardownLine(String line) throws TestfileSyntaxException {
+	void addTeardownLine(String line, int lineNumber) throws TestfileSyntaxException {
 		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)){
 			throw new TestfileSyntaxException("Ungültiges Zeichen");
 		}
 		teardownLines.add(line);
+		addTeardownLineNumber(lineNumber);
 	}
 
 	public boolean hasTeardownLines() {
 		return teardownLines.size() > 0;
 	}
 	
+	public Integer getTeardownLineNumber(int index) {
+		return teardownLineNumber.get(index);
+	}
+
+	private void addTeardownLineNumber(int number) {
+		this.teardownLineNumber.add(number);
+	}
+
 	public String toString(){
 		StringBuilder builder = new StringBuilder();
 		

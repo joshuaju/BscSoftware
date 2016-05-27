@@ -93,6 +93,7 @@ public class TestfileReader {
 		File file = getFileFromPath(path);
 		String[] lines = getLinesFromFile(file);
 		Testfile testfile = readLinesToTestfile(lines);
+		testfile.setPath(file);
 		return testfile;
 	}
 
@@ -144,9 +145,10 @@ public class TestfileReader {
 						break;
 					} else {
 						try {
-							testfile.addSetupLine(line);
+							testfile.addSetupLine(line, i+2);
+							System.out.println((i+2));
 						} catch (TestfileSyntaxException e) {
-							throw ExceptionHandler.InvalidCharacter(i + 1, line);
+							throw ExceptionHandler.InvalidCharacter(i + 2, line);
 						}
 					}
 				}
@@ -159,7 +161,7 @@ public class TestfileReader {
 						break;
 					} else {
 						try {
-							testfile.addTestLine(line);
+							testfile.addTestLine(line, i+2);
 						} catch (TestfileSyntaxException e) {
 							throw ExceptionHandler.InvalidCharacter(i + 1, line);
 						}
@@ -174,7 +176,7 @@ public class TestfileReader {
 						break;
 					} else {
 						try {
-							testfile.addTeardownLine(line);
+							testfile.addTeardownLine(line, i+2);
 						} catch (TestfileSyntaxException e) {
 							throw ExceptionHandler.InvalidCharacter(i + 1, line);
 						}

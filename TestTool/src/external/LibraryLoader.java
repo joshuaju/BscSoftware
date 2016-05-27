@@ -7,6 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import exceptions.ExceptionHandler;
 import exceptions.KeywordLibraryException;
@@ -34,7 +37,7 @@ public class LibraryLoader {
 
 	/**
 	 * Läd eine KeywordLibrary aus dem angegebenen Jar-Verzeichnis mit dem
-	 * angegeben vollständigen Namen.
+	 * angegeben vollständigen Klassennamen.
 	 * 
 	 * @param path
 	 *            Pfad zur Jar-Datei
@@ -68,8 +71,9 @@ public class LibraryLoader {
 			throw ExceptionHandler.FileNotFound(libFile);
 		}
 
-		ClassLoader systemClassLoader = URLClassLoader.getSystemClassLoader();		
-		URLClassLoader loader = new URLClassLoader(urls, systemClassLoader);
+		ClassLoader systemClassLoader = URLClassLoader.getSystemClassLoader();				
+		URLClassLoader loader = URLClassLoader.newInstance(urls, systemClassLoader);
+		loadAllClassesFromJar(path, loader);
 		
 		
 		Class<?> libClass = null;
@@ -81,6 +85,40 @@ public class LibraryLoader {
 			loader.close();
 		}
 
+		return loadLibrary(name, libClass);
+	}
+
+	private static void loadAllClassesFromJar(String path, URLClassLoader loader) throws IOException, ClassNotFoundException{
+		JarFile jar = new JarFile(path);
+		Enumeration<JarEntry> entries = jar.entries();
+		while (entries.hasMoreElements()){
+			JarEntry tmpEntry = entries.nextElement();
+			String filename = tmpEntry.getName();
+			if (filename.endsWith(".class")){							
+				String classname = filename.replace("/", ".").substring(0, filename.length()-6);
+				loader.loadClass(classname);
+			}			
+		}
+	}
+	
+	/**
+	 * Läd eine KeywordLibrary aus der angegebenen Klasse mit dem
+	 * angegeben vollständigen Klassennamen.
+	 * 
+	 * @param libClass
+	 *            Klasse der Bibliothek
+	 * @param name
+	 *            Vollständiger Name (Bsp: 'DeviceLibrary', oder
+	 *            'example.DeviceLibrary' wenn die Klasse in einem paket ist
+	 * @return Bibliothek
+	 * @throws ClassNotFoundException
+	 *             Die Klasse wurde nicht gefunden
+	 * @throws KeywordLibraryException
+	 *             Die Klasse ist keine gültige Bibliothek
+	 * @throws IOException
+	 *             Die Jar-Datei wurde nicht gefunden
+	 */
+	public static KeywordLibrary loadLibrary(String name, Class<?> libClass) throws KeywordLibraryException {
 		Constructor<?> klConstr = null;
 		Object libInstance = null;
 		try {

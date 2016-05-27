@@ -47,12 +47,20 @@ public class KeywordLibrary {
 		Method[] methods = thisclass.getMethods();
 		for (Method m : methods) {
 			if (Keyword.isKeywordMethod(m)){
-				keywordList.add(new Keyword(m));
+				keywordList.add(new Keyword(thisinstance, m));
 			}
 		}		
 		
 	}
 
+	/** Gibt den Namen der Bibliothek zurück. Der Name einer Bibliothek wird in der Testdatei
+	 * festgelegt.
+	 * @return Name
+	 */
+	public String getName(){
+		return thisname;
+	}
+	
 	/**
 	 * Gibt den Names des Erstellers der Bibliothek zurück
 	 * @return Name
@@ -89,7 +97,6 @@ public class KeywordLibrary {
 			}
 		}
 		return null;
-	}
-		
+	}	
 	
 }

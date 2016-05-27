@@ -6,46 +6,87 @@ import java.lang.reflect.Method;
 import exceptions.ExceptionHandler;
 import exceptions.KeywordLibraryException;
 
+/**
+ * Diese Klasse repräsentiert ein Keyword
+ * 
+ * @author JJungen
+ *
+ */
 public class Keyword {
 
 	private final annotations.Keyword annotation;
 	private final Method method;
+	private final Object libInstance;
 
-	public Keyword(Method method) throws KeywordLibraryException {
+	Keyword(Object libInstance, Method method) throws KeywordLibraryException {
 		if (!Keyword.isKeywordMethod(method)) {
 			throw ExceptionHandler.MethodIsNotAKeywordMethod(method.getClass().getName() + "." + method.getName());
 		}
 		this.annotation = method.getAnnotation(annotations.Keyword.class);
 		this.method = method;
+		this.libInstance = libInstance;
 	}
 
+	/**
+	 * Den Namen, also die String-Darstellung des Schlüsselworts
+	 * @return Name
+	 */
 	public String getName() {
 		return annotation.Name();
 	}
 
+	/**
+	 * Die Beschreibung zum Schlüsselwort 
+	 * @return
+	 */
 	public String getDescription() {
 		return annotation.Description();
 	}
 
+	/**
+	 * Die Beschreibung zu den Übergabeparametern
+	 * @return
+	 */
 	public String getParameter() {
 		return annotation.Parameter();
 	}
 
+	/**
+	 * Die Beschreibung zum Rückgabewert
+	 * @return
+	 */
 	public String getReturn() {
 		return annotation.Return();
 
 	}
 
+	/**
+	 * Die Typen der Übergabeparamter (von links nach rechts)
+	 * @return Array der Typen 
+	 */
 	public Class<?>[] getParameterTypes() {
 		return method.getParameterTypes();
 	}
 
+	/**
+	 * Den Typ des Rückgabewerts
+	 * @return 
+	 */
 	public Class<?> getReturntype() {
 		return method.getReturnType();
 	}
 
-	public Object invoke(Object instance, Object... args)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	/**
+	 * Dieses Keyword wird an dem Object instance, mit den Übergabeparametern args, aufegerufen 
+	 * @param instance ausführendes Objekt
+	 * @param args Übergabeparameter
+	 * @return Rückgabewert des Keyword
+	 * @throws IllegalAccessException Fehler bei der Reflexion 
+	 * @throws IllegalArgumentException	Die Übergabeparameter sind nicht gültig
+	 * @throws AssertionError Exception die bei vergleichenden Methoden auftritt.
+	 */
+	public Object invoke(Object... args)
+			throws IllegalAccessException, IllegalArgumentException, AssertionError {
 
 		Class<?>[] argClasses = getParameterTypes();
 
@@ -58,12 +99,16 @@ public class Keyword {
 			Object tmpArg = args[i];
 			tmpArg = parseArgument(tmpArgClass, tmpArg);
 			if (tmpArg == null) {
-				throw ExceptionHandler.WrongArgument(getName(), i);
+				throw ExceptionHandler.WrongArgument(getName(), i, tmpArg);
 			}
 			args[i] = tmpArg;
 		}
 
-		return method.invoke(instance, args);
+		try {
+			return method.invoke(libInstance, args);
+		} catch (InvocationTargetException e){
+			throw new AssertionError(e.getCause().getMessage());
+		}		
 	}
 
 	/**
@@ -78,7 +123,7 @@ public class Keyword {
 	 */
 	private Object parseArgument(Class<?> argClass, Object arg) {
 		try {
-			if (argClass.equals(String.class)) {
+			if (argClass.equals(String.class) || argClass.equals(Object.class)) {
 				return arg.toString();
 			} else if (argClass.equals(Boolean.class) || argClass.equals(boolean.class)) {
 				return Boolean.parseBoolean(arg.toString());
