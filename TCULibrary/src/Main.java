@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 public class Main {
 
-	@SuppressWarnings("unused")
 	public static void main(String[] args)
 			throws IOException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		TCUIVKeywordLibrary tcu = new TCUIVKeywordLibrary();		

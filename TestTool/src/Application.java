@@ -1,7 +1,5 @@
 import execution.TestSuiteExecuter;
 import execution.TestSuiteProtocol;
-import external.Keyword;
-import external.KeywordLibrary;
 import external.LibraryLoader;
 
 public class Application {
@@ -12,8 +10,9 @@ public class Application {
 //		Keyword kw = lib.getKeywordByName("Lese Kanal A");
 //		kw.invoke();
 		
-		TestSuiteExecuter tsExe = new TestSuiteExecuter("Joshua Jungen");
-		tsExe.addPath("testfiles/tcu_perform_null.tst");
+		LibraryLoader.getInstance("D:/Bsc/default/");		
+		TestSuiteExecuter tsExe = new TestSuiteExecuter("Joshua Jungen");		
+		tsExe.addPath("testfiles/test.tst");
 		TestSuiteProtocol tsProtocol = tsExe.execute();
 		System.out.println(tsProtocol);
 		

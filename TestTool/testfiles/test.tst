@@ -2,7 +2,7 @@
 [TESTNAME] 	Verändern von Werten
 [DESC] 		Es wird geprüft ob das Verändern von Werten 
 			am Gerät erfolgreich ist.
-[LIB]		"D:/DeviceKeywordLibrary.jar" dev1
+[LIB]		"D:/Bsc/DeviceKeywordLibrary.jar" dev1
 
 [SETUP]
 #	Baue Verbindung auf

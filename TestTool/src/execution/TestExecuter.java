@@ -3,7 +3,7 @@ package execution;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -22,7 +22,7 @@ public class TestExecuter {
 	private final HashMap<String, KeywordLibrary> libnamesMap;
 	private final HashMap<String, Object> variablesMap;
 	private Testfile testfile;
-	
+
 	public TestExecuter(String path) {
 		this.path = path;
 
@@ -39,30 +39,30 @@ public class TestExecuter {
 			return new TestProtocol(false, "-", path, e.getMessage());
 		}
 
-		
 		// TODO zeile in fehlerprotokoll aufgenommen. überprüfen!!!
-			try {
-				loadLibraries(testfile);
-			} catch (AssertionError | ClassNotFoundException | KeywordLibraryException | IOException e) {
-				return createProtocol(testfile, false, e.getMessage());
-			}
-			try {
-				execute(testfile.getSetupLines());
-			} catch (AssertionError | IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException e) {
-				return createProtocol(testfile, false, "Setup: " + e.getMessage());
-			}
-			try {
-				execute(testfile.getTestLines());
-			} catch (AssertionError | IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException e) {
-				return createProtocol(testfile, false, "Test: " + e.getMessage());
-			}
-			try {
-				execute(testfile.getTeardownLines());
-			} catch (AssertionError | IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException e) {
-				return createProtocol(testfile, false, "Teardown: " + e.getMessage());
-			}
-		
-		 
+		try {
+			loadLibraries(testfile);
+		} catch (AssertionError | ClassNotFoundException | KeywordLibraryException | IOException e) {
+			return createProtocol(testfile, false, e.getMessage());
+		}
+		try {
+			execute(testfile.getSetupLines());
+		} catch (AssertionError | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| IOException e) {
+			return createProtocol(testfile, false, "Setup: " + e.getMessage());
+		}
+		try {
+			execute(testfile.getTestLines());
+		} catch (AssertionError | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| IOException e) {
+			return createProtocol(testfile, false, "Test: " + e.getMessage());
+		}
+		try {
+			execute(testfile.getTeardownLines());
+		} catch (AssertionError | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| IOException e) {
+			return createProtocol(testfile, false, "Teardown: " + e.getMessage());
+		}
 
 		return createProtocol(testfile, true, "");
 	}
@@ -71,11 +71,11 @@ public class TestExecuter {
 		return new TestProtocol(passed, testfile.getTestname(), testfile.getPath(), message);
 	}
 
-	private void execute(String[] lines) throws IOException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
-			{
+	private void execute(String[] lines)
+			throws IOException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		for (int i = 0; i < lines.length; i++) {
-			String line = lines[i];					
-			executeLine(line);						
+			String line = lines[i];
+			executeLine(line);
 		}
 	}
 
@@ -85,7 +85,7 @@ public class TestExecuter {
 			return assignVariableLine(line);
 		} else {
 			return executeKeywordLine(line);
-		}	
+		}
 	}
 
 	private Object assignVariableLine(String line)
@@ -152,8 +152,9 @@ public class TestExecuter {
 	}
 
 	/**
-	 * Sucht ein Keyword in alle Bibliotheken. Wenn ein Bibliotheksname
-	 * vorangestellt ist, dann wird nur in dieser gesucht.
+	 * Sucht ein Keyword in allen in der Testdatei angegeben und standardmäßig
+	 * geladenen Bibliotheken. Wenn ein Bibliotheksname vorangestellt ist, dann
+	 * wird nur in dieser gesucht.
 	 * 
 	 * @param strKeyword
 	 *            Keyword, (optional) mit Bibliotheksname davor
@@ -163,7 +164,12 @@ public class TestExecuter {
 	 *             Bibliotheken vor
 	 */
 	private Keyword findKeyword(String strKeyword) throws TestfileException {
-		Collection<KeywordLibrary> libs = libnamesMap.values();
+		ArrayList<KeywordLibrary> libs = new ArrayList<>(); 
+		libs.addAll(libnamesMap.values());
+		
+		if (LibraryLoader.getInstance().hasDefaultLibraries()) {
+			libs.addAll(Arrays.asList(LibraryLoader.getInstance().getDefaultLibraries()));
+		}
 
 		int indexOfDot = strKeyword.indexOf(".");
 		String libName = "";
@@ -238,13 +244,11 @@ public class TestExecuter {
 				throw ExceptionHandler.LibraryNameIsInvalid(name);
 			}
 
-			KeywordLibrary library = LibraryLoader.loadLibrary(path);
+			KeywordLibrary library = LibraryLoader.getInstance().loadLibrary(path);
 
 			libnamesMap.put(name, library);
 		}
 
-		KeywordLibrary lib = LibraryLoader.loadLibrary("D:/CompareKeywordLibrary.jar");
-		libnamesMap.put("Assert", lib);
 	}
 
 }

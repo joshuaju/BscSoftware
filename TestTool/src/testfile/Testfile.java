@@ -16,11 +16,11 @@ public class Testfile {
 	private ArrayList<String> setupLines;
 	private ArrayList<String> testLines;
 	private ArrayList<String> teardownLines;
-	
+
 	private ArrayList<Integer> setupLineNumber;
 	private ArrayList<Integer> testLineNumber;
 	private ArrayList<Integer> teardownLineNumber;
-	
+
 	public static final String TAG_FIRST_CHAR = "[";
 	public static final String TAG_AUTHOR = "[AUTHOR]";
 	public static final String TAG_TESTNAME = "[TESTNAME]";
@@ -32,7 +32,7 @@ public class Testfile {
 	public static final String TAG_COMMENT = "#";
 
 	private static final String REGEX_KEYWORD_LINE_VALID = "[\\d \\w \\s \" = \\{ \\} , \\. ß äöü ÄÖÜ]*";
-	
+
 	Testfile() {
 		author = "";
 		testname = "";
@@ -103,12 +103,14 @@ public class Testfile {
 		return libPaths.size() > 0;
 	}
 
+	// TODO Line-Objekt zurückgeben: {String line, int linenumber }, damit das
+	// Protokoll besser wird
 	public String[] getSetupLines() {
 		return setupLines.toArray(new String[0]);
 	}
 
-	void addSetupLine(String line, int lineNumber) throws TestfileSyntaxException {		
-		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)){
+	void addSetupLine(String line, int lineNumber) throws TestfileSyntaxException {
+		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)) {
 			throw new TestfileSyntaxException("Ungültiges Zeichen");
 		}
 		setupLines.add(line);
@@ -132,7 +134,7 @@ public class Testfile {
 	}
 
 	void addTestLine(String line, int lineNumber) throws TestfileSyntaxException {
-		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)){
+		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)) {
 			throw new TestfileSyntaxException("Ungültiges Zeichen");
 		}
 		testLines.add(line);
@@ -156,7 +158,7 @@ public class Testfile {
 	}
 
 	void addTeardownLine(String line, int lineNumber) throws TestfileSyntaxException {
-		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)){
+		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)) {
 			throw new TestfileSyntaxException("Ungültiges Zeichen");
 		}
 		teardownLines.add(line);
@@ -166,7 +168,7 @@ public class Testfile {
 	public boolean hasTeardownLines() {
 		return teardownLines.size() > 0;
 	}
-	
+
 	public Integer getTeardownLineNumber(int index) {
 		return teardownLineNumber.get(index);
 	}
@@ -175,36 +177,36 @@ public class Testfile {
 		this.teardownLineNumber.add(number);
 	}
 
-	public String toString(){
+	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		
+
 		builder.append(TAG_AUTHOR + "\t" + getAuthor() + "\n");
 		builder.append(TAG_TESTNAME + "\t" + getTestname() + "\n");
 		builder.append(TAG_DESCRIPTION + "\t" + getDescription() + "\n");
-		
-		if (hasLibraryPaths()){
-			for (String path: libPaths){
+
+		if (hasLibraryPaths()) {
+			for (String path : libPaths) {
 				builder.append(TAG_LIBRARY + "\t" + path + "\n");
 			}
 		}
-		
-		if (hasSetupLines()){
+
+		if (hasSetupLines()) {
 			builder.append(TAG_SETUP + "\n");
-			for (String line: setupLines){
+			for (String line : setupLines) {
 				builder.append("\t" + line + "\n");
 			}
 		}
-		
-		if (hasTestLines()){
+
+		if (hasTestLines()) {
 			builder.append(TAG_TEST + "\n");
-			for (String line: testLines){
+			for (String line : testLines) {
 				builder.append("\t" + line + "\n");
 			}
 		}
-		
-		if (hasTeardownLines()){
+
+		if (hasTeardownLines()) {
 			builder.append(TAG_TEARDOWN + "\n");
-			for (String line: teardownLines){
+			for (String line : teardownLines) {
 				builder.append("\t" + line + "\n");
 			}
 		}

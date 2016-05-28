@@ -2,6 +2,7 @@ package exceptions;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class ExceptionHandler {
 
@@ -72,7 +73,7 @@ public class ExceptionHandler {
 		return new KeywordLibraryException("Die Klasse ist keine gültige Bibliothek: " + name);
 	}
 
-	public static KeywordLibraryException NoDefaultContrucotr(String name) {
+	public static KeywordLibraryException NoDefaultContructor(String name) {
 		return new KeywordLibraryException("Die Bibliothek hat keinen Default-Konstruktor: " + name);
 	}
 
@@ -104,5 +105,13 @@ public class ExceptionHandler {
 	public static TestfileException VariableIsNull(String varname){
 		return new TestfileException("Die angeforderte Variable wurde nie initialisiert: " +  varname);
 	}
-
+	
+	public static IOException ProcessJarFileException(File file){
+		return new IOException("Beim verarbeiten des Jar-Verzeichnis ist ein fehler aufgetreten: " + file.getAbsolutePath());
+	}
+	
+	public static ClassNotFoundException ClassNotInJarFile(File file, String classname){
+		return new ClassNotFoundException("Die Klasse wurde nicht im Jar-Verzeichnis gefunen: " + file.getName() + ": " + classname);
+	}
+	
 }

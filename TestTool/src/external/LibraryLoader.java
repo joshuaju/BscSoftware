@@ -1,5 +1,6 @@
 package external;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -7,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -14,46 +16,221 @@ import java.util.jar.JarFile;
 import exceptions.ExceptionHandler;
 import exceptions.KeywordLibraryException;
 
-public class LibraryLoader {
-	
+public class LibraryLoader implements Closeable {
+
+	private static LibraryLoader instance = null;
+
 	/**
-	 * Läd eine KeywordLibrary aus dem angegebenen Jar-Verzeichnis. Der
-	 * Dateiname entspricht dem Namen des Jar-Verzeichnisses
+	 * Gibt die aktuelle Instanz der Klasse zurück, oder erzeugt eine neue.
 	 * 
-	 * @param path
-	 *            Pfad zur Jar-Datei
-	 * @return Bibliothek
-	 * @throws ClassNotFoundException
-	 * @throws KeywordLibraryException
-	 * @throws IOException
+	 * @return
 	 */
-	public static KeywordLibrary loadLibrary(String path)
-			throws ClassNotFoundException, KeywordLibraryException, IOException {
-		File file = new File(path);
-		String name = file.getName();
-		name = name.substring(0, name.lastIndexOf('.'));		
-		return loadLibrary(path, name);
+	public static LibraryLoader getInstance() {
+		if (instance == null) {
+			instance = new LibraryLoader();
+		}
+		return instance;
 	}
 
 	/**
-	 * Läd eine KeywordLibrary aus dem angegebenen Jar-Verzeichnis mit dem
-	 * angegeben vollständigen Klassennamen.
+	 * Erzeugt eine neue Instanz nachdem die alte (falls vorhanden) beendet
+	 * wurde.
+	 * 
+	 * @return
+	 */
+	public static LibraryLoader getNewInstance() {
+		if (instance != null) {
+			try {
+				instance.close();
+			} catch (IOException e) {
+			} finally {
+				instance = null;
+			}
+		}
+		instance = new LibraryLoader();
+		return instance;
+	}
+
+	/**
+	 * Beendet eine alte Instanz (falls vorhanden) und erstellt eine neue mit
+	 * dem angegebenen Verzeichnispfad. In dem Verzeichnispfad liegen alle 
+	 * referenzierten Klassen und standard Bibliotheken.
+	 * 
+	 * @param loadDir
+	 *            Ordner der geladen wird
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws KeywordLibraryException
+	 */
+	public static LibraryLoader getInstance(String loadDir)
+			throws ClassNotFoundException, IOException, KeywordLibraryException {
+		if (instance != null) {
+			try {
+				instance.close();
+			} catch (IOException e) {
+			} finally {
+				instance = null;
+			}
+		}
+		instance = new LibraryLoader(loadDir);
+		return instance;
+	}
+
+	/**
+	 * Standard Classloader, hier werden StandardBibliotheken und referenzierte
+	 * Klassen reingeladen
+	 */
+	private final URLClassLoader defaultLoader;
+
+	private final ArrayList<KeywordLibrary> defaultLibraries;
+
+	/**
+	 * Erzeugt eine neue Instanz ohne einen URLClassloader
+	 */
+	private LibraryLoader() {
+		defaultLibraries = new ArrayList<>();
+		defaultLoader = null;		
+	}
+
+	/**
+	 * Erzeugt eine neue Instanz mit einem URLClassloader
+	 * 
+	 * @param loadDir
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws KeywordLibraryException
+	 */
+	private LibraryLoader(String loadDir) throws ClassNotFoundException, IOException, KeywordLibraryException {
+		defaultLibraries = new ArrayList<>();
+		defaultLoader = initDefaultLoader(loadDir);		
+	}
+
+	/**
+	 * Überprüft, ob in den standardmäßig geladenen Klassen eine Bibliothek
+	 * entdeckt und gespeichert wurde
+	 * 
+	 * @return
+	 */
+	public boolean hasDefaultLibraries() {
+		if (defaultLibraries == null) {
+			return false;
+		}
+		return defaultLibraries.size() > 0;
+	}
+
+	/**
+	 * Gibt die Standard Bibliotheken zurück
+	 * @return
+	 */
+	public KeywordLibrary[] getDefaultLibraries() {
+		return defaultLibraries.toArray(new KeywordLibrary[0]);
+	}
+
+	/**
+	 * Erstellt einen URLClassloader mit allen Jar Dateien aus den angegebenen
+	 * Verzeichnispfad. Alle Klassen der Jar Dateien werden in den ClassLoader
+	 * geladen.
+	 * 
+	 * @param loadDir
+	 *            Ordner der vollständig geladen wird
+	 * @return ClassLoader mit allen Klassen aller JarVerzeichnisse
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws KeywordLibraryException
+	 */
+	private URLClassLoader initDefaultLoader(String loadDir)
+			throws ClassNotFoundException, IOException, KeywordLibraryException {
+		File dir = new File(loadDir);
+		if (!dir.exists()) {
+			throw ExceptionHandler.DirectoryNotFound(dir);
+		}
+		if (!dir.isDirectory()) {
+			throw ExceptionHandler.DirectoryIsFile(dir);
+		}
+
+		File[] dirFiles = dir.listFiles((fileDir, name) -> name.endsWith(".jar"));
+		URL[] urls = makeURLArray(dirFiles);
+
+		URLClassLoader loader = new URLClassLoader(urls);
+		for (File tmpFile : dirFiles) {
+			try {
+				JarFile jar = new JarFile(tmpFile);
+				loadAllClasses(jar, loader, true);
+			} catch (IOException e) {
+				throw ExceptionHandler.ProcessJarFileException(tmpFile);
+			} catch (ClassNotFoundException e) {
+				throw ExceptionHandler.ClassNotInJarFile(tmpFile, e.getMessage());
+			}
+		}
+		return loader;
+	}
+
+	/**
+	 * Erzeugt ein URL-Array aus den angegeben Dateien
+	 * 
+	 * @param files
+	 * @return
+	 * @throws MalformedURLException
+	 */
+	private URL[] makeURLArray(File... files) throws MalformedURLException {
+		URL[] urls = new URL[files.length];
+		for (int i = 0; i < files.length; i++) {
+			urls[i] = files[i].toURI().toURL();
+		}
+		return urls;
+	}
+
+	/**
+	 * Läd alle Klassen der angegeben JarFile in den URLClassloader. Die URL zur
+	 * JarFile muss beim erzeugen des URLClassLoaders mit angegeben werden.
+	 * 
+	 * @param jar
+	 *            Jar Verzeichnis
+	 * @param loader
+	 * @param addToDefault Gibt an, ob Bibliotheken aus dem verzeichnis in den standard Bibliotheken gespeichert werden soll.
+	 * @throws ClassNotFoundException
+	 * @throws KeywordLibraryException
+	 */
+	private void loadAllClasses(JarFile jar, URLClassLoader loader, boolean addToDefault)
+			throws ClassNotFoundException, KeywordLibraryException {
+		Enumeration<JarEntry> entries = jar.entries();
+		while (entries.hasMoreElements()) {
+			JarEntry tmpEntry = entries.nextElement();
+			String filename = tmpEntry.getName();
+			if (filename.endsWith(".class")) {
+				String classname = filename.replace("/", ".").substring(0, filename.length() - 6);
+				Class<?> tmpClass = loader.loadClass(classname);
+				if (addToDefault && tmpClass.isAnnotationPresent(annotations.KeywordLibrary.class)) {
+					KeywordLibrary keywordLib = createLibraryInstance(tmpClass);
+					defaultLibraries.add(keywordLib);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void close() throws IOException {
+		if (defaultLoader != null) {
+			defaultLoader.close();
+		}
+	}
+
+	/**
+	 * Läd eine KeywordLibrary aus dem angegebenen Jar-Verzeichnis-Pfad
 	 * 
 	 * @param path
-	 *            Pfad zur Jar-Datei
-	 * @param name
-	 *            Vollständiger Name (Bsp: 'DeviceLibrary', oder
-	 *            'example.DeviceLibrary' wenn die Klasse in einem paket ist
-	 * @return Bibliothek
+	 *            Pfad zum Jar-Verzeichnis
+	 * @return Instanz der Bibliothek
 	 * @throws ClassNotFoundException
-	 *             Die Klasse wurde nicht gefunden
-	 * @throws KeywordLibraryException
-	 *             Die Klasse ist keine gültige Bibliothek
+	 *             Die Klasse mit dem Namen des Jar-Verzeichnis wurde nicht in
+	 *             diesem gefunden
 	 * @throws IOException
-	 *             Die Jar-Datei wurde nicht gefunden
+	 *             Die Datei ist kein Jar-Verzeichnis, oder die URL ist ungültig
+	 * @throws KeywordLibraryException
+	 *             Die Klasse ist keine Bibliothek
 	 */
-	public static KeywordLibrary loadLibrary(String path, String name)
-			throws ClassNotFoundException, KeywordLibraryException, IOException {
+	public KeywordLibrary loadLibrary(String path) throws IOException, KeywordLibraryException, ClassNotFoundException {
 		File libFile = new File(path);
 
 		if (!libFile.exists()) {
@@ -64,74 +241,101 @@ public class LibraryLoader {
 			throw ExceptionHandler.FileIsDirectory(libFile);
 		}
 
-		URL[] urls = null;
-		try {
-			urls = new URL[] { libFile.toURI().toURL() };
-		} catch (MalformedURLException e) {
-			throw ExceptionHandler.FileNotFound(libFile);
+		if (!path.endsWith(".jar")) {
+			throw ExceptionHandler.LibraryPathIsInvalid(path);
 		}
 
-		ClassLoader systemClassLoader = URLClassLoader.getSystemClassLoader();				
-		URLClassLoader loader = URLClassLoader.newInstance(urls, systemClassLoader);
-		loadAllClassesFromJar(path, loader);
-		
-		
+		return loadLibrary(libFile);
+	}
+
+	/**
+	 * Läd eine KeywordLibrary aus dem angegebenen Jar-Verzeichnis
+	 * 
+	 * @param libFile
+	 *            Datei
+	 * @return Instanz der Bibliothek
+	 * @throws ClassNotFoundException
+	 *             Die Klasse mit dem Namen des Jar-Verzeichnis wurde nicht in
+	 *             diesem gefunden
+	 * @throws IOException
+	 *             Die Datei ist kein Jar-Verzeichnis, oder die URL ist ungültig
+	 * @throws KeywordLibraryException
+	 *             Die Klasse ist keine Bibliothek
+	 */
+	private KeywordLibrary loadLibrary(File libFile)
+			throws ClassNotFoundException, IOException, KeywordLibraryException {
+		JarFile jarFile = new JarFile(libFile);
+
+		URL[] urls = makeURLArray(libFile);
+		URLClassLoader loader = new URLClassLoader(urls, defaultLoader);
+
+		loadAllClasses(jarFile, loader, false);
+
+		String libClassName = getLibraryNameFromFile(libFile);
+
+		return createLibraryInstance(libClassName, loader);
+	}
+
+	/**
+	 * Erzeugt eine KeywordLibrary anhand des Namens der Klasse und einem
+	 * ClassLoader
+	 * 
+	 * @param libClassName
+	 *            Name der Bibliotheksklasse
+	 * @param loader
+	 *            Loader, der die Klasse kennt
+	 * @return Instanz der Library
+	 * @throws ClassNotFoundException
+	 *             Die Klasse befinet sich nicht im ClassLoader
+	 * @throws KeywordLibraryException
+	 *             Die Klasse ist keine Bibliothek
+	 */
+	private KeywordLibrary createLibraryInstance(String libClassName, ClassLoader loader)
+			throws ClassNotFoundException, KeywordLibraryException {
+
 		Class<?> libClass = null;
 		try {
-			libClass = loader.loadClass(name);
+			libClass = loader.loadClass(libClassName);
 		} catch (ClassNotFoundException e) {
-			throw ExceptionHandler.ClassnameNotInClassLoader(name);
-		} finally {
-			loader.close();
+			throw ExceptionHandler.ClassnameNotInClassLoader(libClassName);
 		}
 
-		return loadLibrary(name, libClass);
+		return createLibraryInstance(libClass);
 	}
 
-	private static void loadAllClassesFromJar(String path, URLClassLoader loader) throws IOException, ClassNotFoundException{
-		JarFile jar = new JarFile(path);
-		Enumeration<JarEntry> entries = jar.entries();
-		while (entries.hasMoreElements()){
-			JarEntry tmpEntry = entries.nextElement();
-			String filename = tmpEntry.getName();
-			if (filename.endsWith(".class")){							
-				String classname = filename.replace("/", ".").substring(0, filename.length()-6);
-				loader.loadClass(classname);
-			}			
+	private KeywordLibrary createLibraryInstance(Class<?> libClass) throws KeywordLibraryException {
+		String libClassName = libClass.getName();
+		if (!libClass.isAnnotationPresent(annotations.KeywordLibrary.class)) {
+			throw ExceptionHandler.ClassIsNotAKeywordLibrary(libClassName);
 		}
-	}
-	
-	/**
-	 * Läd eine KeywordLibrary aus der angegebenen Klasse mit dem
-	 * angegeben vollständigen Klassennamen.
-	 * 
-	 * @param libClass
-	 *            Klasse der Bibliothek
-	 * @param name
-	 *            Vollständiger Name (Bsp: 'DeviceLibrary', oder
-	 *            'example.DeviceLibrary' wenn die Klasse in einem paket ist
-	 * @return Bibliothek
-	 * @throws ClassNotFoundException
-	 *             Die Klasse wurde nicht gefunden
-	 * @throws KeywordLibraryException
-	 *             Die Klasse ist keine gültige Bibliothek
-	 * @throws IOException
-	 *             Die Jar-Datei wurde nicht gefunden
-	 */
-	public static KeywordLibrary loadLibrary(String name, Class<?> libClass) throws KeywordLibraryException {
-		Constructor<?> klConstr = null;
+
+		Constructor<?> libConstructor = null;
+		try {
+			libConstructor = libClass.getConstructor();
+		} catch (NoSuchMethodException | SecurityException e) {
+			throw ExceptionHandler.NoDefaultContructor(libClassName);
+		}
+
 		Object libInstance = null;
 		try {
-			klConstr = libClass.getConstructor();
-			libInstance = klConstr.newInstance();
-		} catch (NoSuchMethodException | SecurityException e) {
-			throw ExceptionHandler.NoDefaultContrucotr(name);
+			libInstance = libConstructor.newInstance();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
+			throw ExceptionHandler.CouldNotInstantiate(libClassName);
 		}
-
-		KeywordLibrary lib = new KeywordLibrary(name, libInstance);
-
-		return lib;
+		return new KeywordLibrary(libClassName, libInstance);
 	}
+
+	/**
+	 * Der Name einer Bibliotheksklasse entspricht dem Namen des Jar
+	 * Verzeichnisses
+	 * 
+	 * @param file
+	 * @return
+	 */
+	private String getLibraryNameFromFile(File file) {
+		String libname = file.getName();
+		return libname.substring(0, libname.lastIndexOf('.'));
+	}
+
 }
