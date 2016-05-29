@@ -13,8 +13,8 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import exceptions.ExceptionHandler;
-import exceptions.KeywordLibraryException;
+import exceptions.keywordlibrary.KeywordLibraryException;
+import exceptions.keywordlibrary.KeywordLibraryExceptionHandler;
 
 public class LibraryLoader implements Closeable {
 
@@ -53,7 +53,7 @@ public class LibraryLoader implements Closeable {
 
 	/**
 	 * Beendet eine alte Instanz (falls vorhanden) und erstellt eine neue mit
-	 * dem angegebenen Verzeichnispfad. In dem Verzeichnispfad liegen alle 
+	 * dem angegebenen Verzeichnispfad. In dem Verzeichnispfad liegen alle
 	 * referenzierten Klassen und standard Bibliotheken.
 	 * 
 	 * @param loadDir
@@ -90,7 +90,7 @@ public class LibraryLoader implements Closeable {
 	 */
 	private LibraryLoader() {
 		defaultLibraries = new ArrayList<>();
-		defaultLoader = null;		
+		defaultLoader = null;
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class LibraryLoader implements Closeable {
 	 */
 	private LibraryLoader(String loadDir) throws ClassNotFoundException, IOException, KeywordLibraryException {
 		defaultLibraries = new ArrayList<>();
-		defaultLoader = initDefaultLoader(loadDir);		
+		defaultLoader = initDefaultLoader(loadDir);
 	}
 
 	/**
@@ -121,6 +121,7 @@ public class LibraryLoader implements Closeable {
 
 	/**
 	 * Gibt die Standard Bibliotheken zurück
+	 * 
 	 * @return
 	 */
 	public KeywordLibrary[] getDefaultLibraries() {
@@ -142,11 +143,8 @@ public class LibraryLoader implements Closeable {
 	private URLClassLoader initDefaultLoader(String loadDir)
 			throws ClassNotFoundException, IOException, KeywordLibraryException {
 		File dir = new File(loadDir);
-		if (!dir.exists()) {
-			throw ExceptionHandler.DirectoryNotFound(dir);
-		}
-		if (!dir.isDirectory()) {
-			throw ExceptionHandler.DirectoryIsFile(dir);
+		if (!dir.exists() || !dir.isDirectory()) {
+			throw KeywordLibraryExceptionHandler.NoSuchDirectory(dir);
 		}
 
 		File[] dirFiles = dir.listFiles((fileDir, name) -> name.endsWith(".jar"));
@@ -158,9 +156,7 @@ public class LibraryLoader implements Closeable {
 				JarFile jar = new JarFile(tmpFile);
 				loadAllClasses(jar, loader, true);
 			} catch (IOException e) {
-				throw ExceptionHandler.ProcessJarFileException(tmpFile);
-			} catch (ClassNotFoundException e) {
-				throw ExceptionHandler.ClassNotInJarFile(tmpFile, e.getMessage());
+				throw KeywordLibraryExceptionHandler.JarFileProcessing(tmpFile, e);
 			}
 		}
 		return loader;
@@ -188,19 +184,25 @@ public class LibraryLoader implements Closeable {
 	 * @param jar
 	 *            Jar Verzeichnis
 	 * @param loader
-	 * @param addToDefault Gibt an, ob Bibliotheken aus dem verzeichnis in den standard Bibliotheken gespeichert werden soll.
-	 * @throws ClassNotFoundException
+	 * @param addToDefault
+	 *            Gibt an, ob Bibliotheken aus dem verzeichnis in den standard
+	 *            Bibliotheken gespeichert werden soll.
 	 * @throws KeywordLibraryException
 	 */
 	private void loadAllClasses(JarFile jar, URLClassLoader loader, boolean addToDefault)
-			throws ClassNotFoundException, KeywordLibraryException {
+			throws KeywordLibraryException {
 		Enumeration<JarEntry> entries = jar.entries();
 		while (entries.hasMoreElements()) {
 			JarEntry tmpEntry = entries.nextElement();
 			String filename = tmpEntry.getName();
 			if (filename.endsWith(".class")) {
 				String classname = filename.replace("/", ".").substring(0, filename.length() - 6);
-				Class<?> tmpClass = loader.loadClass(classname);
+				Class<?> tmpClass = null;
+				try {
+					tmpClass = loader.loadClass(classname);
+				} catch (ClassNotFoundException e) {
+					throw KeywordLibraryExceptionHandler.NoSuchClassInJarfile(classname, e);
+				}
 				if (addToDefault && tmpClass.isAnnotationPresent(annotations.KeywordLibrary.class)) {
 					KeywordLibrary keywordLib = createLibraryInstance(tmpClass);
 					defaultLibraries.add(keywordLib);
@@ -230,21 +232,16 @@ public class LibraryLoader implements Closeable {
 	 * @throws KeywordLibraryException
 	 *             Die Klasse ist keine Bibliothek
 	 */
-	public KeywordLibrary loadLibrary(String path) throws IOException, KeywordLibraryException, ClassNotFoundException {
+	public KeywordLibrary loadLibrary(String path) throws ClassNotFoundException, IOException, KeywordLibraryException {
 		File libFile = new File(path);
 
-		if (!libFile.exists()) {
-			throw ExceptionHandler.FileNotFound(libFile);
-		}
-
-		if (!libFile.isFile()) {
-			throw ExceptionHandler.FileIsDirectory(libFile);
+		if (!libFile.exists() || !libFile.isFile()) {
+			throw KeywordLibraryExceptionHandler.NoSuchFile(libFile);
 		}
 
 		if (!path.endsWith(".jar")) {
-			throw ExceptionHandler.LibraryPathIsInvalid(path);
+			throw KeywordLibraryExceptionHandler.NoSuchJarFile(libFile);
 		}
-
 		return loadLibrary(libFile);
 	}
 
@@ -271,17 +268,15 @@ public class LibraryLoader implements Closeable {
 
 		loadAllClasses(jarFile, loader, false);
 
-		String libClassName = getLibraryNameFromFile(libFile);
-
-		return createLibraryInstance(libClassName, loader);
+		return createLibraryInstance(libFile, loader);
 	}
 
 	/**
 	 * Erzeugt eine KeywordLibrary anhand des Namens der Klasse und einem
 	 * ClassLoader
 	 * 
-	 * @param libClassName
-	 *            Name der Bibliotheksklasse
+	 * @param libFile
+	 *            Datei des Jar-Verzeichnis der Bibliothek
 	 * @param loader
 	 *            Loader, der die Klasse kennt
 	 * @return Instanz der Library
@@ -290,14 +285,14 @@ public class LibraryLoader implements Closeable {
 	 * @throws KeywordLibraryException
 	 *             Die Klasse ist keine Bibliothek
 	 */
-	private KeywordLibrary createLibraryInstance(String libClassName, ClassLoader loader)
+	private KeywordLibrary createLibraryInstance(File libFile, ClassLoader loader)
 			throws ClassNotFoundException, KeywordLibraryException {
-
+		String libClassName = getLibraryNameFromFile(libFile);
 		Class<?> libClass = null;
 		try {
 			libClass = loader.loadClass(libClassName);
 		} catch (ClassNotFoundException e) {
-			throw ExceptionHandler.ClassnameNotInClassLoader(libClassName);
+			throw KeywordLibraryExceptionHandler.NoSuchClassInJarfile(libClassName, e);
 		}
 
 		return createLibraryInstance(libClass);
@@ -306,14 +301,14 @@ public class LibraryLoader implements Closeable {
 	private KeywordLibrary createLibraryInstance(Class<?> libClass) throws KeywordLibraryException {
 		String libClassName = libClass.getName();
 		if (!libClass.isAnnotationPresent(annotations.KeywordLibrary.class)) {
-			throw ExceptionHandler.ClassIsNotAKeywordLibrary(libClassName);
+			throw KeywordLibraryExceptionHandler.ClassIsNotAKeywordLibrary(libClass);
 		}
 
 		Constructor<?> libConstructor = null;
 		try {
 			libConstructor = libClass.getConstructor();
 		} catch (NoSuchMethodException | SecurityException e) {
-			throw ExceptionHandler.NoDefaultContructor(libClassName);
+			throw KeywordLibraryExceptionHandler.NoDefaultConstructor(libClass);
 		}
 
 		Object libInstance = null;
@@ -321,8 +316,9 @@ public class LibraryLoader implements Closeable {
 			libInstance = libConstructor.newInstance();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
-			throw ExceptionHandler.CouldNotInstantiate(libClassName);
+			throw KeywordLibraryExceptionHandler.CouldNotInstantiate(libClass, e);
 		}
+
 		return new KeywordLibrary(libClassName, libInstance);
 	}
 

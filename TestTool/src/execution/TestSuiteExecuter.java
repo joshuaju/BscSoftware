@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import exceptions.ExceptionHandler;
+import exceptions.testfile.TestfileExceptionHandler;
 
 public class TestSuiteExecuter {
 
@@ -21,14 +21,16 @@ public class TestSuiteExecuter {
 		this.paths.addAll(Arrays.asList(paths));
 	}
 	
+	/**
+	 * Fügt alle Testdateien mit der Dateiendung '*.tst' aus dem Verzeichnis hinzu
+	 * @param path
+	 * @throws FileNotFoundException
+	 */
 	public void addDirectory(String path) throws FileNotFoundException{
 		File dir = new File(path);
-		if (!dir.exists()){
-			throw ExceptionHandler.DirectoryNotFound(dir);
-		}
-		if (!dir.isDirectory()){
-			throw ExceptionHandler.DirectoryIsFile(dir);
-		}
+		if (!dir.exists() || !dir.isDirectory()){
+			throw TestfileExceptionHandler.NoSuchDirectory(dir);			
+		}		
 		
 		File[] files = dir.listFiles((currDir, currFile) -> currFile.endsWith(".tst"));
 		ArrayList<String> filePaths = new ArrayList<>();

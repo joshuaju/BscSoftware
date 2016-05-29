@@ -1,4 +1,4 @@
-package exceptions;
+package exceptions.testfile;
 
 import java.io.IOException;
 
@@ -12,6 +12,10 @@ public class TestfileException extends IOException{
 	
 	public TestfileException(String msg){
 		super(msg);
+	}
+	
+	public TestfileException(String msg, Exception cause){
+		super(msg, cause);
 	}
 	
 }

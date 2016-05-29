@@ -1,20 +1,21 @@
 package execution;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import exceptions.ExceptionHandler;
-import exceptions.KeywordLibraryException;
-import exceptions.TestfileException;
+import exceptions.keywordlibrary.KeywordException;
+import exceptions.keywordlibrary.KeywordLibraryException;
+import exceptions.testfile.TestfileException;
+import exceptions.testfile.TestfileExceptionHandler;
 import external.Keyword;
 import external.KeywordLibrary;
 import external.LibraryLoader;
 import testfile.Testfile;
 import testfile.TestfileReader;
+import testfile.Testline;
 
 public class TestExecuter {
 
@@ -39,28 +40,27 @@ public class TestExecuter {
 			return new TestProtocol(false, "-", path, e.getMessage());
 		}
 
-		// TODO zeile in fehlerprotokoll aufgenommen. überprüfen!!!
 		try {
 			loadLibraries(testfile);
-		} catch (AssertionError | ClassNotFoundException | KeywordLibraryException | IOException e) {
+		} catch (ClassNotFoundException | IOException | KeywordLibraryException e) {
 			return createProtocol(testfile, false, e.getMessage());
 		}
+	
 		try {
 			execute(testfile.getSetupLines());
-		} catch (AssertionError | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| IOException e) {
+		} catch (TestfileException | KeywordException | AssertionError e) {
 			return createProtocol(testfile, false, "Setup: " + e.getMessage());
-		}
+		}	
+	
 		try {
 			execute(testfile.getTestLines());
-		} catch (AssertionError | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| IOException e) {
+		} catch (TestfileException | KeywordException | AssertionError e) {
 			return createProtocol(testfile, false, "Test: " + e.getMessage());
 		}
+		
 		try {
 			execute(testfile.getTeardownLines());
-		} catch (AssertionError | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| IOException e) {
+		} catch (TestfileException | KeywordException | AssertionError e) {
 			return createProtocol(testfile, false, "Teardown: " + e.getMessage());
 		}
 
@@ -71,16 +71,23 @@ public class TestExecuter {
 		return new TestProtocol(passed, testfile.getTestname(), testfile.getPath(), message);
 	}
 
-	private void execute(String[] lines)
-			throws IOException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	private void execute(Testline[] lines) throws TestfileException, KeywordException, AssertionError {
 		for (int i = 0; i < lines.length; i++) {
-			String line = lines[i];
-			executeLine(line);
+			Testline line = lines[i];			
+			try {
+				executeLine(line.text);
+			} catch (TestfileException e) {
+				throw new TestfileException("Zeile " + line.number + ": " + e.getMessage(), e);
+			} catch (KeywordException e) {
+				throw new KeywordException("Zeile " + line.number + ": " + e.getMessage(), e);
+			} catch (AssertionError e) {
+				throw new AssertionError("Zeile " + line.number + ": " + e.getMessage(), e);
+			}
 		}
 	}
 
-	private Object executeLine(String line)
-			throws IOException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	private Object executeLine(String line) throws TestfileException, KeywordException, AssertionError
+		{
 		if (line.contains("=")) {
 			return assignVariableLine(line);
 		} else {
@@ -88,8 +95,8 @@ public class TestExecuter {
 		}
 	}
 
-	private Object assignVariableLine(String line)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
+	private Object assignVariableLine(String line) throws TestfileException, KeywordException, AssertionError
+			{
 		int equalsIndex = line.indexOf("=");
 		String strVar = line.substring(0, equalsIndex).trim().replaceAll("[{}]", "");
 
@@ -109,10 +116,10 @@ public class TestExecuter {
 		return assignVal;
 	}
 
-	private Object retrieveVariable(String var) {
+	private Object retrieveVariable(String var) throws TestfileException {
 		Object result = variablesMap.getOrDefault(var, null);
 		if (result == null) {
-
+			throw TestfileExceptionHandler.VariableIsNull(var);
 		}
 		return result;
 	}
@@ -123,13 +130,11 @@ public class TestExecuter {
 	 * @param line
 	 *            Zeile
 	 * @return Rückgabewert des Keywords
-	 * @throws IOException
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws InvocationTargetException
+	 * @throws TestfileException 
+	 * @throws AssertionError 
+	 * @throws KeywordException 
 	 */
-	private Object executeKeywordLine(String line)
-			throws IOException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	private Object executeKeywordLine(String line) throws TestfileException, KeywordException, AssertionError {
 		int firstArg = line.indexOf("\"");
 		int firstVar = line.indexOf("{");
 		int first;
@@ -178,7 +183,7 @@ public class TestExecuter {
 			strKeyword = strKeyword.substring(indexOfDot + 1);
 			KeywordLibrary lib = libnamesMap.getOrDefault(libName, null);
 			if (lib == null) {
-				throw ExceptionHandler.NoSuchLibrary(libName);
+				throw TestfileExceptionHandler.NoLibraryForThisName(libName);				
 			}
 			libs = new ArrayList<>();
 			libs.add(lib);
@@ -191,17 +196,17 @@ public class TestExecuter {
 				if (keyword == null) {
 					keyword = tmpKeyword;
 				} else {
-					throw ExceptionHandler.DuplicateKeyword(strKeyword);
+					throw TestfileExceptionHandler.DuplicatedKeyword(tmpKeyword);
 				}
 			}
 		}
 		if (keyword == null) {
-			throw ExceptionHandler.NoSuchKeyword(strKeyword, libName);
+			throw TestfileExceptionHandler.NoSuchKeywordInLibrary(strKeyword, libName);
 		}
 		return keyword;
 	}
 
-	private Object[] getParameters(String parameterLine) throws IOException {
+	private Object[] getParameters(String parameterLine) throws TestfileException {
 		if (parameterLine.length() == 0) {
 			return new Object[0];
 		}
@@ -216,7 +221,7 @@ public class TestExecuter {
 			} else if (strPar.startsWith("\"")) {
 				strPar = strPar.replace("\"", "");
 			} else {
-				throw ExceptionHandler.InvalidParameter(strPar);
+				throw TestfileExceptionHandler.InvalidParameter(strPar);
 			}
 			res[i] = strPar;
 		}
@@ -227,7 +232,7 @@ public class TestExecuter {
 		return TestfileReader.read(path);
 	}
 
-	private void loadLibraries(Testfile testfile) throws KeywordLibraryException, ClassNotFoundException, IOException {
+	private void loadLibraries(Testfile testfile) throws ClassNotFoundException, IOException, KeywordLibraryException {
 		String[] libLines = testfile.getLibraryPaths();
 
 		for (String line : libLines) {
@@ -236,16 +241,16 @@ public class TestExecuter {
 			String name = split[1];
 
 			if (!Pattern.matches("\".*\"", path)) {
-				throw ExceptionHandler.LibraryPathIsInvalid(path);
+				throw TestfileExceptionHandler.InvalidParameter(path);
 			}
 			path = path.substring(1, path.length() - 1);
 
 			if (!Pattern.matches("[\\d \\w]*", name)) {
-				throw ExceptionHandler.LibraryNameIsInvalid(name);
+				throw TestfileExceptionHandler.InvalidParameter(name);
 			}
 
 			KeywordLibrary library = LibraryLoader.getInstance().loadLibrary(path);
-
+			
 			libnamesMap.put(name, library);
 		}
 

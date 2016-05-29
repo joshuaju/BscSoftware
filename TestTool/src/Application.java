@@ -12,7 +12,8 @@ public class Application {
 		
 		LibraryLoader.getInstance("D:/Bsc/default/");		
 		TestSuiteExecuter tsExe = new TestSuiteExecuter("Joshua Jungen");		
-		tsExe.addPath("testfiles/test.tst");
+		tsExe.addDirectory("testfiles/");
+//		tsExe.addPath("testfiles/test1.tst");
 		TestSuiteProtocol tsProtocol = tsExe.execute();
 		System.out.println(tsProtocol);
 		

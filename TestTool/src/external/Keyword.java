@@ -3,8 +3,9 @@ package external;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import exceptions.ExceptionHandler;
-import exceptions.KeywordLibraryException;
+import exceptions.keywordlibrary.KeywordException;
+import exceptions.keywordlibrary.KeywordExceptionHandler;
+import exceptions.keywordlibrary.KeywordLibraryException;
 
 /**
  * Diese Klasse repräsentiert ein Keyword
@@ -20,7 +21,7 @@ public class Keyword {
 
 	Keyword(Object libInstance, Method method) throws KeywordLibraryException {
 		if (!Keyword.isKeywordMethod(method)) {
-			throw ExceptionHandler.MethodIsNotAKeywordMethod(method.getClass().getName() + "." + method.getName());
+			throw KeywordExceptionHandler.MethodIsNotAKeyword(method);
 		}
 		this.annotation = method.getAnnotation(annotations.Keyword.class);
 		this.method = method;
@@ -84,14 +85,15 @@ public class Keyword {
 	 * @throws IllegalAccessException Fehler bei der Reflexion 
 	 * @throws IllegalArgumentException	Die Übergabeparameter sind nicht gültig
 	 * @throws AssertionError Exception die bei vergleichenden Methoden auftritt.
+	 * @throws KeywordException Zu viele oder falsche Übergabeparameter
 	 */
 	public Object invoke(Object... args)
-			throws IllegalAccessException, IllegalArgumentException, AssertionError {
+			throws AssertionError, KeywordException {
 
 		Class<?>[] argClasses = getParameterTypes();
 
 		if (argClasses.length != args.length) {
-			throw ExceptionHandler.TooManyArguments(getName());
+			throw KeywordExceptionHandler.TooManyArguments(this);
 		}
 
 		for (int i = 0; i < getParameterTypes().length; i++) {
@@ -99,16 +101,22 @@ public class Keyword {
 			Object tmpArg = args[i];
 			tmpArg = parseArgument(tmpArgClass, tmpArg);
 			if (tmpArg == null) {
-				throw ExceptionHandler.WrongArgument(getName(), i, tmpArg);
+				throw KeywordExceptionHandler.WrongArgument(this, tmpArg, i);
 			}
 			args[i] = tmpArg;
 		}
 
 		try {
 			return method.invoke(libInstance, args);
+		} catch(IllegalAccessException e) {
+			// cannot happen
+			e.printStackTrace();
+		} catch(IllegalArgumentException e){
+			throw KeywordExceptionHandler.WrongArgument(this, null, -1);
 		} catch (InvocationTargetException e){
 			throw new AssertionError(e.getCause().getMessage());
-		}		
+		}
+		return null;
 	}
 
 	/**

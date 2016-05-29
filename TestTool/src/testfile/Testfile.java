@@ -2,9 +2,8 @@ package testfile;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
-import exceptions.TestfileSyntaxException;
+import exceptions.testfile.TestfileException;
 
 public class Testfile {
 	private String author;
@@ -13,13 +12,9 @@ public class Testfile {
 	private String path;
 
 	private ArrayList<String> libPaths;
-	private ArrayList<String> setupLines;
-	private ArrayList<String> testLines;
-	private ArrayList<String> teardownLines;
-
-	private ArrayList<Integer> setupLineNumber;
-	private ArrayList<Integer> testLineNumber;
-	private ArrayList<Integer> teardownLineNumber;
+	private ArrayList<Testline> setupLines;
+	private ArrayList<Testline> testLines;
+	private ArrayList<Testline> teardownLines;
 
 	public static final String TAG_FIRST_CHAR = "[";
 	public static final String TAG_AUTHOR = "[AUTHOR]";
@@ -31,8 +26,6 @@ public class Testfile {
 	public static final String TAG_TEARDOWN = "[TEARDOWN]";
 	public static final String TAG_COMMENT = "#";
 
-	private static final String REGEX_KEYWORD_LINE_VALID = "[\\d \\w \\s \" = \\{ \\} , \\. ß äöü ÄÖÜ]*";
-
 	Testfile() {
 		author = "";
 		testname = "";
@@ -42,9 +35,6 @@ public class Testfile {
 		setupLines = new ArrayList<>();
 		testLines = new ArrayList<>();
 		teardownLines = new ArrayList<>();
-		setupLineNumber = new ArrayList<>();
-		testLineNumber = new ArrayList<>();
-		teardownLineNumber = new ArrayList<>();
 	}
 
 	public String getPath() {
@@ -103,79 +93,45 @@ public class Testfile {
 		return libPaths.size() > 0;
 	}
 
-	// TODO Line-Objekt zurückgeben: {String line, int linenumber }, damit das
-	// Protokoll besser wird
-	public String[] getSetupLines() {
-		return setupLines.toArray(new String[0]);
+	public Testline[] getSetupLines() {
+		return setupLines.toArray(new Testline[0]);
 	}
 
-	void addSetupLine(String line, int lineNumber) throws TestfileSyntaxException {
-		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)) {
-			throw new TestfileSyntaxException("Ungültiges Zeichen");
-		}
-		setupLines.add(line);
-		addSetupLineNumber(lineNumber);
+	void addSetupLine(String line, int lineNumber) throws TestfileException {
+		Testline testline = new Testline(lineNumber, line);		
+		setupLines.add(testline);
 	}
 
 	public boolean hasSetupLines() {
 		return setupLines.size() > 0;
 	}
 
-	public Integer getSetupLineNumber(int index) {
-		return setupLineNumber.get(index);
+	public Testline[] getTestLines() {
+		return testLines.toArray(new Testline[0]);
 	}
 
-	private void addSetupLineNumber(int number) {
-		this.setupLineNumber.add(number);
-	}
-
-	public String[] getTestLines() {
-		return testLines.toArray(new String[0]);
-	}
-
-	void addTestLine(String line, int lineNumber) throws TestfileSyntaxException {
-		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)) {
-			throw new TestfileSyntaxException("Ungültiges Zeichen");
-		}
-		testLines.add(line);
-		addTestLineNumber(lineNumber);
+	void addTestLine(String line, int lineNumber) throws TestfileException {
+		Testline testline = new Testline(lineNumber, line);
+		testLines.add(testline);
 	}
 
 	public boolean hasTestLines() {
 		return testLines.size() > 0;
 	}
 
-	public Integer getTestLineNumber(int index) {
-		return testLineNumber.get(index);
+	public Testline[] getTeardownLines() {
+		return teardownLines.toArray(new Testline[0]);
 	}
 
-	private void addTestLineNumber(int number) {
-		this.testLineNumber.add(number);
-	}
+	void addTeardownLine(String line, int lineNumber) throws TestfileException {
+		Testline testline = new Testline(lineNumber, line);		
+		teardownLines.add(testline);
 
-	public String[] getTeardownLines() {
-		return teardownLines.toArray(new String[0]);
-	}
-
-	void addTeardownLine(String line, int lineNumber) throws TestfileSyntaxException {
-		if (!Pattern.matches(REGEX_KEYWORD_LINE_VALID, line)) {
-			throw new TestfileSyntaxException("Ungültiges Zeichen");
-		}
-		teardownLines.add(line);
-		addTeardownLineNumber(lineNumber);
 	}
 
 	public boolean hasTeardownLines() {
 		return teardownLines.size() > 0;
-	}
-
-	public Integer getTeardownLineNumber(int index) {
-		return teardownLineNumber.get(index);
-	}
-
-	private void addTeardownLineNumber(int number) {
-		this.teardownLineNumber.add(number);
-	}
+	}	
 
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -192,22 +148,22 @@ public class Testfile {
 
 		if (hasSetupLines()) {
 			builder.append(TAG_SETUP + "\n");
-			for (String line : setupLines) {
-				builder.append("\t" + line + "\n");
+			for (Testline line : setupLines) {
+				builder.append("\t" + line.text + "\n");
 			}
 		}
 
 		if (hasTestLines()) {
 			builder.append(TAG_TEST + "\n");
-			for (String line : testLines) {
-				builder.append("\t" + line + "\n");
+			for (Testline line : testLines) {
+				builder.append("\t" + line.text + "\n");
 			}
 		}
 
 		if (hasTeardownLines()) {
 			builder.append(TAG_TEARDOWN + "\n");
-			for (String line : teardownLines) {
-				builder.append("\t" + line + "\n");
+			for (Testline line : teardownLines) {
+				builder.append("\t" + line.text + "\n");
 			}
 		}
 		return builder.toString();

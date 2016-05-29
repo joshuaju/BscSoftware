@@ -1,4 +1,4 @@
-package exceptions;
+package exceptions.keywordlibrary;
 
 public class KeywordLibraryException extends Exception {
 
@@ -11,6 +11,11 @@ public class KeywordLibraryException extends Exception {
 	public KeywordLibraryException(String msg){
 		super(msg);
 	}
+	
+	public KeywordLibraryException(String msg, Exception cause){
+		super(msg, cause);
+	}
+	
 
 	
 }

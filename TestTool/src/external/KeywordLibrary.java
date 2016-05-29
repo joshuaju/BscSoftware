@@ -3,8 +3,8 @@ package external;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import exceptions.ExceptionHandler;
-import exceptions.KeywordLibraryException;
+import exceptions.keywordlibrary.KeywordLibraryException;
+import exceptions.keywordlibrary.KeywordLibraryExceptionHandler;
 
 public class KeywordLibrary {
 
@@ -33,7 +33,7 @@ public class KeywordLibrary {
 	private void initKeywordLibrary() throws KeywordLibraryException {
 		annotations.KeywordLibrary klAnnotation = thisclass.getAnnotation(annotations.KeywordLibrary.class);
 		if (klAnnotation == null) {
-			throw ExceptionHandler.ClassIsNotAKeywordLibrary(thisname);
+			throw KeywordLibraryExceptionHandler.ClassIsNotAKeywordLibrary(thisclass);
 		}
 		this.author = klAnnotation.Author();
 		this.description = klAnnotation.Description();			

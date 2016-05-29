@@ -8,13 +8,12 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-import exceptions.ExceptionHandler;
-import exceptions.TestfileContentException;
-import exceptions.TestfileException;
-import exceptions.TestfileSyntaxException;
+import exceptions.testfile.TestfileException;
+import exceptions.testfile.TestfileExceptionHandler;
 
 /**
  * Die Klasse ist verantwortlich für das einlesen von Testdateien.
+ * 
  * @author JJungen
  *
  */
@@ -29,7 +28,8 @@ public class TestfileReader {
 	}
 
 	/**
-	 * Liest eine Testdatei ein, unter beachtung der syntaktishen und inhaltlichen korrektheit. 
+	 * Liest eine Testdatei ein, unter beachtung der syntaktishen und
+	 * inhaltlichen korrektheit.
 	 * 
 	 * @param path
 	 *            Pfad der Testdatei
@@ -54,13 +54,21 @@ public class TestfileReader {
 	/**
 	 * Erzeugt eine neue Instanz der Klasse.
 	 * 
-	 * @param needsAuthor eingelesene Testfile benötigt einen Autoren
-	 * @param needsTestname eingelesene Testfile benötigt einen Testnamen
-	 * @param needsDescription eingelesene Testfile benötigt eine Beschreibung
-	 * @param needsLibraries eingelesene Testfile benötigt mindestens eine referenziert Bibliothek
-	 * @param needsSetup eingelesene Testfile benötigt eine Testaufbauphase
-	 * @param needsTest eingelesene Testfile benötigt eine Testphase
-	 * @param needsTeardown eingelesene Testfile benötigt eine Testabbauphase
+	 * @param needsAuthor
+	 *            eingelesene Testfile benötigt einen Autoren
+	 * @param needsTestname
+	 *            eingelesene Testfile benötigt einen Testnamen
+	 * @param needsDescription
+	 *            eingelesene Testfile benötigt eine Beschreibung
+	 * @param needsLibraries
+	 *            eingelesene Testfile benötigt mindestens eine referenziert
+	 *            Bibliothek
+	 * @param needsSetup
+	 *            eingelesene Testfile benötigt eine Testaufbauphase
+	 * @param needsTest
+	 *            eingelesene Testfile benötigt eine Testphase
+	 * @param needsTeardown
+	 *            eingelesene Testfile benötigt eine Testabbauphase
 	 */
 	private TestfileReader(boolean needsAuthor, boolean needsTestname, boolean needsDescription, boolean needsLibraries,
 			boolean needsSetup, boolean needsTest, boolean needsTeardown) {
@@ -72,14 +80,16 @@ public class TestfileReader {
 		NEEDS_TEST = needsTest;
 		NEEDS_TEARDOWN = needsTeardown;
 	}
-	
+
 	/**
-	 * Erzeugt eine neue Instanz. Die benötigten Inhalten von Testfiles werden auf Standardwerte gesetzt.
+	 * Erzeugt eine neue Instanz. Die benötigten Inhalten von Testfiles werden
+	 * auf Standardwerte gesetzt.
 	 */
 	private TestfileReader() {
 		NEEDS_AUTHOR = true;
 		NEEDS_TESTNAME = true;
-		NEEDS_DESCRIPTION = false;;
+		NEEDS_DESCRIPTION = false;
+		;
 		NEEDS_LIBRARIES = false;
 		NEEDS_SETUP = false;
 		NEEDS_TEST = true;
@@ -144,12 +154,7 @@ public class TestfileReader {
 					} else if (line.startsWith(Testfile.TAG_FIRST_CHAR)) {
 						break;
 					} else {
-						try {
-							testfile.addSetupLine(line, i+2);
-							System.out.println((i+2));
-						} catch (TestfileSyntaxException e) {
-							throw ExceptionHandler.InvalidCharacter(i + 2, line);
-						}
+						testfile.addSetupLine(line, i + 2);
 					}
 				}
 			} else if (line.startsWith(Testfile.TAG_TEST)) { // test
@@ -160,11 +165,7 @@ public class TestfileReader {
 					} else if (line.startsWith(Testfile.TAG_FIRST_CHAR)) {
 						break;
 					} else {
-						try {
-							testfile.addTestLine(line, i+2);
-						} catch (TestfileSyntaxException e) {
-							throw ExceptionHandler.InvalidCharacter(i + 1, line);
-						}
+						testfile.addTestLine(line, i + 2);
 					}
 				}
 			} else if (line.startsWith(Testfile.TAG_TEARDOWN)) { // teardown
@@ -175,15 +176,11 @@ public class TestfileReader {
 					} else if (line.startsWith(Testfile.TAG_FIRST_CHAR)) {
 						break;
 					} else {
-						try {
-							testfile.addTeardownLine(line, i+2);
-						} catch (TestfileSyntaxException e) {
-							throw ExceptionHandler.InvalidCharacter(i + 1, line);
-						}
+						testfile.addTeardownLine(line, i + 2);
 					}
 				}
 			} else {
-				throw ExceptionHandler.InvalidLine(i + 1, line);
+				throw TestfileExceptionHandler.InvalidLine(i + 2, line);
 			}
 		}
 
@@ -200,7 +197,7 @@ public class TestfileReader {
 	 *            Testfile die überprüft wird
 	 * @throws TestfileContentException
 	 */
-	private void checkTestfileContent(Testfile testfile) throws TestfileContentException {
+	private void checkTestfileContent(Testfile testfile) throws TestfileException {
 		ArrayList<String> errorMessages = new ArrayList<>();
 		if (NEEDS_AUTHOR && !testfile.hasAuthor()) {
 			errorMessages.add("Kein Author angegeben");
@@ -225,7 +222,7 @@ public class TestfileReader {
 		}
 
 		if (errorMessages.size() > 0) {
-			throw ExceptionHandler.InvalidContent(errorMessages.toArray(new String[0]));
+			throw TestfileExceptionHandler.Incomplete(errorMessages.toArray(new String[0]));
 		}
 	}
 
@@ -242,13 +239,10 @@ public class TestfileReader {
 	 */
 	private File getFileFromPath(String path) throws FileNotFoundException {
 		File file = new File(path);
-		if (!file.exists()) {
-			throw ExceptionHandler.FileNotFound(file);
+		if (!file.exists() || !file.isFile()) {
+			throw TestfileExceptionHandler.NoSuchFile(file);
 		}
 
-		if (!file.isFile()) {
-			throw ExceptionHandler.FileIsDirectory(file);
-		}
 		return file;
 	}
 
@@ -267,9 +261,8 @@ public class TestfileReader {
 		try {
 			lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
 		} catch (IOException e) {
-			throw new IOException("Die Datei konnte nicht gelesen werden");
+			throw TestfileExceptionHandler.CouldNotReadFile(file, e);
 		}
-
 		return lines.toArray(new String[0]);
 	}
 
