@@ -78,7 +78,7 @@ public class TestfileReader {
 		NEEDS_LIBRARIES = needsLibraries;
 		NEEDS_SETUP = needsSetup;
 		NEEDS_TEST = needsTest;
-		NEEDS_TEARDOWN = needsTeardown;
+		NEEDS_TEARDOWN = needsTeardown;		
 	}
 
 	/**
@@ -88,12 +88,11 @@ public class TestfileReader {
 	private TestfileReader() {
 		NEEDS_AUTHOR = true;
 		NEEDS_TESTNAME = true;
-		NEEDS_DESCRIPTION = false;
-		;
+		NEEDS_DESCRIPTION = false;		
 		NEEDS_LIBRARIES = false;
 		NEEDS_SETUP = false;
 		NEEDS_TEST = true;
-		NEEDS_TEARDOWN = false;
+		NEEDS_TEARDOWN = false;		
 	}
 
 	/**
@@ -146,6 +145,9 @@ public class TestfileReader {
 			} else if (line.startsWith(Testfile.TAG_LIBRARY)) { // library
 				String libPath = getLineContent(Testfile.TAG_LIBRARY, line);
 				testfile.addLibraryPath(libPath);
+			} else if (line.startsWith(Testfile.TAG_REPEAT)) { // repeat
+				String repeat = getLineContent(Testfile.TAG_REPEAT, line);
+				testfile.setRepeat(repeat);				
 			} else if (line.startsWith(Testfile.TAG_SETUP)) { // setup
 				for (; i < lines.length - 1; i++) {
 					line = lines[i + 1].trim();

@@ -4,12 +4,11 @@
 			am Gerät erfolgreich ist.
 [LIB]		"D:/Bsc/DeviceKeywordLibrary.jar" dev1
 
-[SETUP]
-	Ist ungefähr gleich	"2", "0", "2.0"
+
 [TEST]	
-	dev1.Setze Wert auf 	"14"
-	{val1} = 				dev1.Lese Wert	
-	Ist gleich 				{val1}, "14"	
-[TEARDOWN]
-	Ist gleich 				"1", "1"
+	{f1} = 		"1"	
+	{f2} = 		"-7"
+	{v1} = 		"[{f1}-{f2}]"			
+	Ist gleich 	{v1}, "8.0"
+
 	

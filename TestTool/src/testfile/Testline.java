@@ -97,7 +97,18 @@ public class Testline {
 	}
 
 	private boolean checkValue(String value) {
-		String REGEX_VALUE = "\"[\\w \\d \\s \\. ß הצü ִײÜ]*\"";
+//		String REGEX_VALUE = "\"[\\w \\d \\s \\. ß הצü ִײÜ]*\"";
+		String REGEX_VALUE = "\".*\"";
+		if (!Pattern.matches(REGEX_VALUE, value)) {
+			if (!checkMathExpression(value)){
+				return false;
+			}			
+		}
+		return true;
+	}
+	
+	private boolean checkMathExpression(String value){
+		String REGEX_VALUE = "\"\\[[\\w \\d \\s \\. { } * + \\- / ß הצü ִײÜ]*\\]\"";
 		if (!Pattern.matches(REGEX_VALUE, value)) {
 			return false;
 		}

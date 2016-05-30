@@ -8,5 +8,6 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/HttpLibrary"/>
+	<classpathentry kind="lib" path="U:/Developement/Java/Libs/expr.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

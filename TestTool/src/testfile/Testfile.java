@@ -4,13 +4,15 @@ import java.io.File;
 import java.util.ArrayList;
 
 import exceptions.testfile.TestfileException;
+import exceptions.testfile.TestfileExceptionHandler;
 
 public class Testfile {
 	private String author;
 	private String testname;
 	private String description;
 	private String path;
-
+	private int repeat;
+	
 	private ArrayList<String> libPaths;
 	private ArrayList<Testline> setupLines;
 	private ArrayList<Testline> testLines;
@@ -24,6 +26,7 @@ public class Testfile {
 	public static final String TAG_SETUP = "[SETUP]";
 	public static final String TAG_TEST = "[TEST]";
 	public static final String TAG_TEARDOWN = "[TEARDOWN]";
+	public static final String TAG_REPEAT = "[REPEAT]";
 	public static final String TAG_COMMENT = "#";
 
 	Testfile() {
@@ -31,6 +34,7 @@ public class Testfile {
 		testname = "";
 		description = "";
 		path = "";
+		repeat = 1;
 		libPaths = new ArrayList<>();
 		setupLines = new ArrayList<>();
 		testLines = new ArrayList<>();
@@ -79,6 +83,24 @@ public class Testfile {
 
 	public boolean hasDescription() {
 		return description.length() > 0;
+	}
+	
+	void setRepeat(String repeat) throws TestfileException{
+		
+		int parsedVal = 0;
+		try {
+			parsedVal = Integer.parseInt(repeat);				
+		} catch (NumberFormatException e){
+			throw TestfileExceptionHandler.InvalidParameterForRepeat(repeat);
+		}
+		if (parsedVal < 1){
+			throw TestfileExceptionHandler.InvalidParameterForRepeat(repeat);
+		}
+		this.repeat = parsedVal;
+	}
+	
+	public int getRepetition(){
+		return repeat;
 	}
 
 	public String[] getLibraryPaths() {
@@ -139,6 +161,7 @@ public class Testfile {
 		builder.append(TAG_AUTHOR + "\t" + getAuthor() + "\n");
 		builder.append(TAG_TESTNAME + "\t" + getTestname() + "\n");
 		builder.append(TAG_DESCRIPTION + "\t" + getDescription() + "\n");
+		builder.append(TAG_REPEAT + "\t" + getRepetition() + "\n");
 
 		if (hasLibraryPaths()) {
 			for (String path : libPaths) {

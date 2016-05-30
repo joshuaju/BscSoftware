@@ -16,6 +16,14 @@ public class TestfileExceptionHandler {
 		return new TestfileException(PREFIX + "Ungültige Variable für eine Zuweisung: Zeile " + lineNumber + ": " + assignVariable);
 	}
 	
+	public static TestfileException InvalidParameterForRepeat(String parameter){
+		return new TestfileException(PREFIX + "Ungültiger Parameter für die Wiederholungszahl des Tests: " + parameter);
+	}
+	
+	public static TestfileException InvalidMathExpression(String expression, Throwable cause){
+		return new TestfileException(PREFIX + "Ungültiger Mathematischer ausdruck: " + expression, cause);
+	}
+	
 	public static TestfileException InvalidAssignValue(int lineNumber, String assignArgs){
 		return new TestfileException(PREFIX + "Ungültiger Wert für eine Zuweisung: Zeile " + lineNumber + ": " + assignArgs);
 	}

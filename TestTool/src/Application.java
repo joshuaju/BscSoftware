@@ -11,11 +11,10 @@ public class Application {
 
 		//		tsExe.addDirectory("testfiles/");
 		
-		tsExe.addPath("testfiles/test2.tst");
-		tsExe.addPath("testfiles/test1.tst");
-		tsExe.addPath("testfiles/test3.tst");
-		
-		
+		tsExe.addPath("testfiles/test1.tst");		
+//		tsExe.addPath("testfiles/test2.tst");		
+//		tsExe.addPath("testfiles/test3.tst");
+				
 		TestSuiteProtocol tsProtocol = tsExe.execute();
 		
 		System.out.println(tsProtocol);

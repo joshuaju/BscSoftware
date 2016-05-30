@@ -13,6 +13,9 @@ import exceptions.keywordlibrary.KeywordException;
 import exceptions.keywordlibrary.KeywordLibraryException;
 import exceptions.testfile.TestfileException;
 import exceptions.testfile.TestfileExceptionHandler;
+import expr.Expr;
+import expr.Parser;
+import expr.SyntaxException;
 import external.Keyword;
 import external.KeywordLibrary;
 import external.LibraryLoader;
@@ -42,13 +45,22 @@ public class TestExecuter {
 
 	/**
 	 * 
-	 * @throws TestfileException Probleme beim lesen der Testdatei -> Abbruch des einzelnen Tests
-	 * @throws SetupException Probleme in der Aufbauphase des Test -> Abbruch des gesamten Testlauf
-	 * @throws KeywordLibraryException Probleme beim Laden der Bibliotheken -> Abbruch des einzelnen Tests
-	 * @throws TeardownException -> Abbruch des gesamten Testlauf
-	 * @throws TestException -> Abbruch des einzelnen Tests
+	 * @throws TestfileException
+	 *             Probleme beim lesen der Testdatei -> Abbruch des einzelnen
+	 *             Tests
+	 * @throws SetupException
+	 *             Probleme in der Aufbauphase des Test -> Abbruch des gesamten
+	 *             Testlauf
+	 * @throws KeywordLibraryException
+	 *             Probleme beim Laden der Bibliotheken -> Abbruch des einzelnen
+	 *             Tests
+	 * @throws TeardownException
+	 *             -> Abbruch des gesamten Testlauf
+	 * @throws TestException
+	 *             -> Abbruch des einzelnen Tests
 	 */
-	public void execute() throws TestfileException, SetupException, KeywordLibraryException, TeardownException, TestException {
+	public void execute()
+			throws TestfileException, SetupException, KeywordLibraryException, TeardownException, TestException {
 		if (executed) {
 			throw new IllegalStateException("Der Test wurde bereits ausgeführt");
 		}
@@ -70,25 +82,27 @@ public class TestExecuter {
 			throw new KeywordLibraryException(e.getMessage(), e);
 		}
 
-		try {
-			execute(testfile.getSetupLines());
-		} catch (TestfileException | KeywordException | AssertionError e) {
-			protocol = createProtocol(testfile, false, "Setup: " + e.getMessage());
-			throw new SetupException(e.getMessage(), e); 
-		}
+		for (int round = 1; round <= testfile.getRepetition(); round++) {
+			try {
+				execute(testfile.getSetupLines());
+			} catch (TestfileException | KeywordException | AssertionError e) {
+				protocol = createProtocol(testfile, false, "Setup: " + e.getMessage());
+				throw new SetupException(e.getMessage(), e);
+			}
 
-		try {
-			execute(testfile.getTestLines());
-		} catch (TestfileException | KeywordException | AssertionError e) {
-			protocol = createProtocol(testfile, false, "Test: " + e.getMessage());
-			throw new TestException(e.getMessage(), e);
-		}
+			try {
+				execute(testfile.getTestLines());
+			} catch (TestfileException | KeywordException | AssertionError e) {
+				protocol = createProtocol(testfile, false, "Test: " + e.getMessage());
+				throw new TestException(e.getMessage(), e);
+			}
 
-		try {
-			execute(testfile.getTeardownLines());
-		} catch (TestfileException | KeywordException | AssertionError e) {
-			protocol = createProtocol(testfile, false, "Teardown: " + e.getMessage());
-			throw new TeardownException(e.getMessage(), e);
+			try {
+				execute(testfile.getTeardownLines());
+			} catch (TestfileException | KeywordException | AssertionError e) {
+				protocol = createProtocol(testfile, false, "Teardown: " + e.getMessage());
+				throw new TeardownException(e.getMessage(), e);
+			}
 		}
 
 		if (protocol == null) {
@@ -136,27 +150,41 @@ public class TestExecuter {
 		String strVar = line.substring(0, equalsIndex).trim().replaceAll("[{}]", "");
 
 		String strVal = line.substring(equalsIndex + 1).trim();
-		Object assignVal = null;
-		if (strVal.startsWith("{")) { // variable
-			strVal = strVal.replaceAll("[{}]", "");
-			assignVal = variablesMap.getOrDefault(strVal, null);
-		} else if (strVal.startsWith("\"")) { // value
-			strVal = strVal.replace("\"", "");
-			assignVal = strVal;
-		} else { // keyword
-			assignVal = executeKeywordLine(strVal);
-		}
+		Object assignVal = interpretValue(strVal);
+		// if (strVal.startsWith("{")) { // variable
+		// strVal = strVal.replaceAll("[{}]", "");
+		// assignVal = variablesMap.getOrDefault(strVal, null);
+		// } else if (strVal.startsWith("\"")) { // value
+		// // TODO prüfen ob MATH EXPRESSION
+		// strVal = strVal.replace("\"", "");
+		// if (strVal.startsWith("[") && strVal.endsWith("]")){
+		// strVal = evaluateMathExpression(strVal).toString();
+		// }
+		// assignVal = strVal;
+		// } else { // keyword
+		// assignVal = executeKeywordLine(strVal);
+		// }
 
 		variablesMap.put(strVar, assignVal);
 		return assignVal;
 	}
 
-	private Object retrieveVariable(String var) throws TestfileException {
-		Object result = variablesMap.getOrDefault(var, null);
-		if (result == null) {
-			throw TestfileExceptionHandler.VariableIsNull(var);
+	private Object interpretValue(String value) throws TestfileException, KeywordException, AssertionError {
+		Object assignVal = null;
+		if (value.startsWith("{")) { // variable
+			value = value.replaceAll("[{}]", "");
+			assignVal = variablesMap.getOrDefault(value, null);
+		} else if (value.startsWith("\"")) { // value
+			// TODO prüfen ob MATH EXPRESSION
+			value = value.replace("\"", "");
+			if (value.startsWith("[") && value.endsWith("]")) {
+				value = evaluateMathExpression(value).toString();
+			}
+			assignVal = value;
+		} else { // keyword
+			assignVal = executeKeywordLine(value);
 		}
-		return result;
+		return assignVal;
 	}
 
 	/**
@@ -189,6 +217,49 @@ public class TestExecuter {
 		Object[] args = getParameters(parLine);
 
 		return keyword.invoke(args);
+	}
+
+	private Object retrieveVariable(String var) throws TestfileException {
+		Object result = variablesMap.getOrDefault(var, null);
+		if (result == null) {
+			throw TestfileExceptionHandler.VariableIsNull(var);
+		}
+		return result;
+	}
+
+	/**
+	 * Wertet einen mathematischen Ausdruck aus. Das erste und letzte Zeichen
+	 * muss eine ecke Klammer auf/zu sein.
+	 * 
+	 * @param expression
+	 *            Mathematischer Ausdruck
+	 * @return Der Berechnete Wert als double
+	 * @throws TestfileException
+	 *             Wenn der Ausdruck fehler enthält
+	 */
+	private Object evaluateMathExpression(String expression) throws TestfileException {
+		if (!(expression.startsWith("[") && expression.endsWith("]"))) {
+			throw TestfileExceptionHandler.InvalidMathExpression(expression, null);
+		}
+		
+		expression = expression.substring(1, expression.length() - 1); 
+		int varBegin = expression.indexOf("{");
+		while (varBegin != -1) { // Ersetzet alle {Variablen} durch Werte
+			int varEnd = expression.indexOf("}", varBegin);
+			String varName = expression.substring(varBegin + 1, varEnd);
+			Object varValue = retrieveVariable(varName);
+			expression = expression.replace("{" + varName + "}", varValue.toString());
+			varBegin = expression.indexOf("{");
+		}
+
+		try {
+			Expr evaluated = Parser.parse(expression);
+			expression = "" + evaluated.value();
+		} catch (SyntaxException e) {
+			throw TestfileExceptionHandler.InvalidMathExpression(expression, e);
+		}
+
+		return expression;
 	}
 
 	/**
@@ -250,15 +321,22 @@ public class TestExecuter {
 		for (int i = 0; i < parStrArray.length; i++) {
 			String strPar = parStrArray[i].toString().trim();
 
-			if (strPar.startsWith("{")) {
-				strPar = strPar.replaceAll("[{}]", "");
-				strPar = retrieveVariable(strPar).toString();
-			} else if (strPar.startsWith("\"")) {
-				strPar = strPar.replace("\"", "");
-			} else {
+			Object value = null;
+			try {
+				value = interpretValue(strPar);
+			} catch (KeywordException | AssertionError e) {
 				throw TestfileExceptionHandler.InvalidParameter(strPar);
 			}
-			res[i] = strPar;
+			// if (strPar.startsWith("{")) {
+			// strPar = strPar.replaceAll("[{}]", "");
+			// strPar = retrieveVariable(strPar).toString();
+			// } else if (strPar.startsWith("\"")) {
+			// // TODO prüfen ob MATH EXPRESSION
+			// strPar = strPar.replace("\"", "");
+			// } else {
+			// throw TestfileExceptionHandler.InvalidParameter(strPar);
+			// }
+			res[i] = value;
 		}
 		return res;
 	}
