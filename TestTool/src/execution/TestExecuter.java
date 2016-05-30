@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
+import exceptions.executing.SetupException;
+import exceptions.executing.TeardownException;
+import exceptions.executing.TestException;
 import exceptions.keywordlibrary.KeywordException;
 import exceptions.keywordlibrary.KeywordLibraryException;
 import exceptions.testfile.TestfileException;
@@ -22,7 +25,11 @@ public class TestExecuter {
 	private final String path;
 	private final HashMap<String, KeywordLibrary> libnamesMap;
 	private final HashMap<String, Object> variablesMap;
+
 	private Testfile testfile;
+	private TestProtocol protocol;
+
+	private boolean executed;
 
 	public TestExecuter(String path) {
 		this.path = path;
@@ -30,41 +37,71 @@ public class TestExecuter {
 		libnamesMap = new HashMap<>();
 		variablesMap = new HashMap<>();
 
+		executed = false;
 	}
 
-	public TestProtocol execute() {
+	/**
+	 * 
+	 * @throws TestfileException Probleme beim lesen der Testdatei -> Abbruch des einzelnen Tests
+	 * @throws SetupException Probleme in der Aufbauphase des Test -> Abbruch des gesamten Testlauf
+	 * @throws KeywordLibraryException Probleme beim Laden der Bibliotheken -> Abbruch des einzelnen Tests
+	 * @throws TeardownException -> Abbruch des gesamten Testlauf
+	 * @throws TestException -> Abbruch des einzelnen Tests
+	 */
+	public void execute() throws TestfileException, SetupException, KeywordLibraryException, TeardownException, TestException {
+		if (executed) {
+			throw new IllegalStateException("Der Test wurde bereits ausgeführt");
+		}
+
+		executed = true;
 		testfile = null;
+		protocol = null;
 		try {
 			testfile = loadTestfile(path);
 		} catch (IOException e) {
-			return new TestProtocol(false, "-", path, e.getMessage());
+			protocol = new TestProtocol(false, "-", path, e.getMessage());
+			throw new TestfileException(e.getMessage(), e);
 		}
 
 		try {
 			loadLibraries(testfile);
 		} catch (ClassNotFoundException | IOException | KeywordLibraryException e) {
-			return createProtocol(testfile, false, e.getMessage());
+			protocol = createProtocol(testfile, false, e.getMessage());
+			throw new KeywordLibraryException(e.getMessage(), e);
 		}
-	
+
 		try {
 			execute(testfile.getSetupLines());
 		} catch (TestfileException | KeywordException | AssertionError e) {
-			return createProtocol(testfile, false, "Setup: " + e.getMessage());
-		}	
-	
+			protocol = createProtocol(testfile, false, "Setup: " + e.getMessage());
+			throw new SetupException(e.getMessage(), e); 
+		}
+
 		try {
 			execute(testfile.getTestLines());
 		} catch (TestfileException | KeywordException | AssertionError e) {
-			return createProtocol(testfile, false, "Test: " + e.getMessage());
+			protocol = createProtocol(testfile, false, "Test: " + e.getMessage());
+			throw new TestException(e.getMessage(), e);
 		}
-		
+
 		try {
 			execute(testfile.getTeardownLines());
 		} catch (TestfileException | KeywordException | AssertionError e) {
-			return createProtocol(testfile, false, "Teardown: " + e.getMessage());
+			protocol = createProtocol(testfile, false, "Teardown: " + e.getMessage());
+			throw new TeardownException(e.getMessage(), e);
 		}
 
-		return createProtocol(testfile, true, "");
+		if (protocol == null) {
+			// Es ist kein Fehler aufgetreten
+			protocol = createProtocol(testfile, true, "");
+		}
+	}
+
+	public TestProtocol getProtocol() {
+		if (!executed) {
+			throw new IllegalStateException("Der Test wurde noch nicht ausgeführt");
+		}
+		return protocol;
 	}
 
 	private TestProtocol createProtocol(Testfile testfile, boolean passed, String message) {
@@ -73,7 +110,7 @@ public class TestExecuter {
 
 	private void execute(Testline[] lines) throws TestfileException, KeywordException, AssertionError {
 		for (int i = 0; i < lines.length; i++) {
-			Testline line = lines[i];			
+			Testline line = lines[i];
 			try {
 				executeLine(line.text);
 			} catch (TestfileException e) {
@@ -86,8 +123,7 @@ public class TestExecuter {
 		}
 	}
 
-	private Object executeLine(String line) throws TestfileException, KeywordException, AssertionError
-		{
+	private Object executeLine(String line) throws TestfileException, KeywordException, AssertionError {
 		if (line.contains("=")) {
 			return assignVariableLine(line);
 		} else {
@@ -95,8 +131,7 @@ public class TestExecuter {
 		}
 	}
 
-	private Object assignVariableLine(String line) throws TestfileException, KeywordException, AssertionError
-			{
+	private Object assignVariableLine(String line) throws TestfileException, KeywordException, AssertionError {
 		int equalsIndex = line.indexOf("=");
 		String strVar = line.substring(0, equalsIndex).trim().replaceAll("[{}]", "");
 
@@ -130,9 +165,9 @@ public class TestExecuter {
 	 * @param line
 	 *            Zeile
 	 * @return Rückgabewert des Keywords
-	 * @throws TestfileException 
-	 * @throws AssertionError 
-	 * @throws KeywordException 
+	 * @throws TestfileException
+	 * @throws AssertionError
+	 * @throws KeywordException
 	 */
 	private Object executeKeywordLine(String line) throws TestfileException, KeywordException, AssertionError {
 		int firstArg = line.indexOf("\"");
@@ -169,9 +204,9 @@ public class TestExecuter {
 	 *             Bibliotheken vor
 	 */
 	private Keyword findKeyword(String strKeyword) throws TestfileException {
-		ArrayList<KeywordLibrary> libs = new ArrayList<>(); 
+		ArrayList<KeywordLibrary> libs = new ArrayList<>();
 		libs.addAll(libnamesMap.values());
-		
+
 		if (LibraryLoader.getInstance().hasDefaultLibraries()) {
 			libs.addAll(Arrays.asList(LibraryLoader.getInstance().getDefaultLibraries()));
 		}
@@ -183,7 +218,7 @@ public class TestExecuter {
 			strKeyword = strKeyword.substring(indexOfDot + 1);
 			KeywordLibrary lib = libnamesMap.getOrDefault(libName, null);
 			if (lib == null) {
-				throw TestfileExceptionHandler.NoLibraryForThisName(libName);				
+				throw TestfileExceptionHandler.NoLibraryForThisName(libName);
 			}
 			libs = new ArrayList<>();
 			libs.add(lib);
@@ -250,7 +285,7 @@ public class TestExecuter {
 			}
 
 			KeywordLibrary library = LibraryLoader.getInstance().loadLibrary(path);
-			
+
 			libnamesMap.put(name, library);
 		}
 

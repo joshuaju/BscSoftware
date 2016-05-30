@@ -12,7 +12,7 @@ public class KeywordLibraryException extends Exception {
 		super(msg);
 	}
 	
-	public KeywordLibraryException(String msg, Exception cause){
+	public KeywordLibraryException(String msg, Throwable cause){
 		super(msg, cause);
 	}
 	

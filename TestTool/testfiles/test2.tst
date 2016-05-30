@@ -1,10 +1,15 @@
 [AUTHOR] 	Max Muster
-[TESTNAME] 	Verändern von Werten
+[TESTNAME] 	Mehrere Geräte
 [DESC] 		Es wird geprüft ob das Verändern von Werten 
 			am Gerät erfolgreich ist.
 [LIB]		"D:/Bsc/DeviceKeywordLibrary.jar" dev1
 
+[SETUP]
+	Ist gleich 				"Hallo", "Hallo"
 [TEST]	
-	dev1.Setze Wert auf		"20"	
-	{val} = 				Lese Wert
-	Ist gleich 				{val}, "22"
+	dev1.Setze Wert auf 	"14"
+	{val1} = 				dev1.Lese Wert	
+	Ist gleich 				{val1}, "14"	
+[TEARDOWN]
+	Ist gleich 				"1", "1"
+	

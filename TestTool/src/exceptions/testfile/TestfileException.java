@@ -14,7 +14,7 @@ public class TestfileException extends IOException{
 		super(msg);
 	}
 	
-	public TestfileException(String msg, Exception cause){
+	public TestfileException(String msg, Throwable cause){
 		super(msg, cause);
 	}
 	
