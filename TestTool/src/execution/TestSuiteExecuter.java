@@ -11,6 +11,7 @@ import exceptions.executing.TestException;
 import exceptions.keywordlibrary.KeywordLibraryException;
 import exceptions.testfile.TestfileException;
 import exceptions.testfile.TestfileExceptionHandler;
+import exceptions.testfile.TestfileSyntaxException;
 
 public class TestSuiteExecuter {
 
@@ -47,7 +48,7 @@ public class TestSuiteExecuter {
 		this.paths.addAll(filePaths);
 	}
 
-	public TestSuiteProtocol execute() {
+	public TestSuiteProtocol execute() throws TestfileSyntaxException {
 		TestSuiteProtocol suiteprotocol = new TestSuiteProtocol(author);		
 		for (String tmpPath : paths) {
 			TestExecuter tmpExecuter = new TestExecuter(tmpPath);

@@ -1,11 +1,15 @@
-import testfile.TestfileSyntaxer;
+import testfile.TestfileReader;
 
 public class Application {
 
 	public static void main(String[] args) throws Exception {
-//		Syntaxer syntaxer = new Syntaxer();
-//		syntaxer.check("Setze Wert");
+//		TestfileSyntaxer syntaxer = new TestfileSyntaxer();
+//		syntaxer.check(".Setze Wert");
 		
+		
+		TestfileReader.read("testfiles/test.tst");
+
+		System.out.println("DONE");
 //		LibraryLoader.getInstance("D:/Bsc/default/");				
 //		TestSuiteExecuter tsExe = new TestSuiteExecuter("Joshua Jungen");		
 

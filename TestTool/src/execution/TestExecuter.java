@@ -13,6 +13,7 @@ import exceptions.keywordlibrary.KeywordException;
 import exceptions.keywordlibrary.KeywordLibraryException;
 import exceptions.testfile.TestfileException;
 import exceptions.testfile.TestfileExceptionHandler;
+import exceptions.testfile.TestfileSyntaxException;
 import expr.Expr;
 import expr.Parser;
 import expr.SyntaxException;
@@ -65,9 +66,10 @@ public class TestExecuter {
 	 *             -> Abbruch des gesamten Testlauf
 	 * @throws TestException
 	 *             -> Abbruch des einzelnen Tests
+	 * @throws TestfileSyntaxException 
 	 */
 	public void execute()
-			throws TestfileException, SetupException, KeywordLibraryException, TeardownException, TestException {
+			throws TestfileException, SetupException, KeywordLibraryException, TeardownException, TestException, TestfileSyntaxException {
 		if (executed) {
 			throw new IllegalStateException("Der Test wurde bereits ausgeführt");
 		}
@@ -349,7 +351,7 @@ public class TestExecuter {
 		return res;
 	}
 
-	private Testfile loadTestfile(String path) throws IOException {
+	private Testfile loadTestfile(String path) throws IOException, TestfileSyntaxException {
 		return TestfileReader.read(path);
 	}
 

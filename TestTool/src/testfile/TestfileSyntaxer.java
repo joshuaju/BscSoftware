@@ -24,11 +24,91 @@ public class TestfileSyntaxer {
 	public static final String TAG_TEARDOWN = "[TEARDOWN]";
 	public static final String TAG_REPEAT = "[REPEAT]";
 	public static final String TAG_COMMENT = "#";
-	
+
 	public static final String OPERATOR_ASSIGN = "=";
 	public static final String SPLIT_ARGUMENT = ",";
 
-	public void check(String line) throws TestfileSyntaxException {
+	public void check(String... lines) throws TestfileSyntaxException {
+		int lineIndex = 0;
+		try {
+		for (lineIndex = 0; lineIndex < lines.length; lineIndex++) {			
+			String line = lines[lineIndex].trim();
+
+			if (line.startsWith(Testfile.TAG_AUTHOR) || line.startsWith(Testfile.TAG_TESTNAME)) {
+				// Nothing to check
+			} else if (line.startsWith(Testfile.TAG_DESCRIPTION)) { // description
+				for (; lineIndex < lines.length - 1; lineIndex++) {
+					line = lines[lineIndex+1].trim();
+					// Nothing to check
+					if (line.startsWith(Testfile.TAG_FIRST_CHAR)) {
+						break;
+					}
+				}
+			} else if (line.startsWith(Testfile.TAG_LIBRARY_FILE)) { // library
+				checkLibraryFileLine(line);
+			} else if (line.startsWith(Testfile.TAG_VARIABLE_FILE)) {
+				checkVariableFileLine(line);
+			} else if (line.startsWith(Testfile.TAG_REPEAT)) { // repeat
+				checkRepeatLine(line);
+			} else if (line.startsWith(Testfile.TAG_SETUP) || line.startsWith(Testfile.TAG_TEST)
+					|| line.startsWith(Testfile.TAG_TEARDOWN)) { // setup
+				checkEmptyLine(line);
+				for (; lineIndex < lines.length - 1; lineIndex++) {
+					line = lines[lineIndex + 1].trim();
+					if (line.length() == 0 || line.startsWith(Testfile.TAG_COMMENT)) {
+						continue;
+					} else if (line.startsWith(TAG_FIRST_CHAR)) {
+						break;
+					} else {
+						try {
+						checkTestStepLine(line);
+						} catch (TestfileSyntaxException e){
+							lineIndex++;
+							throw e;
+						}
+					}
+				}
+			} else if (line.length() == 0 || line.startsWith(Testfile.TAG_COMMENT)) {
+				// comment or empty row -> ignore
+			} else {
+				// unknown line
+				throw TestfileSyntaxException.InvalidLine();
+			}
+		}
+		} catch (TestfileSyntaxException e){
+			throw new TestfileSyntaxException((lineIndex+1), e.getMessage());
+		}
+	}
+
+	private void checkEmptyLine(String line) throws TestfileSyntaxException {
+		line = line.replaceAll("\\[.*\\]", "").trim(); // remove any tag
+		if (line.length() > 0) {
+			throw TestfileSyntaxException.InvalidLine();
+		}
+	}
+
+	private void checkLibraryFileLine(String line) throws TestfileSyntaxException {
+		line = line.replace(TAG_LIBRARY_FILE, "").trim();
+		if (!Pattern.matches("\".*\" [\\w\\d]+", line)) {
+			throw TestfileSyntaxException.InvalidLibraryFile();
+		}
+	}
+
+	private void checkVariableFileLine(String line) throws TestfileSyntaxException {
+		line = line.replace(TAG_VARIABLE_FILE, "").trim();
+		if (!Pattern.matches("\".*\"", line)) {
+			throw TestfileSyntaxException.InvalidVariableFile();
+		}
+	}
+
+	private void checkRepeatLine(String line) throws TestfileSyntaxException {
+		line = line.replace(TAG_REPEAT, "").trim();
+		if (!Pattern.matches("[0-9]*", line)) {
+			throw TestfileSyntaxException.InvalidArgForRepeat();
+		}
+	}
+
+	private void checkTestStepLine(String line) throws TestfileSyntaxException {
 		if (line.contains(OPERATOR_ASSIGN)) {
 			checkAssign(line);
 		} else {
@@ -104,7 +184,7 @@ public class TestfileSyntaxer {
 	private boolean checkKeyword(String keyword) {
 		String libName = null;
 		if (keyword.contains(".")) {
-			String[] split = keyword.split(".");
+			String[] split = keyword.split("\\.");
 			if (split.length != 2) {
 				return false;
 			}

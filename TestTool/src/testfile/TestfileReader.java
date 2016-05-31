@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import exceptions.testfile.TestfileException;
 import exceptions.testfile.TestfileExceptionHandler;
+import exceptions.testfile.TestfileSyntaxException;
 
 /**
  * Die Klasse ist verantwortlich für das einlesen von Testdateien.
@@ -33,8 +34,9 @@ public class TestfileReader extends AbstractFileReader {
 	 * @throws IOException
 	 *             Wenn die Datei nicht gefunden wird, oder beim lesen der Datei
 	 *             fehler auftreten
+	 * @throws TestfileSyntaxException 
 	 */
-	public static Testfile read(String path) throws IOException {
+	public static Testfile read(String path) throws IOException, TestfileSyntaxException {
 		createInstance();
 		return tfReader._read(path);
 	}
@@ -92,11 +94,16 @@ public class TestfileReader extends AbstractFileReader {
 	}
 
 	/**
+	 * @throws TestfileSyntaxException 
 	 * @see TestfileReader#read(String)
 	 */
-	private Testfile _read(String path) throws IOException {
+	private Testfile _read(String path) throws IOException, TestfileSyntaxException {
 		File file = getFileFromPath(path);
 		String[] lines = getLinesFromFile(file);
+		
+		TestfileSyntaxer syntaxer = new TestfileSyntaxer();
+		syntaxer.check(lines);
+		
 		Testfile testfile = readLinesToTestfile(lines);
 		testfile.setPath(file);
 		return testfile;
