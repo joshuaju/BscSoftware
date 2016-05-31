@@ -8,14 +8,15 @@ public class Main {
 	public static void main(String[] args)
 			throws IOException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		TCUIVKeywordLibrary tcu = new TCUIVKeywordLibrary();		
-				
-		System.err.println(tcu.getChannelA());
-		System.err.println(tcu.getChannelB());
-		
-		tcu.setZeroCalibration();
-		
-		System.err.println(tcu.getChannelA());
-		System.err.println(tcu.getChannelB());
+		tcu.setResetAlarms();
+		System.out.println("done");
+//		System.err.println(tcu.getChannelA());
+//		System.err.println(tcu.getChannelB());
+//		
+//		tcu.setZeroCalibration();
+//		
+//		System.err.println(tcu.getChannelA());
+//		System.err.println(tcu.getChannelB());
 //		Class<?> c = TCUIVKeywordLibrary.class;		
 //		Method m = c.getMethod("getLastCalibFreqB");
 //		AKeyword a = (AKeyword) m.getAnnotation(AKeyword.class);

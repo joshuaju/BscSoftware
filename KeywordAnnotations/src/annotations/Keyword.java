@@ -12,8 +12,8 @@ public @interface Keyword {
 
 	String Description();
 
-	String Parameter();
+	String Parameter() default "";
 
-	String Return();
+	String Return() default "";
 
 }

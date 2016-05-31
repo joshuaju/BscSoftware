@@ -51,12 +51,12 @@ public class Testline {
 		// Variablen haben links und rechts eine geschwungene Klammer,
 		// dazwischen sind Buchstaben und Zahlen erlaubt
 
-		if (!checkVariable(variable)) {
+		if (!isValidVariable(variable)) {
 			throw TestfileExceptionHandler.InvalidAssignVariable(number, variable);
 		}
 		// Eine Variablen wird entweder einer Variable, einem Wert oder Keyword
 		// zugewiesen
-		if (!checkValue(value) && !checkVariable(value)) {
+		if (!isValidValue(value) && !isValidVariable(value)) {
 			try {
 				// auf der rechten Seite des '=' Zeichen steht ein Keyword,
 				// welches überprüft wird
@@ -68,7 +68,7 @@ public class Testline {
 	}
 
 	private void checkRegularLine(String keyword, String args) throws TestfileException {
-		if (!checkKeyword(keyword)) {
+		if (!isValidKeyword(keyword)) {
 			throw TestfileExceptionHandler.InvalidKeyword(number, keyword);
 		}
 
@@ -82,13 +82,13 @@ public class Testline {
 		}
 		for (int i = 0; i < argsArray.length; i++) {
 			String tmpArg = argsArray[i].trim();
-			if (!checkValue(tmpArg) && !checkVariable(tmpArg)) {
+			if (!isValidValue(tmpArg) && !isValidVariable(tmpArg)) {
 				throw TestfileExceptionHandler.InvalidKeywordArgument(number, i, tmpArg);
 			}
 		}
 	}
 
-	private boolean checkVariable(String var) {
+	public static  boolean isValidVariable(String var) {
 		String REGEX_VARIABLE = "[{][\\w \\d \\s ß äöü ÄÖÜ]*[}]";
 		if (!Pattern.matches(REGEX_VARIABLE, var)) {
 			return false;
@@ -96,18 +96,18 @@ public class Testline {
 		return true;
 	}
 
-	private boolean checkValue(String value) {
+	public static  boolean isValidValue(String value) {
 //		String REGEX_VALUE = "\"[\\w \\d \\s \\. ß äöü ÄÖÜ]*\"";
 		String REGEX_VALUE = "\".*\"";
 		if (!Pattern.matches(REGEX_VALUE, value)) {
-			if (!checkMathExpression(value)){
+			if (!isValidMathExpression(value)){
 				return false;
 			}			
 		}
 		return true;
 	}
 	
-	private boolean checkMathExpression(String value){
+	public static  boolean isValidMathExpression(String value){
 		String REGEX_VALUE = "\"\\[[\\w \\d \\s \\. { } * + \\- / ß äöü ÄÖÜ]*\\]\"";
 		if (!Pattern.matches(REGEX_VALUE, value)) {
 			return false;
@@ -115,7 +115,7 @@ public class Testline {
 		return true;
 	}
 
-	private boolean checkKeyword(String keyword) {
+	public static boolean isValidKeyword(String keyword) {
 		String REGEX_KEYWORD = "[\\w \\d \\s \\. ß äöü ÄÖÜ]*";
 		if (!Pattern.matches(REGEX_KEYWORD, keyword)) {
 			return false;

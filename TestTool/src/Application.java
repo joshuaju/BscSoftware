@@ -1,23 +1,25 @@
-import execution.TestSuiteExecuter;
-import execution.TestSuiteProtocol;
-import external.LibraryLoader;
+import testfile.TestfileSyntaxer;
 
 public class Application {
 
 	public static void main(String[] args) throws Exception {
-		LibraryLoader.getInstance("D:/Bsc/default/");		
+//		Syntaxer syntaxer = new Syntaxer();
+//		syntaxer.check("Setze Wert");
 		
-		TestSuiteExecuter tsExe = new TestSuiteExecuter("Joshua Jungen");		
+//		LibraryLoader.getInstance("D:/Bsc/default/");				
+//		TestSuiteExecuter tsExe = new TestSuiteExecuter("Joshua Jungen");		
 
-		//		tsExe.addDirectory("testfiles/");
-		
-		tsExe.addPath("testfiles/test1.tst");		
-//		tsExe.addPath("testfiles/test2.tst");		
-//		tsExe.addPath("testfiles/test3.tst");
+//      --------------------------------------------------------
+//		tsExe.addDirectory("testfiles/tcu/");				
+//		tsExe.addPath("testfiles/tcu/tcu_testsignal_rotor.tst");
+//		tsExe.addPath("testfiles/tcu/tcu_alarm_test.tst");						
+//		tsExe.addPath("testfiles/tcu/tcu_testsignal_tcu.tst");
+//      --------------------------------------------------------
+//		tsExe.addPath("testfiles/test.tst");
+//      --------------------------------------------------------
 				
-		TestSuiteProtocol tsProtocol = tsExe.execute();
-		
-		System.out.println(tsProtocol);
+//		TestSuiteProtocol tsProtocol = tsExe.execute();		
+//		System.out.println(tsProtocol);
 	}
 
 }

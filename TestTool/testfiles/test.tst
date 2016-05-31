@@ -3,13 +3,8 @@
 [DESC] 		Es wird geprüft ob das Verändern von Werten 
 			am Gerät erfolgreich ist.
 [LIB]		"D:/Bsc/DeviceKeywordLibrary.jar" dev1
+[VAR] 		"U:/Developement/Java/BscSoftware/BscSoftware/Testtool/testfiles/test.var"
 
-[SETUP]
-#	Baue Verbindung auf
-[TEST]	
-	dev1.Setze Wert auf		"20"	
-	{val} = 				Lese Wert
-	Ist gleich 				{val}, "20"
-[TEARDOWN]
-	# 'G1.' könnte hier auch weggelassen werden
-#	dev1.Schließe Verbindung
+[TEST]		
+	Ist gleich 			{delay}, "500"
+	Ist gleich 			{global}, "Globale Variabel"

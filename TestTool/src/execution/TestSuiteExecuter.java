@@ -48,8 +48,7 @@ public class TestSuiteExecuter {
 	}
 
 	public TestSuiteProtocol execute() {
-		TestSuiteProtocol suiteprotocol = new TestSuiteProtocol(author);
-
+		TestSuiteProtocol suiteprotocol = new TestSuiteProtocol(author);		
 		for (String tmpPath : paths) {
 			TestExecuter tmpExecuter = new TestExecuter(tmpPath);
 			
@@ -62,11 +61,13 @@ public class TestSuiteExecuter {
 				// Einzelnen Test abrrechen
 				TestProtocol tmpProtocol = tmpExecuter.getProtocol();
 				suiteprotocol.addProtocol(tmpProtocol);
+				System.err.println("### Unchecked ###");
 				continue;
 			} catch (SetupException | TeardownException e){
 				// Gesamten Testlauf abbrechen
 				TestProtocol tmpProtocol = tmpExecuter.getProtocol();
 				suiteprotocol.addProtocol(tmpProtocol);
+				System.err.println("### Checked ###");
 				break;
 			}															
 		}

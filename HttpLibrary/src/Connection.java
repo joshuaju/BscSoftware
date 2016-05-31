@@ -7,7 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Connection {
-
+	
 	private final String base;
 
 	public Connection(String protocol, String ip) {
@@ -22,9 +22,6 @@ public class Connection {
 		// connection.setRequestProperty("User-Agent", USER_AGENT);
 
 		int responseCode = connection.getResponseCode();
-
-		System.out.println("Send GET request to URL: " + url.toString());
-		System.out.println("Response Code: " + responseCode);
 
 		String response = getResponse(connection.getInputStream());
 		return new Response(url.toString(), "", "GET", responseCode, response);

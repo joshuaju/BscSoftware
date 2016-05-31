@@ -12,8 +12,9 @@ public class Testfile {
 	private String description;
 	private String path;
 	private int repeat;
-	
+
 	private ArrayList<String> libPaths;
+	private ArrayList<String> varPaths;
 	private ArrayList<Testline> setupLines;
 	private ArrayList<Testline> testLines;
 	private ArrayList<Testline> teardownLines;
@@ -22,7 +23,8 @@ public class Testfile {
 	public static final String TAG_AUTHOR = "[AUTHOR]";
 	public static final String TAG_TESTNAME = "[TESTNAME]";
 	public static final String TAG_DESCRIPTION = "[DESC]";
-	public static final String TAG_LIBRARY = "[LIB]";
+	public static final String TAG_LIBRARY_FILE = "[LIB]";
+	public static final String TAG_VARIABLE_FILE = "[VAR]";
 	public static final String TAG_SETUP = "[SETUP]";
 	public static final String TAG_TEST = "[TEST]";
 	public static final String TAG_TEARDOWN = "[TEARDOWN]";
@@ -36,6 +38,7 @@ public class Testfile {
 		path = "";
 		repeat = 1;
 		libPaths = new ArrayList<>();
+		varPaths = new ArrayList<>();
 		setupLines = new ArrayList<>();
 		testLines = new ArrayList<>();
 		teardownLines = new ArrayList<>();
@@ -84,35 +87,46 @@ public class Testfile {
 	public boolean hasDescription() {
 		return description.length() > 0;
 	}
-	
-	void setRepeat(String repeat) throws TestfileException{
-		
+
+	void setRepeat(String repeat) throws TestfileException {
 		int parsedVal = 0;
 		try {
-			parsedVal = Integer.parseInt(repeat);				
-		} catch (NumberFormatException e){
+			parsedVal = Integer.parseInt(repeat);
+		} catch (NumberFormatException e) {
 			throw TestfileExceptionHandler.InvalidParameterForRepeat(repeat);
 		}
-		if (parsedVal < 1){
+		if (parsedVal < 1) {
 			throw TestfileExceptionHandler.InvalidParameterForRepeat(repeat);
 		}
 		this.repeat = parsedVal;
 	}
-	
-	public int getRepetition(){
+
+	public int getRepetition() {
 		return repeat;
 	}
 
-	public String[] getLibraryPaths() {
+	public String[] getLibraryFilePaths() {
 		return libPaths.toArray(new String[0]);
 	}
 
-	void addLibraryPath(String path) {
+	void addLibraryFilePath(String path) {
 		libPaths.add(path);
 	}
 
-	public boolean hasLibraryPaths() {
+	public boolean hasLibraryFilePaths() {
 		return libPaths.size() > 0;
+	}
+	
+	public String[] getVariableFilePaths() {
+		return varPaths.toArray(new String[0]);
+	}
+
+	void addVariableFilePath(String path) {
+		varPaths.add(path);
+	}
+
+	public boolean hasVariableFilePaths() {
+		return varPaths.size() > 0;
 	}
 
 	public Testline[] getSetupLines() {
@@ -120,7 +134,7 @@ public class Testfile {
 	}
 
 	void addSetupLine(String line, int lineNumber) throws TestfileException {
-		Testline testline = new Testline(lineNumber, line);		
+		Testline testline = new Testline(lineNumber, line);
 		setupLines.add(testline);
 	}
 
@@ -146,14 +160,14 @@ public class Testfile {
 	}
 
 	void addTeardownLine(String line, int lineNumber) throws TestfileException {
-		Testline testline = new Testline(lineNumber, line);		
+		Testline testline = new Testline(lineNumber, line);
 		teardownLines.add(testline);
 
 	}
 
 	public boolean hasTeardownLines() {
 		return teardownLines.size() > 0;
-	}	
+	}
 
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -163,9 +177,9 @@ public class Testfile {
 		builder.append(TAG_DESCRIPTION + "\t" + getDescription() + "\n");
 		builder.append(TAG_REPEAT + "\t" + getRepetition() + "\n");
 
-		if (hasLibraryPaths()) {
+		if (hasLibraryFilePaths()) {
 			for (String path : libPaths) {
-				builder.append(TAG_LIBRARY + "\t" + path + "\n");
+				builder.append(TAG_LIBRARY_FILE + "\t" + path + "\n");
 			}
 		}
 

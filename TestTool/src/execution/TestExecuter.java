@@ -22,12 +22,17 @@ import external.LibraryLoader;
 import testfile.Testfile;
 import testfile.TestfileReader;
 import testfile.Testline;
+import testfile.VariableFile;
+import testfile.VariableFileReader;
 
 public class TestExecuter {
 
 	private final String path;
+	private VariableFile globalVariables;
+	private VariableFile localVariables;
+	
 	private final HashMap<String, KeywordLibrary> libnamesMap;
-	private final HashMap<String, Object> variablesMap;
+	
 
 	private Testfile testfile;
 	private TestProtocol protocol;
@@ -38,7 +43,9 @@ public class TestExecuter {
 		this.path = path;
 
 		libnamesMap = new HashMap<>();
-		variablesMap = new HashMap<>();
+		
+		globalVariables = new VariableFile();
+		localVariables = new VariableFile();
 
 		executed = false;
 	}
@@ -82,7 +89,17 @@ public class TestExecuter {
 			throw new KeywordLibraryException(e.getMessage(), e);
 		}
 
+		if (testfile.hasVariableFilePaths()) {
+			try {
+				globalVariables = VariableFileReader.readAll(testfile.getVariableFilePaths());
+			} catch (IOException e) {
+				protocol = createProtocol(testfile, false, e.getMessage());
+				throw new TestfileException(e.getMessage(), e);
+			}
+		}
+
 		for (int round = 1; round <= testfile.getRepetition(); round++) {
+
 			try {
 				execute(testfile.getSetupLines());
 			} catch (TestfileException | KeywordException | AssertionError e) {
@@ -94,7 +111,7 @@ public class TestExecuter {
 				execute(testfile.getTestLines());
 			} catch (TestfileException | KeywordException | AssertionError e) {
 				protocol = createProtocol(testfile, false, "Test: " + e.getMessage());
-				throw new TestException(e.getMessage(), e);
+				// throw new TestException(e.getMessage(), e);
 			}
 
 			try {
@@ -148,24 +165,10 @@ public class TestExecuter {
 	private Object assignVariableLine(String line) throws TestfileException, KeywordException, AssertionError {
 		int equalsIndex = line.indexOf("=");
 		String strVar = line.substring(0, equalsIndex).trim().replaceAll("[{}]", "");
-
 		String strVal = line.substring(equalsIndex + 1).trim();
-		Object assignVal = interpretValue(strVal);
-		// if (strVal.startsWith("{")) { // variable
-		// strVal = strVal.replaceAll("[{}]", "");
-		// assignVal = variablesMap.getOrDefault(strVal, null);
-		// } else if (strVal.startsWith("\"")) { // value
-		// // TODO prüfen ob MATH EXPRESSION
-		// strVal = strVal.replace("\"", "");
-		// if (strVal.startsWith("[") && strVal.endsWith("]")){
-		// strVal = evaluateMathExpression(strVal).toString();
-		// }
-		// assignVal = strVal;
-		// } else { // keyword
-		// assignVal = executeKeywordLine(strVal);
-		// }
 
-		variablesMap.put(strVar, assignVal);
+		Object assignVal = interpretValue(strVal);
+		localVariables.addVariable(strVar, strVal);		
 		return assignVal;
 	}
 
@@ -173,9 +176,8 @@ public class TestExecuter {
 		Object assignVal = null;
 		if (value.startsWith("{")) { // variable
 			value = value.replaceAll("[{}]", "");
-			assignVal = variablesMap.getOrDefault(value, null);
+			assignVal = retrieveVariable(value);
 		} else if (value.startsWith("\"")) { // value
-			// TODO prüfen ob MATH EXPRESSION
 			value = value.replace("\"", "");
 			if (value.startsWith("[") && value.endsWith("]")) {
 				value = evaluateMathExpression(value).toString();
@@ -219,11 +221,21 @@ public class TestExecuter {
 		return keyword.invoke(args);
 	}
 
+	/**
+	 * Ermittelt den Wert zu einer gespeicherten Variabel. Es wird zuerst in den
+	 * Testvariablen, und dann in den globalen Variablen nachgesehen.
+	 * 
+	 * @param var Name der Variabel (ohne geschweifte Klammern)
+	 * @return Wert der Variablen
+	 * @throws TestfileException Die Variable gibt es nicht, bzw. ist gleich NULL
+	 */
 	private Object retrieveVariable(String var) throws TestfileException {
-		Object result = variablesMap.getOrDefault(var, null);
-		if (result == null) {
-			throw TestfileExceptionHandler.VariableIsNull(var);
-		}
+		Object result = null;
+		try {
+		result = localVariables.getValueFor(var);
+		} catch (TestfileException e){			
+			result = globalVariables.getValueFor(var);			
+		}		
 		return result;
 	}
 
@@ -241,8 +253,8 @@ public class TestExecuter {
 		if (!(expression.startsWith("[") && expression.endsWith("]"))) {
 			throw TestfileExceptionHandler.InvalidMathExpression(expression, null);
 		}
-		
-		expression = expression.substring(1, expression.length() - 1); 
+
+		expression = expression.substring(1, expression.length() - 1);
 		int varBegin = expression.indexOf("{");
 		while (varBegin != -1) { // Ersetzet alle {Variablen} durch Werte
 			int varEnd = expression.indexOf("}", varBegin);
@@ -259,6 +271,11 @@ public class TestExecuter {
 			throw TestfileExceptionHandler.InvalidMathExpression(expression, e);
 		}
 
+		if (expression.endsWith(".0")) {
+			// Wenn der Wert ganzahlig ist '.0' abschneiden, damit der Wert als
+			// Integer interpretiert werden kann.
+			expression = expression.substring(0, expression.length() - 2);
+		}
 		return expression;
 	}
 
@@ -327,15 +344,6 @@ public class TestExecuter {
 			} catch (KeywordException | AssertionError e) {
 				throw TestfileExceptionHandler.InvalidParameter(strPar);
 			}
-			// if (strPar.startsWith("{")) {
-			// strPar = strPar.replaceAll("[{}]", "");
-			// strPar = retrieveVariable(strPar).toString();
-			// } else if (strPar.startsWith("\"")) {
-			// // TODO prüfen ob MATH EXPRESSION
-			// strPar = strPar.replace("\"", "");
-			// } else {
-			// throw TestfileExceptionHandler.InvalidParameter(strPar);
-			// }
 			res[i] = value;
 		}
 		return res;
@@ -346,25 +354,33 @@ public class TestExecuter {
 	}
 
 	private void loadLibraries(Testfile testfile) throws ClassNotFoundException, IOException, KeywordLibraryException {
-		String[] libLines = testfile.getLibraryPaths();
+		String[] libLines = testfile.getLibraryFilePaths();
 
 		for (String line : libLines) {
 			String[] split = line.split(" ");
-			String path = split[0];
-			String name = split[1];
 
+			String path = split[0];
 			if (!Pattern.matches("\".*\"", path)) {
-				throw TestfileExceptionHandler.InvalidParameter(path);
+				throw TestfileExceptionHandler.InvalidLibraryPath(path);
 			}
 			path = path.substring(1, path.length() - 1);
 
-			if (!Pattern.matches("[\\d \\w]*", name)) {
-				throw TestfileExceptionHandler.InvalidParameter(name);
+			if (split.length == 1) {
+				throw TestfileExceptionHandler.InvalidLibraryName(null);
+			} else if (split.length == 2) {
+				String name = split[1];
+				if (!Pattern.matches("[\\d\\w]*", name)) {
+					throw TestfileExceptionHandler.InvalidLibraryName(name);
+				}
+				KeywordLibrary library = LibraryLoader.getInstance().loadLibrary(path);
+				libnamesMap.put(name, library);
+			} else {
+				String name = "";
+				for (int i = 1; i < split.length; i++) {
+					name += split[i] + " ";
+				}
+				throw TestfileExceptionHandler.InvalidLibraryName(name.trim());
 			}
-
-			KeywordLibrary library = LibraryLoader.getInstance().loadLibrary(path);
-
-			libnamesMap.put(name, library);
 		}
 
 	}
