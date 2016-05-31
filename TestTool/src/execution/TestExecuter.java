@@ -68,8 +68,8 @@ public class TestExecuter {
 	 *             -> Abbruch des einzelnen Tests
 	 * @throws TestfileSyntaxException 
 	 */
-	public void execute()
-			throws TestfileException, SetupException, KeywordLibraryException, TeardownException, TestException, TestfileSyntaxException {
+	public void execute() throws TestfileException, KeywordLibraryException, SetupException, TeardownException
+			 {
 		if (executed) {
 			throw new IllegalStateException("Der Test wurde bereits ausgeführt");
 		}
@@ -79,7 +79,7 @@ public class TestExecuter {
 		protocol = null;
 		try {
 			testfile = loadTestfile(path);
-		} catch (IOException e) {
+		} catch (TestfileSyntaxException | IOException e) {
 			protocol = new TestProtocol(false, "-", path, e.getMessage());
 			throw new TestfileException(e.getMessage(), e);
 		}
@@ -94,7 +94,7 @@ public class TestExecuter {
 		if (testfile.hasVariableFilePaths()) {
 			try {
 				globalVariables = VariableFileReader.readAll(testfile.getVariableFilePaths());
-			} catch (IOException e) {
+			} catch (TestfileSyntaxException | IOException e) {
 				protocol = createProtocol(testfile, false, e.getMessage());
 				throw new TestfileException(e.getMessage(), e);
 			}

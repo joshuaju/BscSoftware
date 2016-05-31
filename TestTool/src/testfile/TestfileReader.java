@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import exceptions.testfile.TestfileException;
 import exceptions.testfile.TestfileExceptionHandler;
 import exceptions.testfile.TestfileSyntaxException;
+import testfile.syntaxer.TestfileSyntaxer;
 
 /**
  * Die Klasse ist verantwortlich für das einlesen von Testdateien.
@@ -34,7 +35,7 @@ public class TestfileReader extends AbstractFileReader {
 	 * @throws IOException
 	 *             Wenn die Datei nicht gefunden wird, oder beim lesen der Datei
 	 *             fehler auftreten
-	 * @throws TestfileSyntaxException 
+	 * @throws TestfileSyntaxException
 	 */
 	public static Testfile read(String path) throws IOException, TestfileSyntaxException {
 		createInstance();
@@ -76,7 +77,7 @@ public class TestfileReader extends AbstractFileReader {
 		NEEDS_LIBRARIES = needsLibraries;
 		NEEDS_SETUP = needsSetup;
 		NEEDS_TEST = needsTest;
-		NEEDS_TEARDOWN = needsTeardown;		
+		NEEDS_TEARDOWN = needsTeardown;
 	}
 
 	/**
@@ -86,24 +87,24 @@ public class TestfileReader extends AbstractFileReader {
 	private TestfileReader() {
 		NEEDS_AUTHOR = true;
 		NEEDS_TESTNAME = true;
-		NEEDS_DESCRIPTION = false;		
+		NEEDS_DESCRIPTION = false;
 		NEEDS_LIBRARIES = false;
 		NEEDS_SETUP = false;
 		NEEDS_TEST = true;
-		NEEDS_TEARDOWN = false;		
+		NEEDS_TEARDOWN = false;
 	}
 
 	/**
-	 * @throws TestfileSyntaxException 
+	 * @throws TestfileSyntaxException
 	 * @see TestfileReader#read(String)
 	 */
 	private Testfile _read(String path) throws IOException, TestfileSyntaxException {
 		File file = getFileFromPath(path);
 		String[] lines = getLinesFromFile(file);
-		
+
 		TestfileSyntaxer syntaxer = new TestfileSyntaxer();
 		syntaxer.check(lines);
-		
+
 		Testfile testfile = readLinesToTestfile(lines);
 		testfile.setPath(file);
 		return testfile;
@@ -148,12 +149,12 @@ public class TestfileReader extends AbstractFileReader {
 			} else if (line.startsWith(Testfile.TAG_LIBRARY_FILE)) { // library
 				String libPath = getLineContent(Testfile.TAG_LIBRARY_FILE, line);
 				testfile.addLibraryFilePath(libPath);
-			} else if (line.startsWith(Testfile.TAG_VARIABLE_FILE)){					
+			} else if (line.startsWith(Testfile.TAG_VARIABLE_FILE)) {
 				String varPath = getLineContent(Testfile.TAG_VARIABLE_FILE, line);
 				testfile.addVariableFilePath(varPath);
-			}else if (line.startsWith(Testfile.TAG_REPEAT)) { // repeat
+			} else if (line.startsWith(Testfile.TAG_REPEAT)) { // repeat
 				String repeat = getLineContent(Testfile.TAG_REPEAT, line);
-				testfile.setRepeat(repeat);				
+				testfile.setRepeat(repeat);
 			} else if (line.startsWith(Testfile.TAG_SETUP)) { // setup
 				for (; i < lines.length - 1; i++) {
 					line = lines[i + 1].trim();
@@ -187,8 +188,6 @@ public class TestfileReader extends AbstractFileReader {
 						testfile.addTeardownLine(line, i + 2);
 					}
 				}
-			} else {
-				throw TestfileExceptionHandler.InvalidLine(i + 2, line);
 			}
 		}
 
@@ -232,7 +231,7 @@ public class TestfileReader extends AbstractFileReader {
 		if (errorMessages.size() > 0) {
 			throw TestfileExceptionHandler.Incomplete(errorMessages.toArray(new String[0]));
 		}
-	}	
+	}
 
 	/**
 	 * Entfernt (äußere) Leerzeichen und einen Teil des Strings

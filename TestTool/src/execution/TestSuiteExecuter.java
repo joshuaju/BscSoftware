@@ -61,14 +61,12 @@ public class TestSuiteExecuter {
 			} catch (TestfileException | TestException | KeywordLibraryException e) {
 				// Einzelnen Test abrrechen
 				TestProtocol tmpProtocol = tmpExecuter.getProtocol();
-				suiteprotocol.addProtocol(tmpProtocol);
-				System.err.println("### Unchecked ###");
+				suiteprotocol.addProtocol(tmpProtocol);				
 				continue;
 			} catch (SetupException | TeardownException e){
 				// Gesamten Testlauf abbrechen
 				TestProtocol tmpProtocol = tmpExecuter.getProtocol();
-				suiteprotocol.addProtocol(tmpProtocol);
-				System.err.println("### Checked ###");
+				suiteprotocol.addProtocol(tmpProtocol);				
 				break;
 			}															
 		}

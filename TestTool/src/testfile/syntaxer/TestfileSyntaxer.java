@@ -1,8 +1,9 @@
-package testfile;
+package testfile.syntaxer;
 
 import java.util.regex.Pattern;
 
 import exceptions.testfile.TestfileSyntaxException;
+import testfile.Testfile;
 
 /**
  * Die Klasse prüft eine Testdatei auf syntaktische und lexikalische
@@ -28,6 +29,22 @@ public class TestfileSyntaxer {
 	public static final String OPERATOR_ASSIGN = "=";
 	public static final String SPLIT_ARGUMENT = ",";
 
+	public void checkVariableLines(String...lines) throws TestfileSyntaxException{
+		for (int lineIndex = 0; lineIndex < lines.length; lineIndex++){
+			String line = lines[lineIndex].trim();
+			if (line.length() == 0 || line.startsWith(TAG_COMMENT)){
+				// ignore
+			} else {
+				try {
+					checkAssign(line, false);
+				} catch (TestfileSyntaxException e) {
+						throw new TestfileSyntaxException(lineIndex+1, e.getMessage());
+				}
+			}			
+		}
+		
+	}
+	
 	public void check(String... lines) throws TestfileSyntaxException {
 		int lineIndex = 0;
 		try {
@@ -110,7 +127,7 @@ public class TestfileSyntaxer {
 
 	private void checkTestStepLine(String line) throws TestfileSyntaxException {
 		if (line.contains(OPERATOR_ASSIGN)) {
-			checkAssign(line);
+			checkAssign(line, true);
 		} else {
 			checkRegular(line);
 		}
@@ -122,7 +139,7 @@ public class TestfileSyntaxer {
 	 * @param line
 	 * @throws TestfileSyntaxException
 	 */
-	private void checkAssign(String line) throws TestfileSyntaxException {
+	private void checkAssign(String line, boolean keywordAllowed) throws TestfileSyntaxException {
 		String[] split = line.split(OPERATOR_ASSIGN);
 		if (split.length != 2) {
 			throw TestfileSyntaxException.InvalidAssignLine();
@@ -135,7 +152,7 @@ public class TestfileSyntaxer {
 			throw TestfileSyntaxException.InvalidVarToAssign();
 		}
 		// rechts darf alles sein
-		if (!(checkArgument(right) || checkKeyword(right))) {
+		if (!(checkArgument(right) || (keywordAllowed && checkKeyword(right)))) {
 			throw TestfileSyntaxException.InvalidArgForAssign();
 		}
 	}
@@ -225,7 +242,10 @@ public class TestfileSyntaxer {
 	 */
 	private boolean checkVariable(String var) {
 		if (Pattern.matches("[{].+[}]", var)) {
-			return true;
+			var = var.substring(1, var.length()-1);
+			if (!(var.contains("{") || var.contains("}"))){				
+				return true;
+			}			
 		}
 		return false;
 	}
@@ -239,7 +259,10 @@ public class TestfileSyntaxer {
 	 */
 	private boolean checkValue(String val) {
 		if (Pattern.matches("\".*\"", val)) {
-			return true;
+			val = val.substring(1, val.length()-1);
+			if (!val.contains("\"")){
+				return true;
+			}			
 		}
 		return false;
 	}
