@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 import exceptions.executing.SetupException;
 import exceptions.executing.TeardownException;
@@ -31,9 +30,8 @@ public class TestExecuter {
 	private final String path;
 	private VariableFile globalVariables;
 	private VariableFile localVariables;
-	
+
 	private final HashMap<String, KeywordLibrary> libnamesMap;
-	
 
 	private Testfile testfile;
 	private TestProtocol protocol;
@@ -44,7 +42,7 @@ public class TestExecuter {
 		this.path = path;
 
 		libnamesMap = new HashMap<>();
-		
+
 		globalVariables = new VariableFile();
 		localVariables = new VariableFile();
 
@@ -66,10 +64,9 @@ public class TestExecuter {
 	 *             -> Abbruch des gesamten Testlauf
 	 * @throws TestException
 	 *             -> Abbruch des einzelnen Tests
-	 * @throws TestfileSyntaxException 
+	 * @throws TestfileSyntaxException
 	 */
-	public void execute() throws TestfileException, KeywordLibraryException, SetupException, TeardownException
-			 {
+	public void execute() throws TestfileException, KeywordLibraryException, SetupException, TeardownException {
 		if (executed) {
 			throw new IllegalStateException("Der Test wurde bereits ausgeführt");
 		}
@@ -78,7 +75,7 @@ public class TestExecuter {
 		testfile = null;
 		protocol = null;
 		try {
-			testfile = loadTestfile(path);
+			testfile = TestfileReader.read(path);
 		} catch (TestfileSyntaxException | IOException e) {
 			protocol = new TestProtocol(false, "-", path, e.getMessage());
 			throw new TestfileException(e.getMessage(), e);
@@ -103,21 +100,21 @@ public class TestExecuter {
 		for (int round = 1; round <= testfile.getRepetition(); round++) {
 
 			try {
-				execute(testfile.getSetupLines());
+				executeLines(testfile.getSetupLines());
 			} catch (TestfileException | KeywordException | AssertionError e) {
 				protocol = createProtocol(testfile, false, "Setup: " + e.getMessage());
 				throw new SetupException(e.getMessage(), e);
 			}
 
 			try {
-				execute(testfile.getTestLines());
+				executeLines(testfile.getTestLines());
 			} catch (TestfileException | KeywordException | AssertionError e) {
 				protocol = createProtocol(testfile, false, "Test: " + e.getMessage());
 				// throw new TestException(e.getMessage(), e);
 			}
 
 			try {
-				execute(testfile.getTeardownLines());
+				executeLines(testfile.getTeardownLines());
 			} catch (TestfileException | KeywordException | AssertionError e) {
 				protocol = createProtocol(testfile, false, "Teardown: " + e.getMessage());
 				throw new TeardownException(e.getMessage(), e);
@@ -130,6 +127,10 @@ public class TestExecuter {
 		}
 	}
 
+	private TestProtocol createProtocol(Testfile testfile, boolean passed, String message) {
+		return new TestProtocol(passed, testfile.getTestname(), testfile.getPath(), message);
+	}
+
 	public TestProtocol getProtocol() {
 		if (!executed) {
 			throw new IllegalStateException("Der Test wurde noch nicht ausgeführt");
@@ -137,11 +138,16 @@ public class TestExecuter {
 		return protocol;
 	}
 
-	private TestProtocol createProtocol(Testfile testfile, boolean passed, String message) {
-		return new TestProtocol(passed, testfile.getTestname(), testfile.getPath(), message);
-	}
-
-	private void execute(Testline[] lines) throws TestfileException, KeywordException, AssertionError {
+	/**
+	 * Führt ein Array von Testschritte/Zeilen aus
+	 * 
+	 * @param lines
+	 *            Testschritte/Zeilen
+	 * @throws TestfileException
+	 * @throws KeywordException
+	 * @throws AssertionError
+	 */
+	private void executeLines(Testline[] lines) throws TestfileException, KeywordException, AssertionError {
 		for (int i = 0; i < lines.length; i++) {
 			Testline line = lines[i];
 			try {
@@ -156,6 +162,15 @@ public class TestExecuter {
 		}
 	}
 
+	/**
+	 * Führt einen Testschritt/Zeile aus
+	 * 
+	 * @param line
+	 * @return
+	 * @throws TestfileException
+	 * @throws KeywordException
+	 * @throws AssertionError
+	 */
 	private Object executeLine(String line) throws TestfileException, KeywordException, AssertionError {
 		if (line.contains("=")) {
 			return assignVariableLine(line);
@@ -164,16 +179,37 @@ public class TestExecuter {
 		}
 	}
 
+	/**
+	 * Führt eine Zeile aus, in der eine Zuweisung (also: {var} = ...)
+	 * stattfindet
+	 * 
+	 * @param line
+	 * @return
+	 * @throws TestfileException
+	 * @throws KeywordException
+	 * @throws AssertionError
+	 */
 	private Object assignVariableLine(String line) throws TestfileException, KeywordException, AssertionError {
-		int equalsIndex = line.indexOf("=");
-		String strVar = line.substring(0, equalsIndex).trim().replaceAll("[{}]", "");
-		String strVal = line.substring(equalsIndex + 1).trim();
+		String[] split = line.split("=");
 
+		String strVar = split[0].trim().replaceAll("[{}]", "");
+		String strVal = split[1].trim();
 		Object assignVal = interpretValue(strVal);
-		localVariables.addVariable(strVar, strVal);		
+
+		localVariables.addVariable(strVar, assignVal.toString());
 		return assignVal;
 	}
 
+	/**
+	 * Interpretiert einen Wert als Variable, Wert(oder mathematischen Ausruck)
+	 * oder als Keyword
+	 * 
+	 * @param value
+	 * @return
+	 * @throws TestfileException
+	 * @throws KeywordException
+	 * @throws AssertionError
+	 */
 	private Object interpretValue(String value) throws TestfileException, KeywordException, AssertionError {
 		Object assignVal = null;
 		if (value.startsWith("{")) { // variable
@@ -227,17 +263,19 @@ public class TestExecuter {
 	 * Ermittelt den Wert zu einer gespeicherten Variabel. Es wird zuerst in den
 	 * Testvariablen, und dann in den globalen Variablen nachgesehen.
 	 * 
-	 * @param var Name der Variabel (ohne geschweifte Klammern)
+	 * @param var
+	 *            Name der Variabel (ohne geschweifte Klammern)
 	 * @return Wert der Variablen
-	 * @throws TestfileException Die Variable gibt es nicht, bzw. ist gleich NULL
+	 * @throws TestfileException
+	 *             Die Variable gibt es nicht, bzw. ist gleich NULL
 	 */
 	private Object retrieveVariable(String var) throws TestfileException {
 		Object result = null;
 		try {
-		result = localVariables.getValueFor(var);
-		} catch (TestfileException e){			
-			result = globalVariables.getValueFor(var);			
-		}		
+			result = localVariables.getValueFor(var);
+		} catch (TestfileException e) {
+			result = globalVariables.getValueFor(var);
+		}
 		return result;
 	}
 
@@ -331,6 +369,14 @@ public class TestExecuter {
 		return keyword;
 	}
 
+	/**
+	 * Spaltet einen String mit durch Komma getrennten Parametern in die
+	 * einzelnen Paramter auf
+	 * 
+	 * @param parameterLine
+	 * @return
+	 * @throws TestfileException
+	 */
 	private Object[] getParameters(String parameterLine) throws TestfileException {
 		if (parameterLine.length() == 0) {
 			return new Object[0];
@@ -351,38 +397,23 @@ public class TestExecuter {
 		return res;
 	}
 
-	private Testfile loadTestfile(String path) throws IOException, TestfileSyntaxException {
-		return TestfileReader.read(path);
-	}
-
+	/**
+	 * Läd alle Schlüsselwortbibliotheken der Testdatei
+	 * 
+	 * @param testfile
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws KeywordLibraryException
+	 */
 	private void loadLibraries(Testfile testfile) throws ClassNotFoundException, IOException, KeywordLibraryException {
 		String[] libLines = testfile.getLibraryFilePaths();
 
 		for (String line : libLines) {
-			String[] split = line.split(" ");
-
-			String path = split[0];
-			if (!Pattern.matches("\".*\"", path)) {
-				throw TestfileExceptionHandler.InvalidLibraryPath(path);
-			}
-			path = path.substring(1, path.length() - 1);
-
-			if (split.length == 1) {
-				throw TestfileExceptionHandler.InvalidLibraryName(null);
-			} else if (split.length == 2) {
-				String name = split[1];
-				if (!Pattern.matches("[\\d\\w]*", name)) {
-					throw TestfileExceptionHandler.InvalidLibraryName(name);
-				}
-				KeywordLibrary library = LibraryLoader.getInstance().loadLibrary(path);
-				libnamesMap.put(name, library);
-			} else {
-				String name = "";
-				for (int i = 1; i < split.length; i++) {
-					name += split[i] + " ";
-				}
-				throw TestfileExceptionHandler.InvalidLibraryName(name.trim());
-			}
+			int last = line.lastIndexOf("\"");
+			String path = line.substring(1, last);
+			String name = line.substring(last + 1).trim();
+			KeywordLibrary library = LibraryLoader.getInstance().loadLibrary(path);
+			libnamesMap.put(name, library);
 		}
 
 	}

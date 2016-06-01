@@ -27,7 +27,7 @@ public class TestfileReader extends AbstractFileReader {
 
 	/**
 	 * Liest eine Testdatei ein, unter beachtung der syntaktishen und
-	 * inhaltlichen korrektheit.
+	 * lexikalischen Korrektheit.
 	 * 
 	 * @param path
 	 *            Pfad der Testdatei
@@ -95,6 +95,8 @@ public class TestfileReader extends AbstractFileReader {
 	}
 
 	/**
+	 * Liest datei
+	 * 
 	 * @throws TestfileSyntaxException
 	 * @see TestfileReader#read(String)
 	 */

@@ -22,6 +22,11 @@ public class TestSuiteExecuter {
 		this.author = author;
 		this.paths = new ArrayList<>();
 	}
+	
+	public TestSuiteExecuter(){
+		this(System.getProperty("user.name"));
+	}
+	
 
 	public void addPath(String... paths) {
 		this.paths.addAll(Arrays.asList(paths));
@@ -52,8 +57,7 @@ public class TestSuiteExecuter {
 		TestSuiteProtocol suiteprotocol = new TestSuiteProtocol(author);		
 		for (String tmpPath : paths) {
 			TestExecuter tmpExecuter = new TestExecuter(tmpPath);
-			
-			
+						
 			try {
 				tmpExecuter.execute();
 				TestProtocol tmpProtocol = tmpExecuter.getProtocol();

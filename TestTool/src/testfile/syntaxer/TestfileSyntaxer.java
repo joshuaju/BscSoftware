@@ -29,71 +29,89 @@ public class TestfileSyntaxer {
 	public static final String OPERATOR_ASSIGN = "=";
 	public static final String SPLIT_ARGUMENT = ",";
 
-	public void checkVariableLines(String...lines) throws TestfileSyntaxException{
-		for (int lineIndex = 0; lineIndex < lines.length; lineIndex++){
+	/**
+	 * Überprüft die Zeilen einer Variabel-Datei auf syntaktische und
+	 * lexikalische Korrektheit
+	 * 
+	 * @param lines
+	 *            Zeilen der Datei
+	 * @throws TestfileSyntaxException
+	 *             Ungültige Zeile entdeckt
+	 */
+	public void checkVariableLines(String... lines) throws TestfileSyntaxException {
+		for (int lineIndex = 0; lineIndex < lines.length; lineIndex++) {
 			String line = lines[lineIndex].trim();
-			if (line.length() == 0 || line.startsWith(TAG_COMMENT)){
+			if (line.length() == 0 || line.startsWith(TAG_COMMENT)) {
 				// ignore
 			} else {
 				try {
 					checkAssign(line, false);
 				} catch (TestfileSyntaxException e) {
-						throw new TestfileSyntaxException(lineIndex+1, e.getMessage());
+					throw new TestfileSyntaxException(lineIndex + 1, e.getMessage());
 				}
-			}			
+			}
 		}
-		
+
 	}
-	
+
+	/**
+	 * Überprüft die Zeilen einer Testdatei auf syntaktischer und lexikalische
+	 * Korrektheit
+	 * 
+	 * @param lines
+	 *            Zeilen der Testdatei
+	 * @throws TestfileSyntaxException
+	 *             Ungültige Zeile entdeckt
+	 */
 	public void check(String... lines) throws TestfileSyntaxException {
 		int lineIndex = 0;
 		try {
-		for (lineIndex = 0; lineIndex < lines.length; lineIndex++) {			
-			String line = lines[lineIndex].trim();
+			for (lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+				String line = lines[lineIndex].trim();
 
-			if (line.startsWith(Testfile.TAG_AUTHOR) || line.startsWith(Testfile.TAG_TESTNAME)) {
-				// Nothing to check
-			} else if (line.startsWith(Testfile.TAG_DESCRIPTION)) { // description
-				for (; lineIndex < lines.length - 1; lineIndex++) {
-					line = lines[lineIndex+1].trim();
+				if (line.startsWith(Testfile.TAG_AUTHOR) || line.startsWith(Testfile.TAG_TESTNAME)) {
 					// Nothing to check
-					if (line.startsWith(Testfile.TAG_FIRST_CHAR)) {
-						break;
-					}
-				}
-			} else if (line.startsWith(Testfile.TAG_LIBRARY_FILE)) { // library
-				checkLibraryFileLine(line);
-			} else if (line.startsWith(Testfile.TAG_VARIABLE_FILE)) {
-				checkVariableFileLine(line);
-			} else if (line.startsWith(Testfile.TAG_REPEAT)) { // repeat
-				checkRepeatLine(line);
-			} else if (line.startsWith(Testfile.TAG_SETUP) || line.startsWith(Testfile.TAG_TEST)
-					|| line.startsWith(Testfile.TAG_TEARDOWN)) { // setup
-				checkEmptyLine(line);
-				for (; lineIndex < lines.length - 1; lineIndex++) {
-					line = lines[lineIndex + 1].trim();
-					if (line.length() == 0 || line.startsWith(Testfile.TAG_COMMENT)) {
-						continue;
-					} else if (line.startsWith(TAG_FIRST_CHAR)) {
-						break;
-					} else {
-						try {
-						checkTestStepLine(line);
-						} catch (TestfileSyntaxException e){
-							lineIndex++;
-							throw e;
+				} else if (line.startsWith(Testfile.TAG_DESCRIPTION)) { // description
+					for (; lineIndex < lines.length - 1; lineIndex++) {
+						line = lines[lineIndex + 1].trim();
+						// Nothing to check
+						if (line.startsWith(Testfile.TAG_FIRST_CHAR)) {
+							break;
 						}
 					}
+				} else if (line.startsWith(Testfile.TAG_LIBRARY_FILE)) { // library
+					checkLibraryFileLine(line);
+				} else if (line.startsWith(Testfile.TAG_VARIABLE_FILE)) {
+					checkVariableFileLine(line);
+				} else if (line.startsWith(Testfile.TAG_REPEAT)) { // repeat
+					checkRepeatLine(line);
+				} else if (line.startsWith(Testfile.TAG_SETUP) || line.startsWith(Testfile.TAG_TEST)
+						|| line.startsWith(Testfile.TAG_TEARDOWN)) { // setup
+					checkEmptyLine(line);
+					for (; lineIndex < lines.length - 1; lineIndex++) {
+						line = lines[lineIndex + 1].trim();
+						if (line.length() == 0 || line.startsWith(Testfile.TAG_COMMENT)) {
+							continue;
+						} else if (line.startsWith(TAG_FIRST_CHAR)) {
+							break;
+						} else {
+							try {
+								checkTestStepLine(line);
+							} catch (TestfileSyntaxException e) {
+								lineIndex++;
+								throw e;
+							}
+						}
+					}
+				} else if (line.length() == 0 || line.startsWith(Testfile.TAG_COMMENT)) {
+					// comment or empty row -> ignore
+				} else {
+					// unknown line
+					throw TestfileSyntaxException.InvalidLine();
 				}
-			} else if (line.length() == 0 || line.startsWith(Testfile.TAG_COMMENT)) {
-				// comment or empty row -> ignore
-			} else {
-				// unknown line
-				throw TestfileSyntaxException.InvalidLine();
 			}
-		}
-		} catch (TestfileSyntaxException e){
-			throw new TestfileSyntaxException((lineIndex+1), e.getMessage());
+		} catch (TestfileSyntaxException e) {
+			throw new TestfileSyntaxException((lineIndex + 1), e.getMessage());
 		}
 	}
 
@@ -152,7 +170,11 @@ public class TestfileSyntaxer {
 			throw TestfileSyntaxException.InvalidVarToAssign();
 		}
 		// rechts darf alles sein
-		if (!(checkArgument(right) || (keywordAllowed && checkKeyword(right)))) {
+		if (checkArgument(right)) {
+		
+		} else if (keywordAllowed) {
+			checkRegular(right);
+		} else {
 			throw TestfileSyntaxException.InvalidArgForAssign();
 		}
 	}
@@ -242,10 +264,10 @@ public class TestfileSyntaxer {
 	 */
 	private boolean checkVariable(String var) {
 		if (Pattern.matches("[{].+[}]", var)) {
-			var = var.substring(1, var.length()-1);
-			if (!(var.contains("{") || var.contains("}"))){				
+			var = var.substring(1, var.length() - 1);
+			if (!(var.contains("{") || var.contains("}"))) {
 				return true;
-			}			
+			}
 		}
 		return false;
 	}
@@ -259,10 +281,10 @@ public class TestfileSyntaxer {
 	 */
 	private boolean checkValue(String val) {
 		if (Pattern.matches("\".*\"", val)) {
-			val = val.substring(1, val.length()-1);
-			if (!val.contains("\"")){
+			val = val.substring(1, val.length() - 1);
+			if (!val.contains("\"")) {
 				return true;
-			}			
+			}
 		}
 		return false;
 	}

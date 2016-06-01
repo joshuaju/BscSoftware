@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -63,7 +64,7 @@ public class LibraryLoader implements Closeable {
 	 * @throws IOException
 	 * @throws KeywordLibraryException
 	 */
-	public static LibraryLoader getInstance(String loadDir)
+	public static LibraryLoader getInstance(String... loadDir)
 			throws ClassNotFoundException, IOException, KeywordLibraryException {
 		if (instance != null) {
 			try {
@@ -101,7 +102,7 @@ public class LibraryLoader implements Closeable {
 	 * @throws IOException
 	 * @throws KeywordLibraryException
 	 */
-	private LibraryLoader(String loadDir) throws ClassNotFoundException, IOException, KeywordLibraryException {
+	private LibraryLoader(String... loadDir) throws ClassNotFoundException, IOException, KeywordLibraryException {
 		defaultLibraries = new ArrayList<>();
 		defaultLoader = initDefaultLoader(loadDir);
 	}
@@ -133,25 +134,42 @@ public class LibraryLoader implements Closeable {
 	 * Verzeichnispfad. Alle Klassen der Jar Dateien werden in den ClassLoader
 	 * geladen.
 	 * 
-	 * @param loadDir
+	 * @param loadFilePaths
 	 *            Ordner der vollständig geladen wird
 	 * @return ClassLoader mit allen Klassen aller JarVerzeichnisse
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 * @throws KeywordLibraryException
 	 */
-	private URLClassLoader initDefaultLoader(String loadDir)
+	private URLClassLoader initDefaultLoader(String... loadFilePaths)
 			throws ClassNotFoundException, IOException, KeywordLibraryException {
-		File dir = new File(loadDir);
-		if (!dir.exists() || !dir.isDirectory()) {
-			throw KeywordLibraryExceptionHandler.NoSuchDirectory(dir);
+		
+		ArrayList<File> allFiles = new ArrayList<>();
+		for (String tmpFilePath: loadFilePaths){
+			tmpFilePath = tmpFilePath.trim();
+			if (tmpFilePath.length() == 0){
+				continue;
+			}
+			File tmpFile = new File(tmpFilePath);
+			if (!tmpFile.exists()){
+				throw KeywordLibraryExceptionHandler.NoSuchFile(tmpFile);
+			}
+			
+			if (tmpFile.isDirectory()) {
+				File[] filesInDir = tmpFile.listFiles((fileDir, name) -> name.endsWith(".jar")); 
+				allFiles.addAll(Arrays.asList(filesInDir));
+			} else {				
+				if (!tmpFile.getName().endsWith(".jar")){
+					throw KeywordLibraryExceptionHandler.NoSuchJarFile(tmpFile);
+				} 
+				allFiles.add(tmpFile);
+				
+			}					
 		}
-
-		File[] dirFiles = dir.listFiles((fileDir, name) -> name.endsWith(".jar"));
-		URL[] urls = makeURLArray(dirFiles);
-
+				
+		URL[] urls = makeURLArray(allFiles.toArray(new File[0]));
 		URLClassLoader loader = new URLClassLoader(urls);
-		for (File tmpFile : dirFiles) {
+		for (File tmpFile : allFiles) {
 			try {
 				JarFile jar = new JarFile(tmpFile);
 				loadAllClasses(jar, loader, true);
