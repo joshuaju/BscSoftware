@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+
+
+<SplitPane dividerPositions="0.5" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="300.0" minWidth="400.0" prefHeight="330.0" prefWidth="620.0" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.KeywordInformationListController">
+  <items>
+      <BorderPane>
+         <center>
+            <ListView fx:id="lv_keywords" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+         </center>
+         <top>
+            <ComboBox fx:id="cb_library" maxWidth="1.7976931348623157E308" promptText="Select a Library" BorderPane.alignment="CENTER" />
+         </top>
+         <bottom>
+            <TextField promptText="Suche" BorderPane.alignment="CENTER" />
+         </bottom>
+      </BorderPane>
+      <BorderPane fx:id="bp_information" prefHeight="200.0" prefWidth="200.0" />
+  </items>
+</SplitPane>

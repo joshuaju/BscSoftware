@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.BorderPane?>
+
+
+<BorderPane fx:id="bp_mainpane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.TestDesignerMainController">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="Datei">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#NewFile" text="Testdatei öffnen" />
+                  <MenuItem mnemonicParsing="false" onAction="#NewFileFromTemplate" text="Neue Templatedatei" />
+            </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="Window">
+              <items>
+                  <CheckMenuItem fx:id="cmi_alwaysOnTop" mnemonicParsing="false" text="Fenster immer oben lassen" />
+                <MenuItem fx:id="openSettings" mnemonicParsing="false" onAction="#openSettings" text="Einstellungen" />
+              </items>
+            </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>

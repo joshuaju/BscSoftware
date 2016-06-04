@@ -92,6 +92,7 @@ public class LibraryLoader implements Closeable {
 	private LibraryLoader() {
 		defaultLibraries = new ArrayList<>();
 		defaultLoader = null;
+		// TODO wenn null, dann werden KeywordAnnotations nicht erkannt
 	}
 
 	/**
@@ -231,7 +232,7 @@ public class LibraryLoader implements Closeable {
 
 	@Override
 	public void close() throws IOException {
-		if (defaultLoader != null) {
+		if (defaultLoader != null) {			
 			defaultLoader.close();
 		}
 	}

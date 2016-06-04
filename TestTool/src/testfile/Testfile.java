@@ -116,7 +116,7 @@ public class Testfile {
 	public boolean hasLibraryFilePaths() {
 		return libPaths.size() > 0;
 	}
-	
+
 	public String[] getVariableFilePaths() {
 		return varPaths.toArray(new String[0]);
 	}
@@ -204,5 +204,39 @@ public class Testfile {
 			}
 		}
 		return builder.toString();
+	}
+
+	public static String[] getTemplate() {
+		ArrayList<String> templatelines = new ArrayList<>();
+
+		templatelines.add(TAG_COMMENT);
+		templatelines.add(TAG_COMMENT + "\tTemplatedatei");
+		templatelines.add(TAG_COMMENT);
+
+		templatelines.add("");
+
+		String username = System.getenv("user.name");
+		templatelines.add(TAG_AUTHOR + "\t" + ((username != null) ? username : ""));
+		templatelines.add(TAG_TESTNAME + "\t");
+		templatelines.add(TAG_DESCRIPTION + "\t");
+		templatelines.add(TAG_REPEAT + "\t1");
+
+		templatelines.add("");
+
+		templatelines.add(TAG_LIBRARY_FILE + "\t");
+		templatelines.add(TAG_VARIABLE_FILE + "\t");
+
+		templatelines.add("");
+
+		templatelines.add(TAG_SETUP);
+
+		templatelines.add("");
+
+		templatelines.add(TAG_TEST);
+
+		templatelines.add("");
+
+		templatelines.add(TAG_TEARDOWN);
+		return templatelines.toArray(new String[0]);
 	}
 }

@@ -7,7 +7,7 @@ import java.io.IOException;
 public class KeywordLibraryExceptionHandler {
 
 	public static KeywordLibraryException ClassIsNotAKeywordLibrary(Class<?> theclass) {
-		return new KeywordLibraryException("Klasse ist kein KeywordLibrary: " + theclass.getName());
+		return new KeywordLibraryException("Klasse ist keine KeywordLibrary: " + theclass.getName());
 	}
 	
 	public static KeywordLibraryException NoDefaultConstructor(Class<?> theclass) {

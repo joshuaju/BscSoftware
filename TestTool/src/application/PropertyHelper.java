@@ -11,6 +11,8 @@ import java.util.Properties;
 
 public class PropertyHelper {
 
+	public static String TEXTEDITOR = "editor";
+	
 	private static Properties props = null;
 
 	/**
@@ -24,22 +26,25 @@ public class PropertyHelper {
 	 * @return
 	 * @throws IOException
 	 */
-	public static Properties loadApplicationProperties(boolean forceReload) throws IOException {
+	public static Properties loadApplicationProperties() throws IOException {
+		boolean forceReload = false;
 		if (props == null || forceReload) {
 			String userpropPath = getUserPropertyPath();
+			
 			props = new Properties();
 
 			try {
 				InputStream in = new FileInputStream(userpropPath);
 				props.load(in);
 				in.close();
+				System.out.println("Load Userproperties from " + userpropPath);
 			} catch (FileNotFoundException e) {
-
+				System.err.println("Userproperties not found");
 			}
 		}
 		return props;
-	}
-
+	}	
+	
 	/**
 	 * Speicher die Property-Datei des Nutzers. Der Speicherort ist über die
 	 * Property-Datei des Projekts festgelegt.

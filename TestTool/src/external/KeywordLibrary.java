@@ -99,4 +99,8 @@ public class KeywordLibrary {
 		return null;
 	}	
 	
+	public Keyword[] getKeywords(){
+		return keywordList.toArray(new Keyword[0]);
+	}
+	
 }
