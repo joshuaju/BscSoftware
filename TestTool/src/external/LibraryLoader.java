@@ -25,6 +25,9 @@ public class LibraryLoader implements Closeable {
 	 * Gibt die aktuelle Instanz der Klasse zurück, oder erzeugt eine neue.
 	 * 
 	 * @return
+	 * @throws KeywordLibraryException 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
 	public static LibraryLoader getInstance() {
 		if (instance == null) {
@@ -38,6 +41,9 @@ public class LibraryLoader implements Closeable {
 	 * wurde.
 	 * 
 	 * @return
+	 * @throws KeywordLibraryException 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
 	public static LibraryLoader getNewInstance() {
 		if (instance != null) {
@@ -88,11 +94,13 @@ public class LibraryLoader implements Closeable {
 
 	/**
 	 * Erzeugt eine neue Instanz ohne einen URLClassloader
+	 * @throws KeywordLibraryException 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
 	private LibraryLoader() {
 		defaultLibraries = new ArrayList<>();
-		defaultLoader = null;
-		// TODO wenn null, dann werden KeywordAnnotations nicht erkannt
+		defaultLoader = new URLClassLoader(new URL[]{}, URLClassLoader.getSystemClassLoader());		
 	}
 
 	/**

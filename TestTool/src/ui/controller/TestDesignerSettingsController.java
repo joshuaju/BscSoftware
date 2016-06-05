@@ -1,15 +1,20 @@
 package ui.controller;
 
+import java.io.File;
 import java.net.URL;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
+import application.PropertyHelper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Accordion;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class TestDesignerSettingsController implements Initializable {
 
@@ -20,9 +25,6 @@ public class TestDesignerSettingsController implements Initializable {
 	private URL location;
 
 	@FXML
-	private Accordion accordion;
-
-	@FXML
 	private TextField tf_pathToEditor;
 
 	@FXML
@@ -30,43 +32,55 @@ public class TestDesignerSettingsController implements Initializable {
 
 	@FXML
 	void browseForDefLibs(ActionEvent event) {
-		// TODO
-		System.out.println("Browse Libraries");
+		DirectoryChooser dc = new DirectoryChooser();
+		
+		File selectedDir = dc.showDialog(tf_pathToDefaultLibraries.getScene().getWindow());
+		if (selectedDir != null) {
+			String path = selectedDir.getAbsolutePath();
+			tf_pathToDefaultLibraries.setText(path);			
+		}
 	}
 
 	@FXML
 	void browseForEditor(ActionEvent event) {
-		// TODO
-		System.out.println("Browser Editor");
+		FileChooser fc = new FileChooser();	
+		ExtensionFilter tstFilter = new ExtensionFilter("Auführbare Datei", "*.*");
+		fc.getExtensionFilters().add(tstFilter);
+		File selected = fc.showSaveDialog(tf_pathToDefaultLibraries.getScene().getWindow());
+		if (selected != null) {
+			if (!selected.exists()) {
+				showAlertDialog("Datei existiert nicht", "");
+				return;
+			}
+			String path = selected.getAbsolutePath();
+			tf_pathToEditor.setText(path);			
+		}
+	}
+
+	private void showAlertDialog(String header, String content) {
+		Alert alertDlg = new Alert(AlertType.ERROR);
+		alertDlg.setHeaderText(header);
+		alertDlg.setContentText(content);
+		alertDlg.show();
 	}
 
 	@FXML
 	void initialize() {
 		assert tf_pathToEditor != null : "fx:id=\"tf_pathToEditor\" was not injected: check your FXML file 'TestDesignerSettingsView.fxml'.";
 		assert tf_pathToDefaultLibraries != null : "fx:id=\"tf_pathToDefaultLibraries\" was not injected: check your FXML file 'TestDesignerSettingsView.fxml'.";
-
 	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		accordion.expandedPaneProperty().addListener((obs, oldPane, newPane) -> {
-			// Das Accordion soll mindestens eine Pane offen haben
-			if (oldPane == null) {
-				return;
-			}
-			boolean allowExpanding = true;
-			for (TitledPane tmpPane : accordion.getPanes()) {
-				if (tmpPane.isExpanded()) {
-					allowExpanding = false;
-					break;
-				}
-			}
-			if (allowExpanding) {
-				Platform.runLater(() -> {
-					accordion.setExpandedPane(oldPane);
-				});
-			}
-		});
-		accordion.setExpandedPane(accordion.getPanes().get(0));
+		
+		String path = PropertyHelper.loadApplicationProperties().getProperty(PropertyHelper.TEXTEDITOR, "notepad");
+		tf_pathToEditor.setText(path);
+		path = PropertyHelper.loadApplicationProperties().getProperty(PropertyHelper.DEF_LIBRARIES_DIR, "");
+		tf_pathToDefaultLibraries.setText(path);
+		Properties props = PropertyHelper.loadApplicationProperties();
+		
+		tf_pathToEditor.textProperty().addListener((obs, oldText, newText) -> props.setProperty(PropertyHelper.TEXTEDITOR, newText));
+		tf_pathToDefaultLibraries.textProperty().addListener((obs, oldText, newText) -> props.setProperty(PropertyHelper.DEF_LIBRARIES_DIR, newText));
 	}
+
 }

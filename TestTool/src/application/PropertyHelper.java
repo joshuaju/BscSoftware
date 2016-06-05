@@ -11,7 +11,9 @@ import java.util.Properties;
 
 public class PropertyHelper {
 
+	public static String ALWAYS_ON_TOP = "always.on.top";
 	public static String TEXTEDITOR = "editor";
+	public static String DEF_LIBRARIES_DIR = "def.lib.dir";
 	
 	private static Properties props = null;
 
@@ -26,7 +28,7 @@ public class PropertyHelper {
 	 * @return
 	 * @throws IOException
 	 */
-	public static Properties loadApplicationProperties() throws IOException {
+	public static Properties loadApplicationProperties() {
 		boolean forceReload = false;
 		if (props == null || forceReload) {
 			String userpropPath = getUserPropertyPath();
@@ -40,6 +42,8 @@ public class PropertyHelper {
 				System.out.println("Load Userproperties from " + userpropPath);
 			} catch (FileNotFoundException e) {
 				System.err.println("Userproperties not found");
+			} catch (IOException e) {				
+				e.printStackTrace();
 			}
 		}
 		return props;
@@ -60,6 +64,7 @@ public class PropertyHelper {
 
 		OutputStream out = new FileOutputStream(outFile.getAbsoluteFile());
 		properties.store(out, "User Properties");
+		System.out.println("Saved Userproperties to " + userpropPath);
 	}
 
 	/**
@@ -69,19 +74,23 @@ public class PropertyHelper {
 	 * @return
 	 * @throws IOException
 	 */
-	private static Properties getProjectProperties() throws IOException {
+	private static Properties getProjectProperties() {
 		InputStream bis = PropertyHelper.class.getClassLoader().getResourceAsStream("project.properties");
 		Properties projprops = new Properties();
 
 		if (bis != null) {
+			try {
 			projprops.load(bis);
 			bis.close();
+			} catch (IOException e){
+				e.printStackTrace();
+			}
 		}
 
 		return projprops;
 	}
 
-	private static String getUserPropertyPath() throws IOException {
+	private static String getUserPropertyPath() {
 		Properties projprops = getProjectProperties();
 		String projname = projprops.getProperty("project.name");
 		String userprop_sysenv = (String) projprops.getOrDefault("userprop.sysenv", "APPDATA");

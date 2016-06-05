@@ -21,8 +21,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
@@ -45,9 +45,7 @@ public class TestDesignerMainController implements Initializable {
 
 	@FXML
 	private CheckMenuItem cmi_alwaysOnTop;
-
-	private String CMD_TEXTEDITOR;
-
+	
 	@FXML
 	void NewFile(ActionEvent event) {
 		File selected = showFileChooserDialog();
@@ -79,7 +77,7 @@ public class TestDesignerMainController implements Initializable {
 	}
 
 	@FXML
-	void openSettings(ActionEvent event) {		
+	void openSettings(ActionEvent event) {
 		FXMLLoader loader = new FXMLLoader(
 				getClass().getClassLoader().getResource("ui/fxml/TestDesignerSettingsView.fxml"));
 		Parent root = null;
@@ -92,10 +90,10 @@ public class TestDesignerMainController implements Initializable {
 		dlgPane.setContent(root);
 
 		Dialog<String> dlg = new Dialog<>();
-		dlg.setTitle("Einstellungen");			
+		dlg.setTitle("Einstellungen");
 		dlg.setDialogPane(dlgPane);
 		dlg.setResizable(true);
-		dlgPane.getButtonTypes().add(ButtonType.OK);		
+		dlgPane.getButtonTypes().add(ButtonType.OK);
 		dlg.show();
 	}
 
@@ -107,8 +105,9 @@ public class TestDesignerMainController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		KeywordLibrary lib = null;
+		// TODO ausgewählte libraries laden
 		try {
-			LibraryLoader.getInstance("D:/Bsc/default/");
+			LibraryLoader.getInstance();
 			lib = LibraryLoader.getInstance().loadLibrary("D:/Bsc/default/CompareKeywordLibrary.jar");
 		} catch (ClassNotFoundException | IOException | KeywordLibraryException e) {
 			e.printStackTrace();
@@ -125,20 +124,22 @@ public class TestDesignerMainController implements Initializable {
 		controller.addLibrary(lib);
 
 		bp_mainpane.setCenter(root);
-
+		
 		Platform.runLater(() -> {
 			Scene currentScene = bp_mainpane.getScene();
 			Stage currentStage = (Stage) currentScene.getWindow();
 			cmi_alwaysOnTop.selectedProperty()
-					.addListener((obs, oldVal, newVal) -> currentStage.setAlwaysOnTop(newVal));
+					.addListener((obs, oldVal, newVal) -> {
+						currentStage.setAlwaysOnTop(newVal);
+						PropertyHelper.loadApplicationProperties().setProperty(PropertyHelper.ALWAYS_ON_TOP, new Boolean(newVal).toString());
+					});
+			
+			String stored = PropertyHelper.loadApplicationProperties().getProperty(PropertyHelper.ALWAYS_ON_TOP, "false");
+			Boolean alwaysOnTop = Boolean.parseBoolean(stored);
+			cmi_alwaysOnTop.setSelected(alwaysOnTop);
 		});
 
-		try {
-			CMD_TEXTEDITOR = PropertyHelper.loadApplicationProperties().getProperty(PropertyHelper.TEXTEDITOR,
-					"notepad");
-		} catch (IOException e) {
-			CMD_TEXTEDITOR = "notepad";
-		}
+		
 	}
 
 	private File showFileChooserDialog() {
@@ -165,7 +166,8 @@ public class TestDesignerMainController implements Initializable {
 	}
 
 	private void callTexteditor(File selected) {
-		ProcessBuilder process = new ProcessBuilder(CMD_TEXTEDITOR, selected.getAbsolutePath());
+		String editor = PropertyHelper.loadApplicationProperties().getProperty(PropertyHelper.TEXTEDITOR, "notepad");
+		ProcessBuilder process = new ProcessBuilder(editor, selected.getAbsolutePath());			
 		try {
 			process.start();
 		} catch (IOException e) {
