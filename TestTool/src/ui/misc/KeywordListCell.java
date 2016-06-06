@@ -47,7 +47,9 @@ public class KeywordListCell extends ListCell<Keyword> {
 	@Override
 	protected void updateItem(Keyword item, boolean empty) {
 		super.updateItem(item, empty);
-		if (item != null) {
+		if (empty){
+			setText("");
+		} else if (item != null) {
 			setText(item.getName());
 		}
 	}

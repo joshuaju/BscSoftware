@@ -44,6 +44,9 @@ public class TestDesignerMainController implements Initializable {
 	private BorderPane bp_mainpane;
 
 	@FXML
+	private LibraryInformationListController libInfoListController;
+	
+	@FXML
 	private CheckMenuItem cmi_alwaysOnTop;
 	
 	@FXML
@@ -97,33 +100,19 @@ public class TestDesignerMainController implements Initializable {
 		dlg.show();
 	}
 
-	@FXML
-	void initialize() {
-		assert bp_mainpane != null : "fx:id=\"bp_mainpane\" was not injected: check your FXML file 'TestDesignerMainView.fxml'.";
-	}
-
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		KeywordLibrary lib = null;
 		// TODO ausgewählte libraries laden
+		KeywordLibrary lib1 = null;
+		KeywordLibrary lib2 = null;
 		try {
 			LibraryLoader.getInstance();
-			lib = LibraryLoader.getInstance().loadLibrary("D:/Bsc/default/CompareKeywordLibrary.jar");
+			lib1 = LibraryLoader.getInstance().loadLibrary("D:/Bsc/libs/CompareKeywordLibrary.jar");
+			lib2 = LibraryLoader.getInstance().loadLibrary("D:/Bsc/libs/DialogKeywordLibrary.jar");
 		} catch (ClassNotFoundException | IOException | KeywordLibraryException e) {
 			e.printStackTrace();
-		}
-		FXMLLoader loader = new FXMLLoader(
-				getClass().getClassLoader().getResource("ui/fxml/KeywordInformationListView.fxml"));
-		Parent root = null;
-		try {
-			root = loader.load();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		KeywordInformationListController controller = loader.getController();
-		controller.addLibrary(lib);
-
-		bp_mainpane.setCenter(root);
+		}		
+		libInfoListController.libraryListProperty().addAll(lib1, lib2);
 		
 		Platform.runLater(() -> {
 			Scene currentScene = bp_mainpane.getScene();

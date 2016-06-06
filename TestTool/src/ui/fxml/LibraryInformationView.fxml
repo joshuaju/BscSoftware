@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="270.0" prefWidth="558.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.LibraryInformationController">
+   <top>
+      <TitledPane fx:id="tp_library" animated="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Keine Bibliothek ausgewählt" BorderPane.alignment="CENTER">
+         <content>
+            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+               <children>
+                  <Label text="Autor">
+                     <padding>
+                        <Insets left="5.0" />
+                     </padding></Label>
+                  <TextField fx:id="tf_author" editable="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" promptText="Autor" />
+                  <Label text="Beschreibung">
+                     <padding>
+                        <Insets left="5.0" />
+                     </padding></Label>
+                  <TextArea fx:id="ta_description" editable="false" maxHeight="80.0" maxWidth="1.7976931348623157E308" prefHeight="24.0" prefWidth="536.0" promptText="Beschreibung" wrapText="true" />
+               </children>
+            </VBox>
+         </content>
+      </TitledPane>
+   </top>
+   <center>
+   		<fx:include fx:id="keywordInfoList" source="KeywordInformationListView.fxml" />
+   </center>
+</BorderPane>

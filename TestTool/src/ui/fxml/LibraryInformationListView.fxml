@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<SplitPane dividerPositions="0.351" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.LibraryInformationListController">
+   <items>
+      <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="266.0" prefWidth="176.0">
+         <center>
+            <ListView fx:id="lv_libraries" maxHeight="1.7976931348623157E308" minHeight="50.0" minWidth="75.0" prefHeight="400.0" />
+         </center>
+         <top>
+            <fx:include fx:id="search" source="searchfield.fxml" />
+         </top>
+      </BorderPane>
+      <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+	      <center>
+	      	<fx:include fx:id="libraryInfo" source="LibraryInformationView.fxml" />
+	      </center>
+      </BorderPane>
+   </items>
+</SplitPane>

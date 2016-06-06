@@ -67,7 +67,7 @@ public class KeywordInformationController implements Initializable {
 	}
 
 	private void setTitle(Keyword keyword) {
-		String name = "";
+		String name = "Kein Keyword ausgewählt";
 		if (keyword != null) {
 			name = keyword.getName();
 		}

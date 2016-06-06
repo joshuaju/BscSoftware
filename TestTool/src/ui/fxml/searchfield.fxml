@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.SearchFieldController">
+   <children>
+      <TextField fx:id="tf_search" promptText="Suche">
+         <opaqueInsets>
+            <Insets right="50.0" />
+         </opaqueInsets>
+         <StackPane.margin>
+            <Insets />
+         </StackPane.margin></TextField>
+      <Label fx:id="lblImage" alignment="TOP_LEFT" graphicTextGap="0.0" StackPane.alignment="CENTER_RIGHT">
+         <StackPane.margin>
+            <Insets right="5.0" />
+         </StackPane.margin>
+      </Label>
+   </children>
+</StackPane>

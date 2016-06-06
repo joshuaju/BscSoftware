@@ -8,6 +8,6 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="lib" path="D:/Bsc/refs/expr.jar"/>
-	<classpathentry kind="lib" path="D:/KeywordAnnotations.jar"/>
+	<classpathentry kind="lib" path="D:/Bsc/refs/KeywordAnnotations.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

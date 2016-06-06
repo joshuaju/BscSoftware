@@ -6,16 +6,16 @@
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="info_mainpane" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="250.0" minWidth="250.0" prefHeight="300.0" prefWidth="300.0" text="Name des Keywords" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.KeywordInformationController">
+<TitledPane fx:id="info_mainpane" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="209.0" prefWidth="302.0" text="Kein Keyword ausgewählt" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.KeywordInformationController">
    <content>
-      <VBox prefHeight="300.0" prefWidth="300.0">
+      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="300.0" prefWidth="300.0">
          <children>
             <Label alignment="TOP_LEFT" text="Beschreibung">
                <VBox.margin>
                   <Insets left="5.0" />
                </VBox.margin>
             </Label>
-            <TextArea fx:id="ta_description" editable="false" maxHeight="80.0" promptText="Keine Beschreibung" wrapText="true">
+            <TextArea fx:id="ta_description" editable="false" maxHeight="80.0" maxWidth="1.7976931348623157E308" promptText="Keine Beschreibung" wrapText="true">
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>
@@ -25,7 +25,7 @@
                   <Insets left="5.0" />
                </VBox.margin>
             </Label>
-            <TextArea fx:id="ta_parameter" editable="false" maxHeight="80.0" promptText="Keine Inforamtionen zu Parametern" wrapText="true">
+            <TextArea fx:id="ta_parameter" editable="false" maxHeight="80.0" maxWidth="1.7976931348623157E308" promptText="Keine Inforamtionen zu Parametern" wrapText="true">
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>
@@ -35,7 +35,7 @@
                   <Insets left="5.0" />
                </VBox.margin>
             </Label>
-            <TextArea fx:id="ta_return" editable="false" maxHeight="80.0" promptText="Keine Informationen zum Rückgabewert" wrapText="true">
+            <TextArea fx:id="ta_return" editable="false" maxHeight="80.0" maxWidth="1.7976931348623157E308" promptText="Keine Informationen zum Rückgabewert" wrapText="true">
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>

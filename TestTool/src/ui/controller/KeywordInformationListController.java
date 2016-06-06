@@ -1,21 +1,18 @@
 package ui.controller;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import external.Keyword;
-import external.KeywordLibrary;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
-import javafx.util.StringConverter;
 import ui.misc.KeywordListCell;
 
 public class KeywordInformationListController implements Initializable {
@@ -27,64 +24,42 @@ public class KeywordInformationListController implements Initializable {
 	private URL location;
 
 	@FXML
-	private ComboBox<KeywordLibrary> cb_library;
-
-	@FXML
 	private ListView<Keyword> lv_keywords;
 
 	@FXML
 	private BorderPane bp_information;
-	private KeywordInformationController controller_information;
 
 	@FXML
-	void initialize() throws IOException {
-		FXMLLoader kwInfoLoader = new FXMLLoader(
-				getClass().getClassLoader().getResource("ui/fxml/KeywordInformationView.fxml"));
-		TitledPane root = kwInfoLoader.load();
-		controller_information = kwInfoLoader.getController();
-		bp_information.setCenter(root);		
-	}
+	private SplitPane sp_main;
+
+	@FXML
+	private KeywordInformationController keywordInfoController;
+
+	@FXML
+	private SearchFieldController searchController;
+
+	private ListProperty<Keyword> keywordListProperty;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		try {
-			initialize();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		cb_library.setConverter(new StringConverter<KeywordLibrary>() {
-
-			@Override
-			public String toString(KeywordLibrary object) {
-				return object.getName();
-			}
-
-			@Override
-			public KeywordLibrary fromString(String string) {
-				return null;
-			}
-		});
-		cb_library.getSelectionModel().selectedItemProperty().addListener((obs) -> updateKeywordList());
-
 		lv_keywords.setCellFactory(param -> new KeywordListCell());
-		lv_keywords.getItems().clear();
+
+		keywordListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+
 		lv_keywords.getSelectionModel().selectedItemProperty()
-				.addListener((obs, oldVal, newVal) -> controller_information.setKeyword(newVal));
+				.addListener((obs, oldVal, newVal) -> keywordInfoController.setKeyword(newVal));
+
+		FilteredList<Keyword> filteredList = searchController.getFilteredList(keywordListProperty);
+		filteredList.setPredicate(kw -> true);
+		searchController.textProperty().addListener((obs, oldVal, newVal) -> {
+			filteredList.setPredicate(kw -> kw.getName().toLowerCase().contains(newVal.toLowerCase()));
+		});
+		
+		lv_keywords.setItems(filteredList);
 	}
 
-	public void addLibrary(KeywordLibrary library) {
-		cb_library.getItems().add(library);
+	public ListProperty<Keyword> keywordListProperty() {
+		return keywordListProperty;
 	}
 
-	private void updateKeywordList() {
-		KeywordLibrary selectedLib = cb_library.getSelectionModel().getSelectedItem();
-
-		ObservableList<Keyword> kwList = FXCollections.observableArrayList();
-		kwList.addAll(selectedLib.getKeywords());
-		kwList.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));
-
-		for (Keyword tmpKeyword : kwList) {
-			lv_keywords.getItems().add(tmpKeyword);
-		}
-	}
 }

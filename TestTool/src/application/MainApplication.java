@@ -11,8 +11,8 @@ import external.LibraryLoader;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class MainApplication extends Application {
@@ -29,12 +29,15 @@ public class MainApplication extends Application {
 
 		FXMLLoader loader = new FXMLLoader(
 				getClass().getClassLoader().getResource("ui/fxml/TestDesignerMainView.fxml"));
-		Parent root = loader.load();
+		BorderPane root = loader.load();
 
-		primaryStage.setScene(new Scene(root));
 		
+		primaryStage.setScene(new Scene(root));	
 		primaryStage.show();
 		
+		primaryStage.sizeToScene();
+		primaryStage.setMinHeight(primaryStage.getHeight());		
+						
 		primaryStage.setOnCloseRequest((event) -> {
 			try {
 				PropertyHelper.saveApplicationProperties(appProperties);
@@ -43,8 +46,8 @@ public class MainApplication extends Application {
 			}
 		});
 		
-	}
-
+	}	
+	
 	public static void testExecution()
 			throws IOException, ClassNotFoundException, KeywordLibraryException, TestfileSyntaxException {
 
