@@ -9,9 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ResourceBundle;
 
+import application.MainApplication;
 import application.PropertyHelper;
 import exceptions.keywordlibrary.KeywordLibraryException;
-import external.KeywordLibrary;
+import external.ExecutableKeywordLibrary;
 import external.LibraryLoader;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -20,8 +21,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Dialog;
@@ -53,7 +52,6 @@ public class TestDesignerMainController implements Initializable {
 	void NewFile(ActionEvent event) {
 		File selected = showFileChooserDialog();
 		if (selected != null) {
-			// "C:/Program Files (x86)/Notepad++/notepad++.exe"
 			callTexteditor(selected);
 		}
 	}
@@ -73,7 +71,7 @@ public class TestDesignerMainController implements Initializable {
 				writer.close();
 				callTexteditor(selected);
 			} catch (IOException e) {
-				showAlertDialog("Template konnte nicht erstellt werden", e.getMessage());
+				MainApplication.showAlert("Template konnte nicht erstellt werden", e.getMessage());
 			}
 
 		}
@@ -97,18 +95,23 @@ public class TestDesignerMainController implements Initializable {
 		dlg.setDialogPane(dlgPane);
 		dlg.setResizable(true);
 		dlgPane.getButtonTypes().add(ButtonType.OK);
-		dlg.show();
+		MainApplication.showDialog(dlg);
+	}
+	
+	@FXML
+	void ImportLibrary(ActionEvent event){
+		libInfoListController.browseAndAddLibrary();
 	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO ausgewählte libraries laden
-		KeywordLibrary lib1 = null;
-		KeywordLibrary lib2 = null;
+		ExecutableKeywordLibrary lib1 = null;
+		ExecutableKeywordLibrary lib2 = null;
 		try {
 			LibraryLoader.getInstance();
-			lib1 = LibraryLoader.getInstance().loadLibrary("D:/Bsc/libs/CompareKeywordLibrary.jar");
-			lib2 = LibraryLoader.getInstance().loadLibrary("D:/Bsc/libs/DialogKeywordLibrary.jar");
+			lib1 = LibraryLoader.getInstance().loadInstantiatedKeywordLibrary("D:/Bsc/libs/CompareKeywordLibrary.jar");
+			lib2 = LibraryLoader.getInstance().loadInstantiatedKeywordLibrary("D:/Bsc/libs/DialogKeywordLibrary.jar");
 		} catch (ClassNotFoundException | IOException | KeywordLibraryException e) {
 			e.printStackTrace();
 		}		
@@ -142,17 +145,10 @@ public class TestDesignerMainController implements Initializable {
 		if (selected != null && !selected.getName().endsWith(".tst")) {
 			String header = "Ungültige Dateiendung";
 			String content = "Die Dateiendung muss \".tst\" sein";
-			showAlertDialog(header, content);
+			MainApplication.showAlert(header, content);
 		}
 		return selected;
-	}
-
-	private void showAlertDialog(String header, String content) {
-		Alert alertDlg = new Alert(AlertType.ERROR);
-		alertDlg.setHeaderText(header);
-		alertDlg.setContentText(content);
-		alertDlg.show();
-	}
+	}	
 
 	private void callTexteditor(File selected) {
 		String editor = PropertyHelper.loadApplicationProperties().getProperty(PropertyHelper.TEXTEDITOR, "notepad");
@@ -160,7 +156,7 @@ public class TestDesignerMainController implements Initializable {
 		try {
 			process.start();
 		} catch (IOException e) {
-			showAlertDialog("Texteditor wurde nicht geöffnet", "");
+			MainApplication.showAlert("Texteditor wurde nicht geöffnet", "");
 		}
 	}
 }

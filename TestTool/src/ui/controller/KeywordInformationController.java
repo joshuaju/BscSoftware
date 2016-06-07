@@ -3,7 +3,7 @@ package ui.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import external.Keyword;
+import external.SimpleKeyword;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
@@ -31,7 +31,7 @@ public class KeywordInformationController implements Initializable {
 	@FXML
 	private TextArea ta_return;
 
-	private ObjectProperty<Keyword> currentKeyword;
+	private ObjectProperty<SimpleKeyword> currentKeyword;
 
 	@FXML
 	void initialize() {
@@ -44,16 +44,16 @@ public class KeywordInformationController implements Initializable {
 		currentKeyword.addListener((obs) -> updateInformation());
 	}
 
-	public void setKeyword(Keyword keyword) {
+	public void setKeyword(SimpleKeyword keyword) {
 		currentKeyword.set(keyword);
 	}
 
-	public ObjectProperty<Keyword> currentKeywordProperty() {
+	public ObjectProperty<SimpleKeyword> currentKeywordProperty() {
 		return currentKeyword;
 	}
 
 	private void updateInformation() {
-		Keyword keyword = currentKeyword.get();
+		SimpleKeyword keyword = currentKeyword.get();
 		setTitle(keyword);
 		setDescription(keyword);
 		setParams(keyword);
@@ -66,7 +66,7 @@ public class KeywordInformationController implements Initializable {
 		}		
 	}
 
-	private void setTitle(Keyword keyword) {
+	private void setTitle(SimpleKeyword keyword) {
 		String name = "Kein Keyword ausgewählt";
 		if (keyword != null) {
 			name = keyword.getName();
@@ -74,7 +74,7 @@ public class KeywordInformationController implements Initializable {
 		info_mainpane.setText(name);
 	}
 
-	private void setDescription(Keyword keyword) {
+	private void setDescription(SimpleKeyword keyword) {
 		String text = "";
 		if (keyword != null) {
 			text = keyword.getDescription();
@@ -82,7 +82,7 @@ public class KeywordInformationController implements Initializable {
 		ta_description.setText(text);
 	}
 
-	private void setParams(Keyword keyword) {
+	private void setParams(SimpleKeyword keyword) {
 		String text = "";
 		if (keyword != null) {
 			text = keyword.getParameter();
@@ -102,7 +102,7 @@ public class KeywordInformationController implements Initializable {
 		ta_parameter.setText(text);
 	}
 
-	private void setReturn(Keyword keyword) {
+	private void setReturn(SimpleKeyword keyword) {
 		String text = "";
 		if (keyword != null) {
 			text = keyword.getReturn();

@@ -2,7 +2,6 @@ package execution;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import exceptions.executing.SetupException;
@@ -16,8 +15,8 @@ import exceptions.testfile.TestfileSyntaxException;
 import expr.Expr;
 import expr.Parser;
 import expr.SyntaxException;
-import external.Keyword;
-import external.KeywordLibrary;
+import external.ExecutableKeyword;
+import external.ExecutableKeywordLibrary;
 import external.LibraryLoader;
 import testfile.Testfile;
 import testfile.TestfileReader;
@@ -26,12 +25,12 @@ import testfile.VariableFile;
 import testfile.VariableFileReader;
 
 public class TestExecuter {
-
+	private final String DEFAULT_LIBRARIES_NAME = "std";
 	private final String path;
 	private VariableFile globalVariables;
 	private VariableFile localVariables;
 
-	private final HashMap<String, KeywordLibrary> libnamesMap;
+	private final HashMap<String, ExecutableKeywordLibrary> libnamesMap;
 
 	private Testfile testfile;
 	private TestProtocol protocol;
@@ -253,7 +252,7 @@ public class TestExecuter {
 		String strKeyword = line.substring(0, first).trim();
 		String parLine = line.substring(first).trim();
 
-		Keyword keyword = findKeyword(strKeyword);
+		ExecutableKeyword keyword = findKeyword(strKeyword);
 		Object[] args = getParameters(parLine);
 
 		return keyword.invoke(args);
@@ -324,49 +323,90 @@ public class TestExecuter {
 	 * geladenen Bibliotheken. Wenn ein Bibliotheksname vorangestellt ist, dann
 	 * wird nur in dieser gesucht.
 	 * 
-	 * @param strKeyword
+	 * @param keywordname
 	 *            Keyword, (optional) mit Bibliotheksname davor
 	 * @return Das ermittelte Keyword
 	 * @throws TestfileException
 	 *             Das Keyword wurde nicht gefunden, oder es kommt in mehreren
 	 *             Bibliotheken vor
 	 */
-	private Keyword findKeyword(String strKeyword) throws TestfileException {
-		ArrayList<KeywordLibrary> libs = new ArrayList<>();
-		libs.addAll(libnamesMap.values());
-
-		if (LibraryLoader.getInstance().hasDefaultLibraries()) {
-			libs.addAll(Arrays.asList(LibraryLoader.getInstance().getDefaultLibraries()));
+	private ExecutableKeyword findKeyword(String keywordname) throws TestfileException {
+		String libraryname = "";
+		int dotIndex = keywordname.indexOf(".");
+		if (dotIndex != -1) {
+			libraryname = keywordname.substring(0, dotIndex);
+			keywordname = keywordname.substring(dotIndex + 1);
 		}
+		ArrayList<ExecutableKeywordLibrary> availableLibs = getAvailableLibraries(libraryname);
+		ExecutableKeyword keyword = getExecutableKeyword(libraryname, keywordname, availableLibs);
+		return keyword;
+	}
 
-		int indexOfDot = strKeyword.indexOf(".");
-		String libName = "";
-		if (indexOfDot != -1) {
-			libName = strKeyword.substring(0, indexOfDot);
-			strKeyword = strKeyword.substring(indexOfDot + 1);
-			KeywordLibrary lib = libnamesMap.getOrDefault(libName, null);
-			if (lib == null) {
-				throw TestfileExceptionHandler.NoLibraryForThisName(libName);
+	/**
+	 * Gibt die verfügbaren Bibliotheken zurück. Kein Name bedeuted, dass alle
+	 * Standard und im Testfall geladenen Bibliotheken zurückgegeben werden.
+	 * Ansonsten wird nur die Bibliothek mit dem Bezeichner geladen. Wenn der
+	 * Standard-Bezeichner verwendet wird, dann werden alle
+	 * Standard-Bibliotheken geladen.
+	 * 
+	 * @param libraryname
+	 *            Bezeichner der Bibliothek
+	 * @return verfügbare Bibliotheken in denen nach einem Schlüsselwort gesucht
+	 *         werden kann
+	 * @throws TestfileException
+	 */
+	private ArrayList<ExecutableKeywordLibrary> getAvailableLibraries(String libraryname) throws TestfileException {
+		ArrayList<ExecutableKeywordLibrary> availableLibs = new ArrayList<>();
+		if (libraryname == null || libraryname.length() == 0) {
+			availableLibs.addAll(LibraryLoader.getInstance().getDefaultLibraries());
+			availableLibs.addAll(libnamesMap.values());
+		} else {
+			if (libraryname.equals(DEFAULT_LIBRARIES_NAME)) {
+				availableLibs.addAll(LibraryLoader.getInstance().getDefaultLibraries());
+			} else {
+				ExecutableKeywordLibrary lib = libnamesMap.getOrDefault(libraryname, null);
+				if (lib == null) {
+					throw TestfileExceptionHandler.NoLibraryForThisName(libraryname);
+				}
+				availableLibs.add(lib);
 			}
-			libs = new ArrayList<>();
-			libs.add(lib);
 		}
+		return availableLibs;
+	}
 
-		Keyword keyword = null;
-		for (KeywordLibrary lib : libs) {
-			Keyword tmpKeyword = lib.getKeywordByName(strKeyword);
+	/**
+	 * Sucht das Schlüsselwort in den verfügbaren Bibliotheken.
+	 * 
+	 * @see TestExecuter#getAvailableLibraries(String)
+	 * @param libraryname
+	 *            Bibliotheks-Bezeichner (kann auch leer sein)
+	 * @param keywordname
+	 *            Name des Schlüsselworts
+	 * @param libraries
+	 *            Bibliotheken in den gesucht wird
+	 * @return
+	 * @throws TestfileException
+	 *             Das Keyword kommt in mehreren Bibliotheke vor, oder es wurde
+	 *             nicht gefunden
+	 */
+	private ExecutableKeyword getExecutableKeyword(String libraryname, String keywordname,
+			ArrayList<ExecutableKeywordLibrary> libraries) throws TestfileException {
+		ExecutableKeyword finalKeyword = null;
+
+		for (ExecutableKeywordLibrary tmpLibrary : libraries) {
+			ExecutableKeyword tmpKeyword = tmpLibrary.getKeywordByName(keywordname);
 			if (tmpKeyword != null) {
-				if (keyword == null) {
-					keyword = tmpKeyword;
-				} else {
+				if (finalKeyword != null) {
 					throw TestfileExceptionHandler.DuplicatedKeyword(tmpKeyword);
 				}
+				finalKeyword = tmpKeyword;
 			}
 		}
-		if (keyword == null) {
-			throw TestfileExceptionHandler.NoSuchKeywordInLibrary(strKeyword, libName);
+
+		if (finalKeyword == null) {
+			throw TestfileExceptionHandler.NoSuchKeywordInLibrary(libraryname, keywordname);
 		}
-		return keyword;
+		return finalKeyword;
 	}
 
 	/**
@@ -412,7 +452,7 @@ public class TestExecuter {
 			int last = line.lastIndexOf("\"");
 			String path = line.substring(1, last);
 			String name = line.substring(last + 1).trim();
-			KeywordLibrary library = LibraryLoader.getInstance().loadLibrary(path);
+			ExecutableKeywordLibrary library = LibraryLoader.getInstance().loadInstantiatedKeywordLibrary(path);
 			libnamesMap.put(name, library);
 		}
 

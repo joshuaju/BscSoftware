@@ -1,19 +1,20 @@
 package ui.misc;
 
-import external.Keyword;
+import external.ExecutableKeyword;
+import external.SimpleKeyword;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
-public class KeywordListCell extends ListCell<Keyword> {
+public class KeywordListCell extends ListCell<SimpleKeyword> {
 
 	public KeywordListCell() {
 		super();
 
 		setOnDragDetected(event -> {
-			Keyword thiskeyword = getItem();
+			SimpleKeyword thiskeyword = getItem();
 			if (thiskeyword == null) {
 				return;
 			}
@@ -45,7 +46,7 @@ public class KeywordListCell extends ListCell<Keyword> {
 	}
 
 	@Override
-	protected void updateItem(Keyword item, boolean empty) {
+	protected void updateItem(SimpleKeyword item, boolean empty) {
 		super.updateItem(item, empty);
 		if (empty){
 			setText("");
@@ -54,7 +55,7 @@ public class KeywordListCell extends ListCell<Keyword> {
 		}
 	}
 
-	private String getDragAndDropText(Keyword thiskeyword) {
+	private String getDragAndDropText(SimpleKeyword thiskeyword) {
 		String paramtext = "";
 
 		for (Class<?> tmpParam : thiskeyword.getParameterTypes()) {

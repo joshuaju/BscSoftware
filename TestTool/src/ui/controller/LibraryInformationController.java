@@ -3,8 +3,8 @@ package ui.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import external.Keyword;
-import external.KeywordLibrary;
+import external.SimpleKeyword;
+import external.SimpleKeywordLibrary;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -36,7 +36,7 @@ public class LibraryInformationController implements Initializable {
 	@FXML
 	private TextArea ta_description;
 
-	private ObjectProperty<KeywordLibrary> libraryProperty;
+	private ObjectProperty<SimpleKeywordLibrary> libraryProperty;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -46,16 +46,18 @@ public class LibraryInformationController implements Initializable {
 
 		tp_library.expandedProperty().addListener((obs, oldPane, newPane) -> {
 			Platform.runLater(() -> {
-				// resize if titledpane expands/collapses
-				Stage stage = (Stage) tp_library.getScene().getWindow();
-				stage.setMinHeight(0);
-				stage.sizeToScene();
-				stage.setMinHeight(stage.getHeight());
+				// resize if titledpane expands
+				if (tp_library.isExpanded()){
+					Stage stage = (Stage) tp_library.getScene().getWindow();				
+//					stage.setMinHeight(0);
+					stage.sizeToScene();
+//					stage.setMinHeight(stage.getHeight());
+				}				
 			});
 		});
 	}
 
-	public ObjectProperty<KeywordLibrary> libraryProperty() {
+	public ObjectProperty<SimpleKeywordLibrary> libraryProperty() {
 		return libraryProperty;
 	}
 
@@ -63,9 +65,9 @@ public class LibraryInformationController implements Initializable {
 		String name = "Keine Bibliothek ausgwählt";
 		String author = "";
 		String description = "";
-		Keyword[] kw = new Keyword[0];
+		SimpleKeyword[] kw = new SimpleKeyword[0];
 		if (libraryProperty.isNotNull().get()) {
-			KeywordLibrary newLib = libraryProperty.get();
+			SimpleKeywordLibrary newLib = libraryProperty.get();
 			name = newLib.getName();
 			author = newLib.getAuthor();
 			description = newLib.getDescription();

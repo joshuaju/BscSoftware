@@ -13,70 +13,19 @@ import exceptions.keywordlibrary.KeywordLibraryException;
  * @author JJungen
  *
  */
-public class Keyword {
+public class ExecutableKeyword extends SimpleKeyword {
 
-	private final annotations.Keyword annotation;
-	private final Method method;
 	private final Object libInstance;
 
-	Keyword(Object libInstance, Method method) throws KeywordLibraryException {
-		if (!Keyword.isKeywordMethod(method)) {
-			throw KeywordExceptionHandler.MethodIsNotAKeyword(method);
-		}
-		this.annotation = method.getAnnotation(annotations.Keyword.class);
-		this.method = method;
+	ExecutableKeyword(Object libInstance, Method method) throws KeywordLibraryException {
+		super(method);
 		this.libInstance = libInstance;
 	}
-
-	/**
-	 * Den Namen, also die String-Darstellung des Schlüsselworts
-	 * @return Name
-	 */
-	public String getName() {
-		return annotation.Name();
+	
+	public ExecutableKeyword(Object libInstance, SimpleKeyword simple) throws KeywordLibraryException {
+		this(libInstance, simple.method);
 	}
-
-	/**
-	 * Die Beschreibung zum Schlüsselwort 
-	 * @return
-	 */
-	public String getDescription() {
-		return annotation.Description();
-	}
-
-	/**
-	 * Die Beschreibung zu den Übergabeparametern
-	 * @return
-	 */
-	public String getParameter() {
-		return annotation.Parameter();
-	}
-
-	/**
-	 * Die Beschreibung zum Rückgabewert
-	 * @return
-	 */
-	public String getReturn() {
-		return annotation.Return();
-
-	}
-
-	/**
-	 * Die Typen der Übergabeparamter (von links nach rechts)
-	 * @return Array der Typen 
-	 */
-	public Class<?>[] getParameterTypes() {
-		return method.getParameterTypes();
-	}
-
-	/**
-	 * Den Typ des Rückgabewerts
-	 * @return 
-	 */
-	public Class<?> getReturntype() {
-		return method.getReturnType();
-	}
-
+	
 	/**
 	 * Dieses Keyword wird an dem Object instance, mit den Übergabeparametern args, aufegerufen 
 	 * @param instance ausführendes Objekt
@@ -106,7 +55,7 @@ public class Keyword {
 			args[i] = tmpArg;
 		}
 
-		try {
+		try {			
 			return method.invoke(libInstance, args);
 		} catch(IllegalAccessException e) {
 			// cannot happen
@@ -164,18 +113,5 @@ public class Keyword {
 		return "[NAME] " + getName() + ", [DESC] " + getDescription() + ", [PARA] " + getParameter() + ", [RET] "
 				+ getReturn();
 	}
-
-	public static boolean isKeywordMethod(Method method) {
-		annotations.Keyword anno = method.getAnnotation(annotations.Keyword.class);
-		if (anno != null) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public static boolean isNameEqual(Keyword keyword, String name) {
-		return keyword.getName().equals(name);
-	}
-
+	
 }

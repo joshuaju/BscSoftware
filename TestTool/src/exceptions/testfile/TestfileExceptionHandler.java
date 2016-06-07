@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import external.Keyword;
+import external.ExecutableKeyword;
 
 public class TestfileExceptionHandler {
 
@@ -63,7 +63,7 @@ public class TestfileExceptionHandler {
 		return new TestfileException(PREFIX + "Keine Bibliothek mit diesem Name: " + name);
 	}
 
-	public static TestfileException DuplicatedKeyword(Keyword keyword) {
+	public static TestfileException DuplicatedKeyword(ExecutableKeyword keyword) {
 		return new TestfileException(PREFIX + "Das Keyword kommt in mehreren Bibliotheken vor: " + keyword.getName());
 	}
 

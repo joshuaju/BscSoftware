@@ -18,12 +18,12 @@
                      <padding>
                         <Insets left="5.0" />
                      </padding></Label>
-                  <TextField fx:id="tf_author" editable="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" promptText="Autor" />
+                  <TextField fx:id="tf_author" editable="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" promptText="Kein Autor" />
                   <Label text="Beschreibung">
                      <padding>
                         <Insets left="5.0" />
                      </padding></Label>
-                  <TextArea fx:id="ta_description" editable="false" maxHeight="80.0" maxWidth="1.7976931348623157E308" prefHeight="24.0" prefWidth="536.0" promptText="Beschreibung" wrapText="true" />
+                  <TextArea fx:id="ta_description" editable="false" maxHeight="80.0" maxWidth="1.7976931348623157E308" prefHeight="24.0" prefWidth="536.0" promptText="Keine Beschreibung" wrapText="true" />
                </children>
             </VBox>
          </content>

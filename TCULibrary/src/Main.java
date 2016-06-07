@@ -10,22 +10,6 @@ public class Main {
 		TCUIVKeywordLibrary tcu = new TCUIVKeywordLibrary();		
 		tcu.setResetAlarms();
 		System.out.println("done");
-//		System.err.println(tcu.getChannelA());
-//		System.err.println(tcu.getChannelB());
-//		
-//		tcu.setZeroCalibration();
-//		
-//		System.err.println(tcu.getChannelA());
-//		System.err.println(tcu.getChannelB());
-//		Class<?> c = TCUIVKeywordLibrary.class;		
-//		Method m = c.getMethod("getLastCalibFreqB");
-//		AKeyword a = (AKeyword) m.getAnnotation(AKeyword.class);
-//		
-//		System.out.println("Method: " + m.getName());
-//		System.out.println("Keyword: " + a.name());
-//		System.out.println("Doc: " + a.documentation());
-//		System.out.println("Returns: \n" + a.returns());
-		//test_get(tcu);
 	}
 
 	/**

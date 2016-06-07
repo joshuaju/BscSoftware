@@ -10,7 +10,7 @@
 	{dlg} = Frage nach Text für "Name"	
 	Ist gleich		{dlg}, "Joshua"
 	
-	Warte auf Bestätigung "Ist alles in Ordnung?"
+	std.Warte auf Bestätigung "Ist alles in Ordnung?"
 	
 	{dlg} = Frage nach ganzer Zahl für "Alter"	
 	Ist gleich		{dlg}, "21"

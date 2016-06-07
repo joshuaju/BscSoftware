@@ -34,7 +34,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 
 	private Connection tcu;
 
-	public TCUIVKeywordLibrary() {
+	public TCUIVKeywordLibrary() {	
 		tcu = new Connection("http", "172.16.86.3");
 	}
 

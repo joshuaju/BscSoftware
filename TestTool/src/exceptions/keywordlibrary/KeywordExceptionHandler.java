@@ -2,7 +2,7 @@ package exceptions.keywordlibrary;
 
 import java.lang.reflect.Method;
 
-import external.Keyword;
+import external.ExecutableKeyword;
 
 public class KeywordExceptionHandler {
 
@@ -11,15 +11,15 @@ public class KeywordExceptionHandler {
 				"Methode ist kein Keyword: " + method.getClass().getName() + "." + method.getName());
 	}
 
-	public static KeywordException TooManyArguments(Keyword keyword) {
+	public static KeywordException TooManyArguments(ExecutableKeyword keyword) {
 		return new KeywordException("Ungültige Anzahl von Übergabeparametern: " + keyword.getName());
 	}
 
-	public static KeywordException WrongArgument(Keyword keyword, Object arg, int argNumber) {
+	public static KeywordException WrongArgument(ExecutableKeyword keyword, Object arg, int argNumber) {
 		return new KeywordException("Ungültiger Übergabeparameter: Parameter " + argNumber + ", " + arg);
 	}
 	
-	public static KeywordException WrongArgument(Keyword keyword, IllegalArgumentException cause) {
+	public static KeywordException WrongArgument(ExecutableKeyword keyword, IllegalArgumentException cause) {
 		return new KeywordException("Ungültiger Übergabeparameter", cause);
 	}
 
