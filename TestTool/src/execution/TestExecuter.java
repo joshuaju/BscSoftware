@@ -18,6 +18,7 @@ import expr.SyntaxException;
 import external.ExecutableKeyword;
 import external.ExecutableKeywordLibrary;
 import external.LibraryLoader;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import testfile.Testfile;
 import testfile.TestfileReader;
 import testfile.Testline;
@@ -37,15 +38,18 @@ public class TestExecuter {
 
 	private boolean executed;
 
+	private ProgressHandler progressHandler;
+
 	public TestExecuter(String path) {
 		this.path = path;
-
+		
 		libnamesMap = new HashMap<>();
 
 		globalVariables = new VariableFile();
 		localVariables = new VariableFile();
 
 		executed = false;
+		progressHandler = new ProgressHandler();
 	}
 
 	/**
@@ -65,11 +69,10 @@ public class TestExecuter {
 	 *             -> Abbruch des einzelnen Tests
 	 * @throws TestfileSyntaxException
 	 */
-	public void execute() throws TestfileException, KeywordLibraryException, SetupException, TeardownException {
+	public void execute() throws TestfileException, KeywordLibraryException, SetupException, TeardownException {	
 		if (executed) {
 			throw new IllegalStateException("Der Test wurde bereits ausgeführt");
 		}
-
 		executed = true;
 		testfile = null;
 		protocol = null;
@@ -80,6 +83,13 @@ public class TestExecuter {
 			throw new TestfileException(e.getMessage(), e);
 		}
 
+		int teststeps = testfile.getSetupLines().length + testfile.getTestLines().length
+				+ testfile.getTeardownLines().length;
+		teststeps *= testfile.getRepetition();
+		int max = testfile.getLibraryFilePaths().length + ((testfile.getVariableFilePaths().length > 0) ? 1 : 0)
+				+ teststeps;
+		progressHandler.setMax(max);
+		
 		try {
 			loadLibraries(testfile);
 		} catch (ClassNotFoundException | IOException | KeywordLibraryException e) {
@@ -89,7 +99,8 @@ public class TestExecuter {
 
 		if (testfile.hasVariableFilePaths()) {
 			try {
-				globalVariables = VariableFileReader.readAll(testfile.getVariableFilePaths());
+				globalVariables = VariableFileReader.readAll(path, testfile.getVariableFilePaths());
+				progressHandler.increment();				
 			} catch (TestfileSyntaxException | IOException e) {
 				protocol = createProtocol(testfile, false, e.getMessage());
 				throw new TestfileException(e.getMessage(), e);
@@ -97,7 +108,6 @@ public class TestExecuter {
 		}
 
 		for (int round = 1; round <= testfile.getRepetition(); round++) {
-
 			try {
 				executeLines(testfile.getSetupLines());
 			} catch (TestfileException | KeywordException | AssertionError e) {
@@ -109,7 +119,6 @@ public class TestExecuter {
 				executeLines(testfile.getTestLines());
 			} catch (TestfileException | KeywordException | AssertionError e) {
 				protocol = createProtocol(testfile, false, "Test: " + e.getMessage());
-				// throw new TestException(e.getMessage(), e);
 			}
 
 			try {
@@ -119,10 +128,10 @@ public class TestExecuter {
 				throw new TeardownException(e.getMessage(), e);
 			}
 		}
-
+		
 		if (protocol == null) {
 			// Es ist kein Fehler aufgetreten
-			protocol = createProtocol(testfile, true, "");
+			protocol = createProtocol(testfile, true, "");			
 		}
 	}
 
@@ -158,6 +167,7 @@ public class TestExecuter {
 			} catch (AssertionError e) {
 				throw new AssertionError("Zeile " + line.number + ": " + e.getMessage(), e);
 			}
+			progressHandler.increment();
 		}
 	}
 
@@ -454,8 +464,13 @@ public class TestExecuter {
 			String name = line.substring(last + 1).trim();
 			ExecutableKeywordLibrary library = LibraryLoader.getInstance().loadInstantiatedKeywordLibrary(path);
 			libnamesMap.put(name, library);
+			progressHandler.increment();
 		}
 
 	}
 
+	public ReadOnlyDoubleProperty progressProperty() {
+		return progressHandler.progressProperty();
+	}
+	
 }

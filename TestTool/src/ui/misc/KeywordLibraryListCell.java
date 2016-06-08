@@ -1,7 +1,5 @@
 package ui.misc;
 
-import java.util.function.Consumer;
-
 import external.SimpleKeywordLibrary;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -29,7 +27,7 @@ public class KeywordLibraryListCell extends ListCell<SimpleKeywordLibrary> {
 		if (empty) {
 			setVisible(false);
 			setText("");
-			setGraphic(null);
+			setGraphic(null);			
 		} else if (item != null) {
 			setText(item.getName());
 			setVisible(true);

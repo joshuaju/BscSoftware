@@ -2,7 +2,7 @@
 [TESTNAME] 	Nullabgleich Channel A und B
 [DESC] 		Prüfe ob der Nullabgleich an Kanal A und B 
 			funktioniert.
-[LIB]		"D:/Bsc/TCUIVKeywordLibrary.jar" tcu
+[LIB]		"tcu/TCUIVKeywordLibrary.jar" tcu
 
 [SETUP]
 	{chA1} = 		Lese Kanal A

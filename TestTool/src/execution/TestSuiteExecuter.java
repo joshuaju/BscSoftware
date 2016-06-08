@@ -12,21 +12,28 @@ import exceptions.keywordlibrary.KeywordLibraryException;
 import exceptions.testfile.TestfileException;
 import exceptions.testfile.TestfileExceptionHandler;
 import exceptions.testfile.TestfileSyntaxException;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 
 public class TestSuiteExecuter {
 
 	private final String author;
 	private final ArrayList<String> paths;
+	private ProgressHandler progressHandler;
+
+	private DoubleProperty suiteProgress = new SimpleDoubleProperty();
+	private DoubleProperty testProgress = new SimpleDoubleProperty();
 
 	public TestSuiteExecuter(String author) {
 		this.author = author;
 		this.paths = new ArrayList<>();
+		progressHandler = new ProgressHandler();
 	}
-	
-	public TestSuiteExecuter(){
+
+	public TestSuiteExecuter() {
 		this(System.getProperty("user.name"));
 	}
-	
 
 	public void addPath(String... paths) {
 		this.paths.addAll(Arrays.asList(paths));
@@ -54,10 +61,14 @@ public class TestSuiteExecuter {
 	}
 
 	public TestSuiteProtocol execute() throws TestfileSyntaxException {
-		TestSuiteProtocol suiteprotocol = new TestSuiteProtocol(author);		
+		TestSuiteProtocol suiteprotocol = new TestSuiteProtocol(author);
+		progressHandler.setMax(paths.size());
+		suiteProgress.bind(progressHandler.progressProperty());
 		for (String tmpPath : paths) {
+
 			TestExecuter tmpExecuter = new TestExecuter(tmpPath);
-						
+			testProgress.bind(tmpExecuter.progressProperty());
+
 			try {
 				tmpExecuter.execute();
 				TestProtocol tmpProtocol = tmpExecuter.getProtocol();
@@ -65,17 +76,26 @@ public class TestSuiteExecuter {
 			} catch (TestfileException | TestException | KeywordLibraryException e) {
 				// Einzelnen Test abrrechen
 				TestProtocol tmpProtocol = tmpExecuter.getProtocol();
-				suiteprotocol.addProtocol(tmpProtocol);				
+				suiteprotocol.addProtocol(tmpProtocol);
 				continue;
-			} catch (SetupException | TeardownException e){
+			} catch (SetupException | TeardownException e) {
 				// Gesamten Testlauf abbrechen
 				TestProtocol tmpProtocol = tmpExecuter.getProtocol();
-				suiteprotocol.addProtocol(tmpProtocol);				
+				suiteprotocol.addProtocol(tmpProtocol);
 				break;
-			}															
+			} finally {
+				progressHandler.increment();
+			}
 		}
 
 		return suiteprotocol;
 	}
 
+	public ReadOnlyDoubleProperty suiteProgressProperty() {
+		return suiteProgress;
+	}
+
+	public ReadOnlyDoubleProperty testProgressProperty() {
+		return testProgress;
+	}
 }

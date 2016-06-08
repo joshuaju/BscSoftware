@@ -8,20 +8,26 @@ import testfile.syntaxer.TestfileSyntaxer;
 
 public class VariableFileReader extends AbstractFileReader {
 
-	private static VariableFileReader vfReader = null;
-
-	public static VariableFile readAll(String... path) throws IOException, TestfileSyntaxException {
+	private static VariableFileReader vfReader = null;	
+	public static VariableFile readAll(String testfilePath, String... path) throws IOException, TestfileSyntaxException {		
 		if (vfReader == null) {
 			vfReader = new VariableFileReader();
 		}
-		return vfReader._read(path);
+		return vfReader._read(testfilePath, path);
 	}
 
-	private VariableFile _read(String... paths) throws IOException, TestfileSyntaxException {
-		VariableFile globalFile = new VariableFile();
+	private VariableFile _read(String testfilePath, String... paths) throws IOException, TestfileSyntaxException {		
+		VariableFile globalFile = new VariableFile();		
 		for (String path : paths) {
 			path = path.replace("\"", "");
-			File file = getFileFromPath(path);
+			File file;
+			if (!path.contains(":")){
+				File testfile = new File(testfilePath);
+				file = new File(testfile.getParentFile(), path);
+			} else {
+				file = new File(path);
+			}
+			
 			String[] lines = getLinesFromFile(file);
 			readLinesToVariableFile(lines, file, globalFile);
 		}

@@ -7,7 +7,7 @@
 			<accessrule kind="accessible" pattern="javafx/**"/>
 		</accessrules>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/Bsc/refs/expr.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/KeywordAnnotations"/>
+	<classpathentry kind="lib" path="D:/Bsc/refs/expr.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

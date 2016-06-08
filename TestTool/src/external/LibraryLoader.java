@@ -15,43 +15,13 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import application.UserPreferences;
 import exceptions.keywordlibrary.KeywordLibraryException;
 import exceptions.keywordlibrary.KeywordLibraryExceptionHandler;
 
 public class LibraryLoader implements Closeable {
 
 	private static LibraryLoader instance = null;
-
-	/**
-	 * Gibt die aktuelle Instanz der Klasse zurück, oder erzeugt eine neue.
-	 * 
-	 * @return
-	 */
-	public static LibraryLoader getInstance() {
-		if (instance == null) {
-			instance = new LibraryLoader();
-		}
-		return instance;
-	}
-
-	/**
-	 * Erzeugt eine neue Instanz nachdem die alte (falls vorhanden) beendet
-	 * wurde.
-	 * 
-	 * @return
-	 */
-	public static LibraryLoader getNewInstance() {
-		if (instance != null) {
-			try {
-				instance.close();
-			} catch (IOException e) {
-			} finally {
-				instance = null;
-			}
-		}
-		instance = new LibraryLoader();
-		return instance;
-	}
 
 	/**
 	 * Beendet eine alte Instanz (falls vorhanden) und erstellt eine neue mit
@@ -65,8 +35,7 @@ public class LibraryLoader implements Closeable {
 	 * @throws IOException
 	 * @throws KeywordLibraryException
 	 */
-	public static LibraryLoader getInstance(String... loadDir)
-			throws ClassNotFoundException, IOException, KeywordLibraryException {
+	public static LibraryLoader createInstance() throws ClassNotFoundException, IOException, KeywordLibraryException {
 		if (instance != null) {
 			try {
 				instance.close();
@@ -75,7 +44,12 @@ public class LibraryLoader implements Closeable {
 				instance = null;
 			}
 		}
-		instance = new LibraryLoader(loadDir);
+		String defLibraries = UserPreferences.get().getOrDefault(UserPreferences.STD_LIBRARY_DIR);
+		instance = new LibraryLoader(defLibraries);
+		return instance;
+	}
+
+	public static LibraryLoader getInstance() {
 		return instance;
 	}
 
@@ -86,18 +60,6 @@ public class LibraryLoader implements Closeable {
 	private final URLClassLoader defaultLoader;
 
 	private final ArrayList<ExecutableKeywordLibrary> defaultLibraries;
-
-	/**
-	 * Erzeugt eine neue Instanz ohne einen URLClassloader
-	 * 
-	 * @throws KeywordLibraryException
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 */
-	private LibraryLoader() {
-		defaultLibraries = new ArrayList<>();
-		defaultLoader = null;
-	}
 
 	/**
 	 * Erzeugt eine neue Instanz mit einem URLClassloader
@@ -149,8 +111,7 @@ public class LibraryLoader implements Closeable {
 
 		for (File tmpFile : allFiles) {
 			try {
-				JarFile jar = new JarFile(tmpFile);
-				Class<?>[] loadedClasses = loadClasses(jar, loader);
+				Class<?>[] loadedClasses = loadClasses(tmpFile, loader);
 				for (Class<?> tmpClass : loadedClasses) {
 					if (tmpClass.isAnnotationPresent(annotations.KeywordLibrary.class)) {
 						SimpleKeywordLibrary simpleLibrary = getSimpleLibraryInstance(tmpClass);
@@ -178,6 +139,7 @@ public class LibraryLoader implements Closeable {
 	 */
 	public ExecutableKeywordLibrary loadInstantiatedKeywordLibrary(String path)
 			throws ClassNotFoundException, IOException, KeywordLibraryException {
+
 		SimpleKeywordLibrary simpleLibrary = loadSimpleKeywordLibrary(path);
 		return getExecutableLibraryInstance(simpleLibrary);
 	}
@@ -195,9 +157,10 @@ public class LibraryLoader implements Closeable {
 	 */
 	public SimpleKeywordLibrary loadSimpleKeywordLibrary(String path) throws IOException, KeywordLibraryException {
 		File file = getJarFile(path);
-		JarFile jarFile = new JarFile(file);
 		URLClassLoader loader = getURLClassLoader(file);
-		loadClasses(jarFile, loader);
+
+		loadClasses(file, loader);
+
 		Class<?> libraryClass = getLibraryClass(file, loader);
 		return getSimpleLibraryInstance(libraryClass);
 	}
@@ -206,14 +169,16 @@ public class LibraryLoader implements Closeable {
 	 * Läd eine Jar-Datei aus dem angegebenen Pfad
 	 * 
 	 * @param path
-	 *            Pfad zum Jar-Verzeichnis
+	 *            Pfad zum Jar-Verzeichnis beginnend vom Hauptverzeichnis
 	 * @return Datei gefundene Datei
 	 * @throws FileNotFoundException
 	 *             Datei existiert nicht, ist keine Datei oder ist kein
 	 *             Jar-Verzeichnis
 	 */
 	private File getJarFile(String path) throws FileNotFoundException {
-		File libFile = new File(path);
+		String libraryDir = UserPreferences.get().getOrDefault(UserPreferences.LIBRARY_DIR);
+		path = getSimplePath(path);
+		File libFile = new File(libraryDir, path);
 
 		if (!libFile.exists() || !libFile.isFile()) {
 			throw KeywordLibraryExceptionHandler.NoSuchFile(libFile);
@@ -292,9 +257,13 @@ public class LibraryLoader implements Closeable {
 	 * @return alle Klassen die geladen wurden
 	 * @throws KeywordLibraryException
 	 *             eine Klasse wurde nicht gefunden
+	 * @throws IOException
 	 */
-	private Class<?>[] loadClasses(JarFile jar, URLClassLoader loader) throws KeywordLibraryException {
+	private Class<?>[] loadClasses(File file, URLClassLoader loader) throws KeywordLibraryException, IOException {
+
 		ArrayList<Class<?>> loadedClasses = new ArrayList<>();
+
+		JarFile jar = new JarFile(file);
 		Enumeration<JarEntry> entries = jar.entries();
 		while (entries.hasMoreElements()) {
 			JarEntry tmpEntry = entries.nextElement();
@@ -305,6 +274,8 @@ public class LibraryLoader implements Closeable {
 				loadedClasses.add(tmpClass);
 			}
 		}
+		jar.close();
+
 		return loadedClasses.toArray(new Class<?>[0]);
 	}
 
@@ -420,6 +391,14 @@ public class LibraryLoader implements Closeable {
 			urls[i] = files[i].toURI().toURL();
 		}
 		return urls;
+	}
+
+	private String getSimplePath(String path) {
+		String libraryDir = UserPreferences.get().getOrDefault(UserPreferences.LIBRARY_DIR);
+		if (path.startsWith(libraryDir)) {
+			path = path.substring(libraryDir.length());
+		}
+		return path;
 	}
 
 	@Override

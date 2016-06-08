@@ -68,7 +68,8 @@ public class TestfileExceptionHandler {
 	}
 
 	public static TestfileException NoSuchKeywordInLibrary(String libname, String keywordName) {
-		return new TestfileException(PREFIX + "Das Keyword kommt nicht vor: " + libname + "." + keywordName);
+		libname = (libname.length() > 0) ? libname + "." : libname;
+		return new TestfileException(PREFIX + "Das Keyword kommt nicht vor: " + libname + keywordName);
 	}
 
 	public static TestfileException InvalidParameter(String parameter) {

@@ -3,11 +3,13 @@
 [DESC] 		Es wird geprüft ob das Verändern von Werten 
 			am Gerät erfolgreich ist.
 			
-[LIB]		"D:/Bsc/DeviceKeywordLibrary.jar" lib
-[VAR] 		"U:/Developement/Java/BscSoftware/BscSoftware/Testtool/testfiles/test.var"
+[LIB]		"DeviceKeywordLibrary.jar" lib
+[VAR] 		"test.var"
 
-[TEST]				
-	{dlg} = Frage nach Text für "Name"	
+[TEST]			
+	Ist gleich {global}, "global"
+	
+	{dlg} = std.Frage nach Text für "Name"	
 	Ist gleich		{dlg}, "Joshua"
 	
 	std.Warte auf Bestätigung "Ist alles in Ordnung?"

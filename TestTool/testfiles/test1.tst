@@ -2,7 +2,7 @@
 [TESTNAME] 	Mehrere Geräte
 [DESC] 		Es wird geprüft ob das Verändern von Werten 
 			am Gerät erfolgreich ist.
-[LIB]		"D:/Bsc/DeviceKeywordLibrary.jar" dev1
+[LIB]		"DeviceKeywordLibrary.jar" dev1
 
 
 [TEST]	

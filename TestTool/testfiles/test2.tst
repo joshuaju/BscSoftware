@@ -1,9 +1,9 @@
 [AUTHOR] 	Max Muster
-[TESTNAME] 	Mehrere Geräte
+[TESTNAME] 	Mehrere Geräte 2
 [DESC] 		Es wird geprüft ob das Verändern von Werten 
 			am Gerät erfolgreich ist.
-[LIB]		"D:/Bsc/DeviceKeywordLibrary.jar" dev1
-
+[LIB]		"DeviceKeywordLibrary.jar" dev1
+[REPEAT] 5
 [SETUP]
 	Ist gleich 				"Hallo", "Hallo"
 [TEST]	

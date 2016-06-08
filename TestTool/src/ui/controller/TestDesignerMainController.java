@@ -7,13 +7,15 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.ResourceBundle;
 
 import application.MainApplication;
-import application.PropertyHelper;
+import application.UserPreferences;
 import exceptions.keywordlibrary.KeywordLibraryException;
-import external.ExecutableKeywordLibrary;
 import external.LibraryLoader;
+import external.SimpleKeywordLibrary;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -44,13 +46,54 @@ public class TestDesignerMainController implements Initializable {
 
 	@FXML
 	private LibraryInformationListController libInfoListController;
-	
+
 	@FXML
 	private CheckMenuItem cmi_alwaysOnTop;
-	
+
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		// TODO ausgewählte libraries laden
+		String libraryDir = UserPreferences.get().getOrDefault(UserPreferences.LIBRARY_DIR);
+		File libDirFile = new File(libraryDir);
+		Collection<File> files = null;
+		try {
+		files = getFiles(libDirFile);
+		} catch (Exception e){
+			System.err.println("WARNUNG: Der Pfad zum Bibliothekspfad war fehlerhaft. Der Pfad wurde auf Standard gesetzt");
+			libraryDir = UserPreferences.get().getDefaultValue(UserPreferences.LIBRARY_DIR);
+			libDirFile = new File(libraryDir);
+			files = getFiles(libDirFile);
+		}
+		Collection<SimpleKeywordLibrary> libraries = new ArrayList<>();
+
+		for (File tmp : files) {
+			try {
+				SimpleKeywordLibrary lib = LibraryLoader.getInstance().loadSimpleKeywordLibrary(tmp.getAbsolutePath());
+				libraries.add(lib);
+			} catch (IOException | KeywordLibraryException e) {
+				e.printStackTrace();
+			}
+		}
+
+		libInfoListController.libraryListProperty().addAll(libraries);
+
+		Platform.runLater(() -> {
+			Scene currentScene = bp_mainpane.getScene();
+			Stage currentStage = (Stage) currentScene.getWindow();
+			cmi_alwaysOnTop.selectedProperty().addListener((obs, oldVal, newVal) -> {
+				currentStage.setAlwaysOnTop(newVal);
+				UserPreferences.get().put(UserPreferences.ALWAYS_ON_TOP, newVal.toString());
+			});
+
+			String stored = UserPreferences.get().getOrDefault(UserPreferences.ALWAYS_ON_TOP);
+			Boolean alwaysOnTop = Boolean.parseBoolean(stored);
+			cmi_alwaysOnTop.setSelected(alwaysOnTop);
+		});
+	}
+
 	@FXML
 	void NewFile(ActionEvent event) {
-		File selected = showFileChooserDialog();
+		File selected = showFileOpener(null);
 		if (selected != null) {
 			callTexteditor(selected);
 		}
@@ -58,7 +101,7 @@ public class TestDesignerMainController implements Initializable {
 
 	@FXML
 	void NewFileFromTemplate(ActionEvent event) {
-		File selected = showFileChooserDialog();
+		File selected = showFileSaver(null);
 		if (selected != null) {
 			String[] lines = Testfile.getTemplate();
 			try {
@@ -95,52 +138,41 @@ public class TestDesignerMainController implements Initializable {
 		dlg.setDialogPane(dlgPane);
 		dlg.setResizable(true);
 		dlgPane.getButtonTypes().add(ButtonType.OK);
+		dlg.setResizable(false);
 		MainApplication.showDialog(dlg);
 	}
-	
+
 	@FXML
-	void ImportLibrary(ActionEvent event){
+	void ImportLibrary(ActionEvent event) {
 		libInfoListController.browseAndAddLibrary();
 	}
 
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		// TODO ausgewählte libraries laden
-		ExecutableKeywordLibrary lib1 = null;
-		ExecutableKeywordLibrary lib2 = null;
-		try {
-			LibraryLoader.getInstance();
-			lib1 = LibraryLoader.getInstance().loadInstantiatedKeywordLibrary("D:/Bsc/libs/CompareKeywordLibrary.jar");
-			lib2 = LibraryLoader.getInstance().loadInstantiatedKeywordLibrary("D:/Bsc/libs/DialogKeywordLibrary.jar");
-		} catch (ClassNotFoundException | IOException | KeywordLibraryException e) {
-			e.printStackTrace();
-		}		
-		libInfoListController.libraryListProperty().addAll(lib1, lib2);
-		
-		Platform.runLater(() -> {
-			Scene currentScene = bp_mainpane.getScene();
-			Stage currentStage = (Stage) currentScene.getWindow();
-			cmi_alwaysOnTop.selectedProperty()
-					.addListener((obs, oldVal, newVal) -> {
-						currentStage.setAlwaysOnTop(newVal);
-						PropertyHelper.loadApplicationProperties().setProperty(PropertyHelper.ALWAYS_ON_TOP, new Boolean(newVal).toString());
-					});
-			
-			String stored = PropertyHelper.loadApplicationProperties().getProperty(PropertyHelper.ALWAYS_ON_TOP, "false");
-			Boolean alwaysOnTop = Boolean.parseBoolean(stored);
-			cmi_alwaysOnTop.setSelected(alwaysOnTop);
-		});
-
-		
+	private Collection<File> getFiles(File file) {
+		Collection<File> files = new ArrayList<>();
+		if (file.isFile()) {
+			files.add(file);
+		} else if (file.isDirectory()) {
+			File[] dirFiles = file.listFiles();
+			for (File tmp : dirFiles) {	
+				files.addAll(getFiles(tmp));	
+			}
+		}
+		return files;
 	}
 
-	private File showFileChooserDialog() {
-		FileChooser fc = new FileChooser();
-
+	private File showFileSaver(String initDir) {
+		FileChooser fc = new FileChooser();		
 		ExtensionFilter tstFilter = new ExtensionFilter("Testdatei", "*.tst");
 		fc.getExtensionFilters().add(tstFilter);
-
+		
 		File selected = fc.showSaveDialog(bp_mainpane.getScene().getWindow());
+
+		if (initDir != null && initDir.length() > 0) {
+			File initDirFile = new File(initDir);
+			if (initDirFile.exists() && initDirFile.isDirectory()) {
+				fc.setInitialDirectory(initDirFile);
+			}
+		}
 
 		if (selected != null && !selected.getName().endsWith(".tst")) {
 			String header = "Ungültige Dateiendung";
@@ -148,15 +180,37 @@ public class TestDesignerMainController implements Initializable {
 			MainApplication.showAlert(header, content);
 		}
 		return selected;
-	}	
+	}
+	
+	private File showFileOpener(String initDir){
+		FileChooser fc = new FileChooser();		
+		ExtensionFilter tstFilter = new ExtensionFilter("Testdatei", "*.tst");
+		fc.getExtensionFilters().add(tstFilter);
+		
+		File selected = fc.showOpenDialog(bp_mainpane.getScene().getWindow());
+
+		if (initDir != null && initDir.length() > 0) {
+			File initDirFile = new File(initDir);
+			if (initDirFile.exists() && initDirFile.isDirectory()) {
+				fc.setInitialDirectory(initDirFile);
+			}
+		}
+
+		if (selected != null && !selected.getName().endsWith(".tst")) {
+			String header = "Ungültige Dateiendung";
+			String content = "Die Dateiendung muss \".tst\" sein";
+			MainApplication.showAlert(header, content);
+		}
+		return selected;
+	}
 
 	private void callTexteditor(File selected) {
-		String editor = PropertyHelper.loadApplicationProperties().getProperty(PropertyHelper.TEXTEDITOR, "notepad");
-		ProcessBuilder process = new ProcessBuilder(editor, selected.getAbsolutePath());			
+		String editor = UserPreferences.get().getOrDefault(UserPreferences.EDITOR_EXE);
+		ProcessBuilder process = new ProcessBuilder(editor, selected.getAbsolutePath());
 		try {
 			process.start();
 		} catch (IOException e) {
-			MainApplication.showAlert("Texteditor wurde nicht geöffnet", "");
+			MainApplication.showAlert("Texteditor wurde nicht geöffnet", "In den Einstellungen kann der Pfad zum Editor angepasst werden");
 		}
 	}
 }
