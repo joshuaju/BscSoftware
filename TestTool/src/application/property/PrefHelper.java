@@ -1,4 +1,4 @@
-package application;
+package application.property;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -31,7 +31,7 @@ public abstract class PrefHelper {
 	
 	protected abstract void load();
 
-	protected abstract void store();
+	public abstract void store();
 			
 	public String getDefaultValue(String key){
 		return null;

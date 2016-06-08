@@ -1,4 +1,4 @@
-package application;
+package application.property;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,7 +13,7 @@ public class UserPreferences extends PrefHelper {
 	public static final String EDITOR_EXE = "editor.exe";
 	public static final String LIBRARY_DIR = "library.dir";
 	public static final String STD_LIBRARY_DIR = "std.library.dir";
-	public static final String RECENTLY_OPENED = "recently.opened";
+	public static final String SESSION_DIR = "session.dir";
 	public static final String ALWAYS_ON_TOP = "always.on.top";
 
 	private static PrefHelper pref = new UserPreferences();
@@ -58,10 +58,13 @@ public class UserPreferences extends PrefHelper {
 
 		File stdfolder = new File(getOrDefault(UserPreferences.STD_LIBRARY_DIR));
 		stdfolder.mkdirs();
+		
+		File sessionFolder = new File(getOrDefault(UserPreferences.SESSION_DIR));
+		sessionFolder.mkdirs();
 	}
 
 	@Override
-	protected void store() {
+	public void store() {
 		Properties prop = new Properties();
 
 		Set<String> keys = super.keySet();
@@ -71,7 +74,7 @@ public class UserPreferences extends PrefHelper {
 		}
 		
 		try {
-			prop.store(new FileOutputStream(propertyfile), "");
+			prop.store(new FileOutputStream(propertyfile), "In dieser Datei stehen die Einstellung der Applikation.");
 			System.out.println("Properties stored: " + propertyfile.getAbsolutePath());
 		} catch (IOException e) {
 			System.err.println("Properties not stored: " + propertyfile.getAbsolutePath());			
@@ -88,8 +91,10 @@ public class UserPreferences extends PrefHelper {
 					+ File.separator + "libs" + File.separator;
 		} else if (key.equals(STD_LIBRARY_DIR)) {
 			return getDefaultValue(LIBRARY_DIR) + File.separator + "std";
-		} else if (key.equals(RECENTLY_OPENED)) {
-			return "";
+		} else if (key.equals(SESSION_DIR)) {
+			String projectname = ProjectPreferences.get().getOrDefault(ProjectPreferences.PROJECT_NAME);
+			return System.getProperty("user.home") + File.separator + "Documents" + File.separator + projectname
+					+ File.separator + "sessions" + File.separator;
 		} else if (key.equals(ALWAYS_ON_TOP)) {
 			return Boolean.FALSE.toString();
 		} else {

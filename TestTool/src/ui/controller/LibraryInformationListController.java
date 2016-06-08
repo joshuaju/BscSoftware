@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import application.MainApplication;
-import application.UserPreferences;
+import application.property.UserPreferences;
 import exceptions.keywordlibrary.KeywordLibraryException;
 import external.LibraryLoader;
 import external.SimpleKeywordLibrary;

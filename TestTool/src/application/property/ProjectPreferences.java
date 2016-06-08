@@ -1,4 +1,4 @@
-package application;
+package application.property;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +35,7 @@ public class ProjectPreferences extends PrefHelper {
 	}
 
 	@Override
-	protected void store() {
+	public void store() {
 		
 	}
 

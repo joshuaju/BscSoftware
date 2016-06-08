@@ -15,7 +15,7 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import application.UserPreferences;
+import application.property.UserPreferences;
 import exceptions.keywordlibrary.KeywordLibraryException;
 import exceptions.keywordlibrary.KeywordLibraryExceptionHandler;
 
@@ -114,7 +114,7 @@ public class LibraryLoader implements Closeable {
 				Class<?>[] loadedClasses = loadClasses(tmpFile, loader);
 				for (Class<?> tmpClass : loadedClasses) {
 					if (tmpClass.isAnnotationPresent(annotations.KeywordLibrary.class)) {
-						SimpleKeywordLibrary simpleLibrary = getSimpleLibraryInstance(tmpClass);
+						SimpleKeywordLibrary simpleLibrary = getSimpleLibraryInstance(tmpClass, tmpFile);
 						ExecutableKeywordLibrary instantiatedLibrary = getExecutableLibraryInstance(simpleLibrary);
 						defaultLibraries.add(instantiatedLibrary);
 					}
@@ -162,7 +162,7 @@ public class LibraryLoader implements Closeable {
 		loadClasses(file, loader);
 
 		Class<?> libraryClass = getLibraryClass(file, loader);
-		return getSimpleLibraryInstance(libraryClass);
+		return getSimpleLibraryInstance(libraryClass, file);
 	}
 
 	/**
@@ -329,12 +329,12 @@ public class LibraryLoader implements Closeable {
 	 * @return Bibliothek
 	 * @throws KeywordLibraryException
 	 */
-	private SimpleKeywordLibrary getSimpleLibraryInstance(Class<?> libraryClass) throws KeywordLibraryException {
+	private SimpleKeywordLibrary getSimpleLibraryInstance(Class<?> libraryClass, File file) throws KeywordLibraryException {
 		if (!libraryClass.isAnnotationPresent(annotations.KeywordLibrary.class)) {
 			throw KeywordLibraryExceptionHandler.ClassIsNotAKeywordLibrary(libraryClass);
 		}
 
-		return new SimpleKeywordLibrary(libraryClass);
+		return new SimpleKeywordLibrary(libraryClass, file);
 	}
 
 	/**

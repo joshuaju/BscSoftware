@@ -1,5 +1,6 @@
 package external;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import exceptions.keywordlibrary.KeywordLibraryException;
@@ -10,8 +11,8 @@ public class ExecutableKeywordLibrary extends SimpleKeywordLibrary {
 
 	private ArrayList<ExecutableKeyword> keywordList;
 
-	ExecutableKeywordLibrary(Object instance) throws KeywordLibraryException {
-		super(instance.getClass());		
+	ExecutableKeywordLibrary(Object instance, File file) throws KeywordLibraryException {
+		super(instance.getClass(), file);		
 		thisinstance = instance;		
 		init();		
 	}

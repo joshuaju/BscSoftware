@@ -1,5 +1,6 @@
 package external;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,9 +17,11 @@ public class SimpleKeywordLibrary {
 	private String description;
 	private ArrayList<SimpleKeyword> keywordList;
 
-	public SimpleKeywordLibrary(Class<?> thisclass) throws KeywordLibraryException {
+	private final File file;
+	public SimpleKeywordLibrary(Class<?> thisclass, File file) throws KeywordLibraryException {
 		this.thisclass = thisclass;
 		this.thisname = thisclass.getSimpleName();
+		this.file = file;
 		keywordList = new ArrayList<>();
 		
 		annotations.KeywordLibrary klAnnotation = thisclass.getAnnotation(annotations.KeywordLibrary.class);
@@ -41,6 +44,7 @@ public class SimpleKeywordLibrary {
 		this.author = simple.getAuthor();
 		this.description = simple.getDescription();
 		this.keywordList = new ArrayList<>(Arrays.asList(simple.getKeywords()));
+		this.file = simple.file;
 	}
 
 	/**
@@ -82,6 +86,10 @@ public class SimpleKeywordLibrary {
 
 	public SimpleKeyword[] getKeywords() {
 		return keywordList.toArray(new SimpleKeyword[0]);
+	}
+	
+	public String getAbsolutePath(){
+		return file.getAbsolutePath();
 	}
 
 }
