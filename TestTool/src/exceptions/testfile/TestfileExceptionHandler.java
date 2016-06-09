@@ -97,6 +97,10 @@ public class TestfileExceptionHandler {
 		else
 			return new FileNotFoundException(PREFIX + "Verzeichnis existiert nicht: " + file.getAbsolutePath());
 	}
+	
+	public static TestfileException InvalidFileEnding(String path) throws TestfileException{
+		throw new TestfileException(PREFIX + "Ungültige Dateiendung");
+	}
 
 	public static IOException CouldNotReadFile(File file, IOException cause) {
 		return new IOException(PREFIX + "Datei konnte nicht gelesen werden: " + file.getAbsolutePath(), cause);

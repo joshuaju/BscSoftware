@@ -6,6 +6,9 @@ import java.lang.reflect.Method;
 import exceptions.keywordlibrary.KeywordException;
 import exceptions.keywordlibrary.KeywordExceptionHandler;
 import exceptions.keywordlibrary.KeywordLibraryException;
+import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 /**
  * Diese Klasse repräsentiert ein Keyword
@@ -21,23 +24,27 @@ public class ExecutableKeyword extends SimpleKeyword {
 		super(method);
 		this.libInstance = libInstance;
 	}
-	
+
 	public ExecutableKeyword(Object libInstance, SimpleKeyword simple) throws KeywordLibraryException {
 		this(libInstance, simple.method);
 	}
-	
+
 	/**
-	 * Dieses Keyword wird an dem Object instance, mit den Übergabeparametern args, aufegerufen 
-	 * @param instance ausführendes Objekt
-	 * @param args Übergabeparameter
-	 * @return Rückgabewert des Keyword
-	 * @throws IllegalAccessException Fehler bei der Reflexion 
-	 * @throws IllegalArgumentException	Die Übergabeparameter sind nicht gültig
-	 * @throws AssertionError Exception die bei vergleichenden Methoden auftritt.
-	 * @throws KeywordException Zu viele oder falsche Übergabeparameter
+	 * Dieses Keyword wird an dem Object instance, mit den Übergabeparametern
+	 * args, aufegerufen
+	 * 
+	 * @param instance
+	 *            ausführendes Objekt
+	 * @param args
+	 *            Übergabeparameter
+	 * @return Rückgabewert des Keyword 
+	 * @throws KeywordException 
+	 * @throws IllegalAccessException
+	 *             Fehler bei der Reflexion
+	 * @throws IllegalArgumentException
+	 *             Die Übergabeparameter sind nicht gültig
 	 */
-	public Object invoke(Object... args)
-			throws AssertionError, KeywordException {
+	public Object invoke(Object... args) throws KeywordException {
 
 		Class<?>[] argClasses = getParameterTypes();
 
@@ -55,15 +62,30 @@ public class ExecutableKeyword extends SimpleKeyword {
 			args[i] = tmpArg;
 		}
 
-		try {			
+		try {
 			return method.invoke(libInstance, args);
-		} catch(IllegalAccessException e) {
+		} catch (IllegalAccessException e) {
 			// cannot happen
 			e.printStackTrace();
-		} catch(IllegalArgumentException e){
+		} catch (IllegalArgumentException e) {
 			throw KeywordExceptionHandler.WrongArgument(this, null, -1);
-		} catch (InvocationTargetException e){
-			throw new AssertionError(e.getCause().getMessage());
+		} catch (InvocationTargetException e) {
+//			String x = e.getTargetException().getMessage();
+//			if (x.contains("Not on FX application thread")) {
+//				ObjectProperty<Throwable> throwable = new SimpleObjectProperty<>();
+//				Platform.runLater(() -> {
+//					try {
+//						invoke(args);
+//					} catch (KeywordException | AssertionError e1) {
+//						throwable.set(e1);
+//					}
+//				});
+//				if (throwable.isNotNull().get()){
+//					throw new AssertionError(e.getCause().getMessage());
+//				}
+//			} else {
+				throw new AssertionError(e.getCause().getMessage());
+//			}
 		}
 		return null;
 	}
@@ -113,5 +135,5 @@ public class ExecutableKeyword extends SimpleKeyword {
 		return "[NAME] " + getName() + ", [DESC] " + getDescription() + ", [PARA] " + getParameter() + ", [RET] "
 				+ getReturn();
 	}
-	
+
 }

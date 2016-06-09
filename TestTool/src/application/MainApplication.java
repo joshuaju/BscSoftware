@@ -13,6 +13,7 @@ import external.LibraryLoader;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -31,20 +32,21 @@ public class MainApplication extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws IOException, ClassNotFoundException, KeywordLibraryException,
-			TestfileSyntaxException, BackingStoreException {
+			TestfileSyntaxException, BackingStoreException, InterruptedException {
 		LibraryLoader.createInstance();
-	
 		stage = primaryStage;
-		testGUI(primaryStage);
-		// testExecution();
-		// Platform.exit();
+
+		testExecutionGUI(primaryStage);
+
+//		testExecution();
+//		Platform.exit();
 	}
 
-	public static void testGUI(Stage primaryStage) throws IOException {
+	public static void testDocumentationGUI(Stage primaryStage) throws IOException {
 		FXMLLoader loader = new FXMLLoader(
 				MainApplication.class.getClassLoader().getResource("ui/fxml/TestDesignerMainView.fxml"));
 		BorderPane root = loader.load();
-		
+
 		Scene scene = new Scene(root);
 		scene.getStylesheets()
 				.add(MainApplication.class.getClassLoader().getResource("ui/css/listview.css").toExternalForm());
@@ -56,9 +58,21 @@ public class MainApplication extends Application {
 
 		primaryStage.setOnCloseRequest((event) -> UserPreferences.get().store());
 	}
+	
+	public static void testExecutionGUI(Stage primaryStage) throws IOException {
+		FXMLLoader loader = new FXMLLoader(
+				MainApplication.class.getClassLoader().getResource("ui/fxml/TestExecuterView.fxml"));
+		
+		Parent root = loader.load();
+		Scene scene = new Scene(root);		
+		primaryStage.setScene(scene);
+		primaryStage.show();
+
+		primaryStage.sizeToScene();		
+	}
 
 	public static void testExecution()
-			throws IOException, ClassNotFoundException, KeywordLibraryException, TestfileSyntaxException {
+			throws IOException, ClassNotFoundException, KeywordLibraryException, TestfileSyntaxException, InterruptedException {
 		TestSuiteExecuter tsExe = new TestSuiteExecuter("Joshua Jungen");
 		// --------------------------------------------------------
 		// tsExe.addDirectory("testfiles/tcu/");
@@ -66,15 +80,18 @@ public class MainApplication extends Application {
 		// tsExe.addPath("testfiles/tcu/tcu_alarm_test.tst");
 		// tsExe.addPath("testfiles/tcu/tcu_testsignal_tcu.tst");
 		// --------------------------------------------------------
-		tsExe.addPath("testfiles/test.tst");
-		tsExe.addPath("testfiles/test1.tst");
-		tsExe.addPath("testfiles/test2.tst");
-		tsExe.addPath("testfiles/test3.tst");
+//		tsExe.addDirectory(true, "testfiles");
+		 tsExe.addFile("testfiles/test.tst");
+		// tsExe.addPath("testfiles/test1.tst");
+		// tsExe.addPath("testfiles/test2.tst");
+		// tsExe.addPath("testfiles/test3.tst");
 		// --------------------------------------------------------
 
-		tsExe.suiteProgressProperty().addListener((obs, oldValue, newValue) -> System.out.println(newValue + "%"));
-		tsExe.testProgressProperty()
-				.addListener((obs, oldValue, newValue) -> System.out.println("\t" + newValue + "%"));
+		tsExe.suiteProgressProperty().addListener(
+				(obs, oldValue, newValue) -> System.out.println(((int) (newValue.doubleValue() * 100)) + "%"));
+		tsExe.testProgressProperty().addListener(
+				(obs, oldValue, newValue) -> System.out.println("\t" + ((int) (newValue.doubleValue() * 100)) + "%"));
+		
 		TestSuiteProtocol tsProtocol = tsExe.execute();
 		System.out.println("\n" + tsProtocol);
 

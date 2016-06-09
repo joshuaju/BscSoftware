@@ -9,10 +9,10 @@
 [TEST]			
 	Ist gleich {global}, "global"
 	
-	{dlg} = std.Frage nach Text für "Name"	
+	{dlg} = Frage nach Text für "Name"	
 	Ist gleich		{dlg}, "Joshua"
 	
-	std.Warte auf Bestätigung "Ist alles in Ordnung?"
+	Warte auf Bestätigung "Ist alles in Ordnung?"
 	
 	{dlg} = Frage nach ganzer Zahl für "Alter"	
 	Ist gleich		{dlg}, "21"

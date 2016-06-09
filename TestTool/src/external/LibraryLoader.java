@@ -117,6 +117,7 @@ public class LibraryLoader implements Closeable {
 						SimpleKeywordLibrary simpleLibrary = getSimpleLibraryInstance(tmpClass, tmpFile);
 						ExecutableKeywordLibrary instantiatedLibrary = getExecutableLibraryInstance(simpleLibrary);
 						defaultLibraries.add(instantiatedLibrary);
+						System.out.println("Loaded: " + instantiatedLibrary.getName());
 					}
 				}
 			} catch (IOException e) {

@@ -26,6 +26,8 @@ import testfile.VariableFile;
 import testfile.VariableFileReader;
 
 public class TestExecuter {
+	private volatile boolean abort = false;
+	
 	private final String DEFAULT_LIBRARIES_NAME = "std";
 	private final String path;
 	private VariableFile globalVariables;
@@ -65,11 +67,12 @@ public class TestExecuter {
 	 *             Tests
 	 * @throws TeardownException
 	 *             -> Abbruch des gesamten Testlauf
+	 * @throws InterruptedException 
 	 * @throws TestException
 	 *             -> Abbruch des einzelnen Tests
 	 * @throws TestfileSyntaxException
 	 */
-	public void execute() throws TestfileException, KeywordLibraryException, SetupException, TeardownException {	
+	public void execute() throws TestfileException, KeywordLibraryException, SetupException, TeardownException, InterruptedException {	
 		if (executed) {
 			throw new IllegalStateException("Der Test wurde bereits ausgeführt");
 		}
@@ -95,8 +98,8 @@ public class TestExecuter {
 		} catch (ClassNotFoundException | IOException | KeywordLibraryException e) {
 			protocol = createProtocol(testfile, false, e.getMessage());
 			throw new KeywordLibraryException(e.getMessage(), e);
-		}
-
+		}		
+		
 		if (testfile.hasVariableFilePaths()) {
 			try {
 				globalVariables = VariableFileReader.readAll(path, testfile.getVariableFilePaths());
@@ -128,7 +131,10 @@ public class TestExecuter {
 				throw new TeardownException(e.getMessage(), e);
 			}
 		}
-		
+				
+		if (abort){
+			throw new InterruptedException();
+		}
 		if (protocol == null) {
 			// Es ist kein Fehler aufgetreten
 			protocol = createProtocol(testfile, true, "");			
@@ -156,7 +162,7 @@ public class TestExecuter {
 	 * @throws AssertionError
 	 */
 	private void executeLines(Testline[] lines) throws TestfileException, KeywordException, AssertionError {
-		for (int i = 0; i < lines.length; i++) {
+		for (int i = 0; i < lines.length && !abort; i++) {
 			Testline line = lines[i];
 			try {
 				executeLine(line.text);
@@ -466,11 +472,14 @@ public class TestExecuter {
 			libnamesMap.put(name, library);
 			progressHandler.increment();
 		}
-
 	}
 
 	public ReadOnlyDoubleProperty progressProperty() {
 		return progressHandler.progressProperty();
+	}
+	
+	public void abort(){
+		abort = true;
 	}
 	
 }
