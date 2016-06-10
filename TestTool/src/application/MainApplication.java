@@ -64,7 +64,9 @@ public class MainApplication extends Application {
 				MainApplication.class.getClassLoader().getResource("ui/fxml/TestExecuterView.fxml"));
 		
 		Parent root = loader.load();
-		Scene scene = new Scene(root);		
+		Scene scene = new Scene(root);
+		scene.getStylesheets()
+		.add(MainApplication.class.getClassLoader().getResource("ui/css/listview.css").toExternalForm());
 		primaryStage.setScene(scene);
 		primaryStage.show();
 

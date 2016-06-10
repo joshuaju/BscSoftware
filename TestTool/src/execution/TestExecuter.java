@@ -18,7 +18,9 @@ import expr.SyntaxException;
 import external.ExecutableKeyword;
 import external.ExecutableKeywordLibrary;
 import external.LibraryLoader;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import testfile.Testfile;
 import testfile.TestfileReader;
 import testfile.Testline;
@@ -26,7 +28,7 @@ import testfile.VariableFile;
 import testfile.VariableFileReader;
 
 public class TestExecuter {
-	private volatile boolean abort = false;
+	private volatile BooleanProperty abortProperty = new SimpleBooleanProperty(false);
 	
 	private final String DEFAULT_LIBRARIES_NAME = "std";
 	private final String path;
@@ -132,7 +134,7 @@ public class TestExecuter {
 			}
 		}
 				
-		if (abort){
+		if (abortProperty.get()){
 			throw new InterruptedException();
 		}
 		if (protocol == null) {
@@ -162,7 +164,7 @@ public class TestExecuter {
 	 * @throws AssertionError
 	 */
 	private void executeLines(Testline[] lines) throws TestfileException, KeywordException, AssertionError {
-		for (int i = 0; i < lines.length && !abort; i++) {
+		for (int i = 0; i < lines.length && !abortProperty.get(); i++) {
 			Testline line = lines[i];
 			try {
 				executeLine(line.text);
@@ -479,7 +481,11 @@ public class TestExecuter {
 	}
 	
 	public void abort(){
-		abort = true;
+		abortProperty.set(true);
+	}
+	
+	BooleanProperty abortProperty(){
+		return abortProperty;
 	}
 	
 }

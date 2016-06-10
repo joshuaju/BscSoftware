@@ -11,13 +11,15 @@ import exceptions.executing.TestException;
 import exceptions.keywordlibrary.KeywordLibraryException;
 import exceptions.testfile.TestfileException;
 import exceptions.testfile.TestfileExceptionHandler;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 public class TestSuiteExecuter {
 
-	private volatile boolean abort = false;
+	private volatile BooleanProperty abortProperty = new SimpleBooleanProperty(false);
 	
 	private final String author;
 	private final ArrayList<String> paths;
@@ -42,7 +44,7 @@ public class TestSuiteExecuter {
 		progressHandler.setMax(paths.size());
 		suiteProgress.bind(progressHandler.progressProperty());
 
-		for (int i = 0; i < paths.size() && !abort; i++) {
+		for (int i = 0; i < paths.size() && !abortProperty.get(); i++) {
 			String tmpPath = paths.get(i);
 			try {
 				executePath(suiteprotocol, tmpPath);
@@ -52,7 +54,7 @@ public class TestSuiteExecuter {
 			progressHandler.increment();
 		}
 
-		if (abort){
+		if (abortProperty.get()){
 			throw new InterruptedException();
 		}
 		return suiteprotocol;
@@ -60,7 +62,8 @@ public class TestSuiteExecuter {
 
 	private void executePath(TestSuiteProtocol suiteprotocol, String tmpPath) throws SetupException, TeardownException, InterruptedException {
 		TestExecuter tmpExecuter = new TestExecuter(tmpPath);
-
+		tmpExecuter.abortProperty().bind(abortProperty);
+		
 		testProgress.bind(tmpExecuter.progressProperty());
 
 		try {
@@ -119,6 +122,10 @@ public class TestSuiteExecuter {
 	}
 	
 	public void abort(){
-		abort = true;
+		abortProperty.set(true);
+	}
+	
+	BooleanProperty abortProperty(){
+		return abortProperty;
 	}
 }

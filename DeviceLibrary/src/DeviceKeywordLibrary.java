@@ -18,4 +18,12 @@ public class DeviceKeywordLibrary {
 		return this.wert;
 	}
 
+	@Keyword(Description = "Wartet für die angegebene Zeit", Name = "Warte für", Parameter = "Wartezeit in Millisekunden")
+	public void delay(long milliseconds) {
+		try {
+			Thread.sleep(milliseconds);
+		} catch (InterruptedException e) {			
+			e.printStackTrace();
+		}
+	}
 }

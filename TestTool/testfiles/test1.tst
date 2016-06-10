@@ -6,9 +6,13 @@
 
 
 [TEST]	
+	Warte für "1000"
 	{f1} = 		"1"	
+	Warte für "1000"
 	{f2} = 		"-7"
+	Warte für "1000"
 	{v1} = 		"[{f1}-{f2}]"			
-	Ist gleich 	{v1}, "8"
+	Warte für "1000"
+	Ist gleich 	{v1}, "8"	
 
 	

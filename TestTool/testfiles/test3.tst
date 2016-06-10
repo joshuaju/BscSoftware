@@ -5,6 +5,9 @@
 [LIB]		"DeviceKeywordLibrary.jar" dev1
 
 [TEST]	
+	Warte für "1000"
 	dev1.Setze Wert auf		"20"	
+	Warte für "1000"
 	{val} = 				Lese Wert
+	Warte für "1000"
 	Ist gleich 				{val}, "22"

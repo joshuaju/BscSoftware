@@ -1,5 +1,9 @@
 package execution;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -54,6 +58,21 @@ public class TestSuiteProtocol {
 
 	public void addProtocol(TestProtocol protocol) {
 		protocols.add(protocol);
+	}
+
+	public void writeToFile(File destination) throws IOException {
+
+		File parent = destination.getParentFile();
+		parent.mkdirs();
+
+		destination.createNewFile();
+				
+		FileWriter w = new FileWriter(destination);
+		BufferedWriter writer = new BufferedWriter(w);
+		writer.write(this.toString());
+		writer.flush();
+		writer.close();
+		destination.setWritable(false);
 	}
 
 	@Override

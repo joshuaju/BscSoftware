@@ -18,12 +18,12 @@ public class TestSuiteExecuterThread extends Thread {
 		super(() -> {
 			ObjectProperty<TestSuiteProtocol> protocol = new SimpleObjectProperty<>();
 			try {
-				protocol.set(executer.execute());
-				onFinish.accept(protocol.get());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+				TestSuiteProtocol ptc = executer.execute();
+				protocol.set(ptc);
+				onFinish.accept(protocol.get());				
+			} catch (InterruptedException e) {				
 				onAbort.run();
-			}
+			}			
 		});
 		setDaemon(true);
 		this.executer = executer;
