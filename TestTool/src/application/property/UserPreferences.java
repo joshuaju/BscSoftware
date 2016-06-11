@@ -93,11 +93,11 @@ public class UserPreferences extends PrefHelper {
 			String projectname = ProjectPreferences.get().getOrDefault(ProjectPreferences.PROJECT_NAME);
 			return System.getProperty("user.home") + File.separator + "Documents" + File.separator + projectname + File.separator;
 		} else if (key.equals(LIBRARY_DIR)) {			
-			return getOrDefault(APPLICATION_HOME_DIR) + File.separator + "libs" + File.separator;
+			return getOrDefault(APPLICATION_HOME_DIR) + "libs" + File.separator;
 		} else if (key.equals(STD_LIBRARY_DIR)) {
-			return getOrDefault(LIBRARY_DIR) + File.separator + "std";
+			return getOrDefault(LIBRARY_DIR) + "std";
 		} else if (key.equals(SESSION_DIR)) {			
-			return getOrDefault(APPLICATION_HOME_DIR) + File.separator + "sessions" + File.separator;
+			return getOrDefault(APPLICATION_HOME_DIR) + "sessions" + File.separator;
 		} else if (key.equals(ALWAYS_ON_TOP)) {
 			return Boolean.FALSE.toString();
 		} else {

@@ -1,7 +1,6 @@
 package application;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
 import application.property.UserPreferences;
@@ -15,11 +14,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Dialog;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class MainApplication extends Application {
@@ -28,7 +23,7 @@ public class MainApplication extends Application {
 		launch(args);
 	}
 
-	public static Stage stage;
+	static Stage stage;
 
 	@Override
 	public void start(Stage primaryStage) throws IOException, ClassNotFoundException, KeywordLibraryException,
@@ -42,7 +37,7 @@ public class MainApplication extends Application {
 //		Platform.exit();
 	}
 
-	public static void testDocumentationGUI(Stage primaryStage) throws IOException {
+	static void testDocumentationGUI(Stage primaryStage) throws IOException {
 		FXMLLoader loader = new FXMLLoader(
 				MainApplication.class.getClassLoader().getResource("ui/fxml/TestDesignerMainView.fxml"));
 		BorderPane root = loader.load();
@@ -59,7 +54,7 @@ public class MainApplication extends Application {
 		primaryStage.setOnCloseRequest((event) -> UserPreferences.get().store());
 	}
 	
-	public static void testExecutionGUI(Stage primaryStage) throws IOException {
+	static void testExecutionGUI(Stage primaryStage) throws IOException {
 		FXMLLoader loader = new FXMLLoader(
 				MainApplication.class.getClassLoader().getResource("ui/fxml/TestExecuterView.fxml"));
 		
@@ -73,7 +68,7 @@ public class MainApplication extends Application {
 		primaryStage.sizeToScene();		
 	}
 
-	public static void testExecution()
+	static void testExecution()
 			throws IOException, ClassNotFoundException, KeywordLibraryException, TestfileSyntaxException, InterruptedException {
 		TestSuiteExecuter tsExe = new TestSuiteExecuter("Joshua Jungen");
 		// --------------------------------------------------------
@@ -99,27 +94,6 @@ public class MainApplication extends Application {
 
 		UserPreferences.get().store();
 		Platform.exit();
-	}
-
-	public static void showAlert(String header, String content) {
-		boolean onTop = MainApplication.stage.isAlwaysOnTop();
-		MainApplication.stage.setAlwaysOnTop(false);
-		Alert alertDlg = new Alert(AlertType.ERROR);
-		alertDlg.setHeaderText(header);
-		alertDlg.setContentText(content);
-		alertDlg.showAndWait();
-		MainApplication.stage.setAlwaysOnTop(onTop);
-
-	}
-
-	public static <T> Optional<T> showDialog(Dialog<T> dlg) {
-		boolean onTop = MainApplication.stage.isAlwaysOnTop();
-		MainApplication.stage.setAlwaysOnTop(false);
-		dlg.initOwner(stage);
-		dlg.initModality(Modality.APPLICATION_MODAL);
-		Optional<T> optional = dlg.showAndWait();
-		MainApplication.stage.setAlwaysOnTop(onTop);
-		return optional;
 	}
 
 }

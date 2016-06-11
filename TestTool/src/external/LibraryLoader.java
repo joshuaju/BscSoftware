@@ -394,10 +394,15 @@ public class LibraryLoader implements Closeable {
 		return urls;
 	}
 
-	private String getSimplePath(String path) {
+	private String getSimplePath(String path) throws FileNotFoundException {
 		String libraryDir = UserPreferences.get().getOrDefault(UserPreferences.LIBRARY_DIR);
-		if (path.startsWith(libraryDir)) {
-			path = path.substring(libraryDir.length());
+		File libraryDirFile = new File(libraryDir);
+		File pathFile = new File(path);
+		
+		String absFilePath = pathFile.getAbsolutePath();
+		String absDirPath = libraryDirFile.getAbsolutePath();
+		if (absFilePath.startsWith(absDirPath)){
+			return absFilePath.substring(absDirPath.length()); 
 		}
 		return path;
 	}

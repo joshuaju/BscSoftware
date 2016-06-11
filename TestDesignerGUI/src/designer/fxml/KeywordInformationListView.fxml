@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<SplitPane fx:id="sp_main" dividerPositions="0.4077669902912621" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="238.0" prefWidth="558.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="designer.controller.KeywordInformationListController">
+  <items>
+      <BorderPane>
+         <center>
+            <ListView fx:id="lv_keywords" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="50.0" minWidth="50.0" />
+         </center>
+         <top>
+            <fx:include fx:id="search" source="searchfield.fxml" />
+         </top>
+      </BorderPane>
+      <BorderPane fx:id="bp_information">
+      	<center>
+      		<fx:include fx:id="keywordInfo" source="KeywordInformationView.fxml" />
+  		</center>
+      </BorderPane>
+  </items>
+</SplitPane>
