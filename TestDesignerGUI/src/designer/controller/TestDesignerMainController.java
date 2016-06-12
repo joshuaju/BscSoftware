@@ -22,6 +22,7 @@ import designer.misc.DialogFactory;
 import exceptions.keywordlibrary.KeywordLibraryException;
 import external.LibraryLoader;
 import external.SimpleKeywordLibrary;
+import input.Testfile;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -34,7 +35,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import testfile.Testfile;
 
 public class TestDesignerMainController implements Initializable {
 

@@ -1,10 +1,9 @@
-package testfile;
+package input;
 
 import java.io.File;
 import java.io.IOException;
 
 import exceptions.testfile.TestfileSyntaxException;
-import testfile.syntaxer.TestfileSyntaxer;
 
 public class VariableFileReader extends AbstractFileReader {
 

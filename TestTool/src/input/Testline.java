@@ -1,4 +1,4 @@
-package testfile;
+package input;
 
 import exceptions.testfile.TestfileException;
 

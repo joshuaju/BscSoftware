@@ -1,9 +1,8 @@
-package testfile.syntaxer;
+package input;
 
 import java.util.regex.Pattern;
 
 import exceptions.testfile.TestfileSyntaxException;
-import testfile.Testfile;
 
 /**
  * Die Klasse prüft eine Testdatei auf syntaktische und lexikalische

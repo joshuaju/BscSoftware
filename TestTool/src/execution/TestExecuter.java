@@ -18,14 +18,14 @@ import expr.SyntaxException;
 import external.ExecutableKeyword;
 import external.ExecutableKeywordLibrary;
 import external.LibraryLoader;
+import input.Testfile;
+import input.TestfileReader;
+import input.Testline;
+import input.VariableFile;
+import input.VariableFileReader;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import testfile.Testfile;
-import testfile.TestfileReader;
-import testfile.Testline;
-import testfile.VariableFile;
-import testfile.VariableFileReader;
 
 public class TestExecuter {
 	private volatile BooleanProperty abortProperty = new SimpleBooleanProperty(false);

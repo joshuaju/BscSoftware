@@ -10,8 +10,8 @@ import application.property.UserPreferences;
 import exceptions.testfile.TestfileException;
 import executer.misc.DialogFactory;
 import executer.misc.FileListCell;
+import execution.AsyncTestSuiteExecuter;
 import execution.TestSuiteExecuter;
-import execution.TestSuiteExecuterThread;
 import execution.TestSuiteProtocol;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -74,24 +74,24 @@ public class TestExecuterController {
 
 	@FXML
 	private ProgressBar pbSuite;
-	
+
 	@FXML
-    private MenuItem miAddFile;
+	private MenuItem miAddFile;
 
-    @FXML
-    private MenuItem miAddDirectory;
+	@FXML
+	private MenuItem miAddDirectory;
 
-    @FXML
-    private MenuItem miRemove;
+	@FXML
+	private MenuItem miRemove;
 
-    @FXML
-    private MenuItem miRemoveAll;
+	@FXML
+	private MenuItem miRemoveAll;
 
 	private final ListProperty<File> selectedFiles;
 	private final ObjectProperty<File> protocolFile;
 	private final BooleanProperty executionRunning;
 	private final BooleanProperty abortionRunning;
-	private TestSuiteExecuterThread executionThread = null;
+	private AsyncTestSuiteExecuter asyncExecuter = null;
 
 	public TestExecuterController() {
 		selectedFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -170,7 +170,7 @@ public class TestExecuterController {
 			protocolFile.set(protocol);
 			tfProtocolFile.setText(protocol.getAbsolutePath());
 		}
-	}	
+	}
 
 	private void browseTestFiles(File initDir) {
 		FileChooser fc = new FileChooser();
@@ -203,17 +203,17 @@ public class TestExecuterController {
 	void startExecution(ActionEvent event) {
 		taOutput.clear();
 
-		TestSuiteExecuter tsExe = new TestSuiteExecuter(tfAuthor.getText());
+		TestSuiteExecuter executer = new TestSuiteExecuter(tfAuthor.getText());
 
-		pbSuite.progressProperty().bind(tsExe.suiteProgressProperty());
-		pbTest.progressProperty().bind(tsExe.testProgressProperty());
+		pbSuite.progressProperty().bind(executer.suiteProgressProperty());
+		pbTest.progressProperty().bind(executer.testProgressProperty());
 
 		selectedFiles.forEach(file -> {
 			try {
 				if (file.isDirectory()) {
-					tsExe.addDirectory(true, file.getAbsolutePath());
+					executer.addDirectory(true, file.getAbsolutePath());
 				} else if (file.isFile()) {
-					tsExe.addFile(file.getAbsolutePath());
+					executer.addFile(file.getAbsolutePath());
 				} else {
 
 				}
@@ -222,12 +222,12 @@ public class TestExecuterController {
 			}
 		});
 
-		executionThread = new TestSuiteExecuterThread(tsExe);
-		executionThread.setOnFinish(protocol -> finishedExecution(protocol));
-		executionThread.setOnAbort(() -> abortedExecution());
+		asyncExecuter = new AsyncTestSuiteExecuter(executer);
+		asyncExecuter.setOnFinish(protocol -> finishedExecution(protocol));
+		asyncExecuter.setOnAbort(() -> abortedExecution());
 
+		asyncExecuter.execute();
 		executionRunning.set(true);
-		executionThread.start();
 	}
 
 	private void finishedExecution(TestSuiteProtocol protocol) {
@@ -259,38 +259,38 @@ public class TestExecuterController {
 
 	@FXML
 	void abortExecution(ActionEvent event) {
-		if (executionThread == null || !executionThread.isAlive()) {
+		if (asyncExecuter == null || !asyncExecuter.isExecuting()) {
 			executionRunning.set(false);
 			return;
 		}
+		asyncExecuter.abort();
 		abortionRunning.set(true);
-		executionThread.abort();
 	}
 
 	private void setDefaultAuthorText() {
 		tfAuthor.setText(System.getProperty("user.name"));
 	}
-	
+
 	@FXML
-    void contextMenuAddDirectoryAction(ActionEvent event) {
+	void contextMenuAddDirectoryAction(ActionEvent event) {
 		// TODO Pfad merken
 		browseTestDirectory(null);
-    }
+	}
 
-    @FXML
-    void contextMenuAddFileAction(ActionEvent event) {
-    	// TODO letzten pfad merken
-    	browseTestFiles(null);
-    }
+	@FXML
+	void contextMenuAddFileAction(ActionEvent event) {
+		// TODO letzten pfad merken
+		browseTestFiles(null);
+	}
 
-    @FXML
-    void contextMenuRemoveAction(ActionEvent event) {
-    	removeSelectedFile();
-    }
+	@FXML
+	void contextMenuRemoveAction(ActionEvent event) {
+		removeSelectedFile();
+	}
 
-    @FXML
-    void contextMenuRemoveAllAction(ActionEvent event) {
-    	selectedFiles.clear();
-    }
+	@FXML
+	void contextMenuRemoveAllAction(ActionEvent event) {
+		selectedFiles.clear();
+	}
 
 }

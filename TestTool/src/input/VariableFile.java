@@ -1,4 +1,4 @@
-package testfile;
+package input;
 
 import java.util.HashMap;
 

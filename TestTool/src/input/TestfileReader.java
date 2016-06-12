@@ -1,4 +1,4 @@
-package testfile;
+package input;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import exceptions.testfile.TestfileException;
 import exceptions.testfile.TestfileExceptionHandler;
 import exceptions.testfile.TestfileSyntaxException;
-import testfile.syntaxer.TestfileSyntaxer;
 
 /**
  * Die Klasse ist verantwortlich für das einlesen von Testdateien.

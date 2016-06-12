@@ -34,10 +34,6 @@ public class TestSuiteExecuter {
 		progressHandler = new ProgressHandler();
 	}
 
-	public TestSuiteExecuter() {
-		this(System.getProperty("user.name"));
-	}
-
 	public TestSuiteProtocol execute() throws InterruptedException {
 		TestSuiteProtocol suiteprotocol = new TestSuiteProtocol(author);
 
