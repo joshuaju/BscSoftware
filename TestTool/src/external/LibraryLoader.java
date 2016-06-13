@@ -46,6 +46,7 @@ public class LibraryLoader implements Closeable {
 		}
 		String defLibraries = UserPreferences.get().getOrDefault(UserPreferences.STD_LIBRARY_DIR);
 		instance = new LibraryLoader(defLibraries);
+		System.out.println("Created Library Loader with libraries from: " + defLibraries);
 		return instance;
 	}
 
