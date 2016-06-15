@@ -6,9 +6,6 @@ import java.lang.reflect.Method;
 import exceptions.keywordlibrary.KeywordException;
 import exceptions.keywordlibrary.KeywordExceptionHandler;
 import exceptions.keywordlibrary.KeywordLibraryException;
-import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 
 /**
  * Diese Klasse repräsentiert ein Keyword

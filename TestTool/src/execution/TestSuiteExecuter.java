@@ -3,6 +3,7 @@ package execution;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import exceptions.executing.SetupException;
@@ -11,6 +12,7 @@ import exceptions.executing.TestException;
 import exceptions.keywordlibrary.KeywordLibraryException;
 import exceptions.testfile.TestfileException;
 import exceptions.testfile.TestfileExceptionHandler;
+import external.LibraryLoader;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -28,10 +30,11 @@ public class TestSuiteExecuter {
 	private DoubleProperty suiteProgress = new SimpleDoubleProperty();
 	private DoubleProperty testProgress = new SimpleDoubleProperty();
 
-	public TestSuiteExecuter(String author) {
+	public TestSuiteExecuter(String author) throws ClassNotFoundException, IOException, KeywordLibraryException {
 		this.author = author;
 		this.paths = new ArrayList<>();
 		progressHandler = new ProgressHandler();
+		LibraryLoader.createInstance();
 	}
 
 	public TestSuiteProtocol execute() throws InterruptedException {

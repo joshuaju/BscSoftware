@@ -55,6 +55,13 @@ public class TestDesignerMainController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		try {
+			LibraryLoader.createInstance();
+		} catch (ClassNotFoundException | IOException | KeywordLibraryException e1) {
+			DialogFactory.createAlert("Bibliotheken konnten nicht geladen werden",
+					"In den Einstellungen kann der Standardpfad angepasst werden", AlertType.ERROR).show();
+		}
+
 		String libraryDir = UserPreferences.get().getOrDefault(UserPreferences.LIBRARY_DIR);
 		File libDirFile = new File(libraryDir);
 		Collection<File> files = null;
@@ -118,7 +125,8 @@ public class TestDesignerMainController implements Initializable {
 				writer.close();
 				callTexteditor(selected);
 			} catch (IOException e) {
-				DialogFactory.createAlert("Template konnte nicht erstellt werden", e.getMessage(), AlertType.ERROR).show();
+				DialogFactory.createAlert("Template konnte nicht erstellt werden", e.getMessage(), AlertType.ERROR)
+						.show();
 			}
 
 		}
@@ -151,8 +159,9 @@ public class TestDesignerMainController implements Initializable {
 				session.load(is);
 				is.close();
 			} catch (FileNotFoundException e) {
-				DialogFactory.createAlert("Sitzung wurde nicht geöffnet", "Die Datei wurde nicht gefunden",
-						AlertType.ERROR).show();
+				DialogFactory
+						.createAlert("Sitzung wurde nicht geöffnet", "Die Datei wurde nicht gefunden", AlertType.ERROR)
+						.show();
 			} catch (IOException e) {
 				DialogFactory.createAlert("Sitzung wurde nicht geöffnet", "Die Datei konnte nicht geladen werden",
 						AlertType.ERROR).show();
@@ -233,7 +242,8 @@ public class TestDesignerMainController implements Initializable {
 			StringBuilder builder = new StringBuilder();
 			notloaded.forEach((name) -> builder.append(", " + name));
 			String msg = builder.toString().substring(2);
-			DialogFactory.createAlert("Folgende Bibliotheken konnten nicht geladen werden", msg, AlertType.WARNING).show();
+			DialogFactory.createAlert("Folgende Bibliotheken konnten nicht geladen werden", msg, AlertType.WARNING)
+					.show();
 		}
 	}
 

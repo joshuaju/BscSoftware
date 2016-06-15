@@ -9,5 +9,6 @@
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/KeywordAnnotations"/>
 	<classpathentry kind="lib" path="D:/Bsc/refs/expr.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

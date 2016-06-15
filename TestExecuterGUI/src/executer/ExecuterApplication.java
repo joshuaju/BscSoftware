@@ -2,9 +2,8 @@ package executer;
 
 import java.io.IOException;
 
-import executer.misc.DialogFactory;
 import exceptions.keywordlibrary.KeywordLibraryException;
-import external.LibraryLoader;
+import executer.misc.DialogFactory;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,8 +13,7 @@ import javafx.stage.Stage;
 
 public class ExecuterApplication extends Application {
 
-	public static void main(String[] args) throws ClassNotFoundException, IOException, KeywordLibraryException{
-		LibraryLoader.createInstance();
+	public static void main(String[] args) throws ClassNotFoundException, IOException, KeywordLibraryException{		
 		launch(args);
 	}
 	

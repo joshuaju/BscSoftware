@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import application.property.UserPreferences;
+import exceptions.keywordlibrary.KeywordLibraryException;
 import exceptions.testfile.TestfileException;
 import executer.misc.DialogFactory;
 import executer.misc.FileListCell;
@@ -203,7 +204,14 @@ public class TestExecuterController {
 	void startExecution(ActionEvent event) {
 		taOutput.clear();
 
-		TestSuiteExecuter executer = new TestSuiteExecuter(tfAuthor.getText());
+		TestSuiteExecuter executer;
+		try {
+			executer = new TestSuiteExecuter(tfAuthor.getText());
+		} catch (ClassNotFoundException | IOException | KeywordLibraryException e1) {
+			DialogFactory.createAlert("Bibliotheken konnten nicht geladen werden",
+					"In den Einstellungen im TestDesigner kann der Standardpfad angepasst werden", AlertType.ERROR).show();
+			return;
+		}
 
 		pbSuite.progressProperty().bind(executer.suiteProgressProperty());
 		pbTest.progressProperty().bind(executer.testProgressProperty());
@@ -226,7 +234,7 @@ public class TestExecuterController {
 		asyncExecuter.setOnFinish(protocol -> finishedExecution(protocol));
 		asyncExecuter.setOnAbort(() -> abortedExecution());
 
-		asyncExecuter.execute();
+		asyncExecuter.execute();		
 		executionRunning.set(true);
 	}
 
@@ -240,6 +248,8 @@ public class TestExecuterController {
 			taOutput.setText(protocol.toString());
 			try {
 				protocol.writeToFile(protocolFile.get());
+				protocolFile.set(null);
+				tfProtocolFile.clear();
 			} catch (IOException e) {
 				Alert warning = DialogFactory.createAlert("Protokoll konnte nicht gespeichert werden",
 						"Erstellen Sie eine Protokolldatei manuel", AlertType.WARNING);

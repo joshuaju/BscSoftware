@@ -4,7 +4,6 @@ import java.io.IOException;
 import application.property.UserPreferences;
 import designer.misc.DialogFactory;
 import exceptions.keywordlibrary.KeywordLibraryException;
-import external.LibraryLoader;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,7 +14,6 @@ import javafx.stage.Stage;
 public class DesignApplication extends Application {
 
 	public static void main(String[] args) throws ClassNotFoundException, IOException, KeywordLibraryException{
-		LibraryLoader.createInstance();
 		launch(args);
 	}
 	

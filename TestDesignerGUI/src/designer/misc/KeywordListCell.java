@@ -1,6 +1,5 @@
 package designer.misc;
 
-import external.ExecutableKeyword;
 import external.SimpleKeyword;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.ClipboardContent;
