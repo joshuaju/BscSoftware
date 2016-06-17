@@ -61,11 +61,10 @@ public class KeywordListCell extends ListCell<SimpleKeyword> {
 			String name = tmpParam.getSimpleName().toUpperCase();			
 			paramtext += name + ", ";
 		}
+		
 		if (paramtext.length() > 0) {
 			paramtext = paramtext.replace(Object.class.getSimpleName().toUpperCase(), "ANY");
 			paramtext = paramtext.substring(0, paramtext.length() - 2);
-		} else {
-			paramtext = Void.class.getSimpleName();
 		}
 		
 

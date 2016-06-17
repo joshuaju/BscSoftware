@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.text.DecimalFormat;
 
 import annotations.Keyword;
 import annotations.KeywordLibrary;
@@ -34,7 +33,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 
 	private Connection tcu;
 
-	public TCUIVKeywordLibrary() {	
+	public TCUIVKeywordLibrary() {
 		tcu = new Connection("http", "172.16.86.3");
 	}
 
@@ -46,36 +45,36 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-//	@AKeyword(documentation = "Returns the current torque limit", name = "Get Torque Limit", returns = "")
+	// @AKeyword(documentation = "Returns the current torque limit", name = "Get
+	// Torque Limit", returns = "")
 	public Integer getTorqueLimit() throws IOException {
 		Parser parser = getParserForPath(ALARM_XML);
 		Integer result = parser.getNodeValue_AsInteger("tli");
 		return result;
 	}
-	
-	public Boolean getTorqueAlarmStatus() throws IOException{
+
+	public Boolean getTorqueAlarmStatus() throws IOException {
 		char status = getStatusword().charAt(1);
 		return status == '1';
 	}
-	
+
 	@Keyword(Description = "Prüft, ob das Torque Alarm Bit gesetzt ist", Name = "Ist Torque Alarm aktiv")
-	public void isTorqueAlarmActive() throws IOException, AssertionError{
-		if (!getTorqueAlarmStatus()){
+	public void isTorqueAlarmActive() throws IOException, AssertionError {
+		if (!getTorqueAlarmStatus()) {
 			throw new AssertionError("Torque Alarm darf nicht inaktiv sein");
 		}
 	}
-	
+
 	@Keyword(Description = "Prüft, ob das Torque Alarm Bit nicht gesetzt ist", Name = "Ist Torque Alarm inaktiv")
-	public void isTorqueAlarmNotActive() throws IOException, AssertionError{
-		if (getTorqueAlarmStatus()){
+	public void isTorqueAlarmNotActive() throws IOException, AssertionError {
+		if (getTorqueAlarmStatus()) {
 			throw new AssertionError("Torque Alarm darf nicht aktiv sein");
 		}
 	}
-	
-	
 
 	@Override
-//	@AKeyword(documentation = "Returns the current speed limit", name = "Get Speed Limit", returns = "")
+	// @AKeyword(documentation = "Returns the current speed limit", name = "Get
+	// Speed Limit", returns = "")
 	public Integer getSpeedLimit() throws IOException {
 		Parser parser = getParserForPath(ALARM_XML);
 		Integer result = parser.getNodeValue_AsInteger("sli");
@@ -83,7 +82,8 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-//	@AKeyword(documentation = "Returns the current accelaration limit", name = "Get Accelaration Limit", returns = "")
+	// @AKeyword(documentation = "Returns the current accelaration limit", name
+	// = "Get Accelaration Limit", returns = "")
 	public Integer getAccelarationLimit() throws IOException {
 		Parser parser = getParserForPath(ALARM_XML);
 		Integer result = parser.getNodeValue_AsInteger("ali");
@@ -91,7 +91,9 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-//	@AKeyword(documentation = "Returns output range of voltage/power output", name = "Get Analog Range A", returns = "Voltage<br>: 0 = 0-5V, 1 = +-5V, 2 = 0-10V, 3 = +-10V\nPower: 0 = 4-20mA")
+	// @AKeyword(documentation = "Returns output range of voltage/power output",
+	// name = "Get Analog Range A", returns = "Voltage<br>: 0 = 0-5V, 1 = +-5V,
+	// 2 = 0-10V, 3 = +-10V\nPower: 0 = 4-20mA")
 	public Integer getAnaRangeA() throws IOException {
 		Parser parser = getParserForPath(ANALOG_XML);
 		Integer result = parser.getNodeValue_AsInteger("rA");
@@ -99,7 +101,9 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-//	@AKeyword(documentation = "Returns the calibration date for analog channel A", name = "Get Calibration Date for Analog A", returns = "year-month-day")
+	// @AKeyword(documentation = "Returns the calibration date for analog
+	// channel A", name = "Get Calibration Date for Analog A", returns =
+	// "year-month-day")
 	public String getLastCalibAnaA() throws IOException {
 		Parser parser = getParserForPath(CALIB_A_XML);
 		String result = parser.getNodeValue_AsString("cda");
@@ -107,7 +111,9 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-//	@AKeyword(documentation = "Returns the calibration date for analog channel B", name = "Get Calibration Date for Analog B", returns = "year-month-day")
+	// @AKeyword(documentation = "Returns the calibration date for analog
+	// channel B", name = "Get Calibration Date for Analog B", returns =
+	// "year-month-day")
 	public String getLastCalibAnaB() throws IOException {
 		Parser parser = getParserForPath(CALIB_A_XML);
 		String result = parser.getNodeValue_AsString("cdb");
@@ -115,7 +121,9 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-//	@AKeyword(documentation = "Returns the calibration date for analog channel C", name = "Get Calibration Date for Analog C", returns = "year-month-day")
+	// @AKeyword(documentation = "Returns the calibration date for analog
+	// channel C", name = "Get Calibration Date for Analog C", returns =
+	// "year-month-day")
 	public String getLastCalibAnaC() throws IOException {
 		Parser parser = getParserForPath(CALIB_A_XML);
 		String result = parser.getNodeValue_AsString("cdc");
@@ -123,7 +131,9 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-//	@AKeyword(documentation = "Returns the calibration date for frequency channel A", name = "Get Calibration Date for Frequency A", returns = "year-month-day")
+	// @AKeyword(documentation = "Returns the calibration date for frequency
+	// channel A", name = "Get Calibration Date for Frequency A", returns =
+	// "year-month-day")
 	public String getLastCalibFreqA() throws IOException {
 		Parser parser = getParserForPath(CALIB_F_XML);
 		String result = parser.getNodeValue_AsString("cda");
@@ -131,7 +141,9 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-//	@AKeyword(documentation = "Returns the calibration date for frequency channel B", name = "Get Calibration Date for Frequency B", returns = "year-month-day")
+	// @AKeyword(documentation = "Returns the calibration date for frequency
+	// channel B", name = "Get Calibration Date for Frequency B", returns =
+	// "year-month-day")
 	public String getLastCalibFreqB() throws IOException {
 		Parser parser = getParserForPath(CALIB_F_XML);
 		String result = parser.getNodeValue_AsString("cdb");
@@ -202,7 +214,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-	@Keyword(Description = "Liest Rated Torque von Kanal A", Name = "Lese Rated Torque von Kanal A", Return="Integer")
+	@Keyword(Description = "Liest Rated Torque von Kanal A", Name = "Lese Rated Torque von Kanal A", Return = "Integer")
 	public Integer getRatedTorqueA() throws IOException {
 		Parser parser = getParserForPath(CHART_XML);
 		Integer result = parser.getNodeValue_AsInteger("rta");
@@ -210,15 +222,15 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-	@Keyword(Description = "Liest Rated Torque von Kanal B", Name = "Lese Rated Torque von Kanal B", Return="Integer")
+	@Keyword(Description = "Liest Rated Torque von Kanal B", Name = "Lese Rated Torque von Kanal B", Return = "Integer")
 	public Integer getRatedTorqueB() throws IOException {
 		Parser parser = getParserForPath(CHART_XML);
-		Integer result = parser.getNodeValue_AsInteger("rtb");		
+		Integer result = parser.getNodeValue_AsInteger("rtb");
 		return result;
 	}
 
 	@Override
-	@Keyword(Description = "Liest Rated Speed", Name = "Lese Rated Speed", Return="Integer")
+	@Keyword(Description = "Liest die Nenndrehzahl der TCU", Name = "Lese Nenndrehzahl der TCU", Return = "Integer")
 	public Integer getRatedSpeed() throws IOException {
 		Parser parser = getParserForPath(CHART_XML);
 		Integer result = parser.getNodeValue_AsInteger("rts");
@@ -345,6 +357,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest das Inkrement der TCU aus", Name = "Lese TCU Inkrement")
 	public Integer getSpeedIncrement() throws IOException {
 		Parser parser = getParserForPath(NEWDATA_XML);
 		Integer result = parser.getNodeValue_AsInteger("sI");
@@ -415,10 +428,12 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-	public Double getSpM() throws IOException {
+	@Keyword(Description = "Liest die nominale Versorgungsspannung des Senders", Name = "Lese Nominalspannung", Return = "Double zwischen 4 und 10,5 mit maximal 2 Nachkommastellen")
+	public Double getNominalVoltage() throws IOException {
 		Parser parser = getParserForPath(SETUP_XML);
-		Double result = parser.getNodeValue_AsDouble("spM");
-		return result;
+		Double result = parser.getNodeValue_AsDouble("spM") / 100;
+		int cut = (int) (result * 100);
+		return (cut / 100.0);
 	}
 
 	@Override
@@ -429,6 +444,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest das im Rotor gespeicherte Nennmoment an Kanal A", Name = "Lese Rated Torque A aus dem Rotor")
 	public Integer getRotorTorqueA() throws IOException {
 		Parser parser = getParserForPath(SETUP_XML);
 		Integer result = parser.getNodeValue_AsInteger("rAT");
@@ -436,6 +452,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest die positive Steigung an Kanal A aus dem Rotor", Name = "Lese positive Sensitivity an Kanal A aus dem Rotor")
 	public Double getRotorSensivityPositiveA() throws IOException {
 		Parser parser = getParserForPath(SETUP_XML);
 		Double result = parser.getNodeValue_AsDouble("rAP");
@@ -443,6 +460,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest die negative Steigung an Kanal A aus dem Rotor", Name = "Lese negative Sensitivity an Kanal A aus dem Rotor")
 	public Double getRotorSensivityNegativeA() throws IOException {
 		Parser parser = getParserForPath(SETUP_XML);
 		Double result = parser.getNodeValue_AsDouble("rAN");
@@ -450,6 +468,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest das im Rotor gespeicherte Nennmoment an Kanal B", Name = "Lese Rated Torque B aus dem Rotor")
 	public Integer getRotorTorqueB() throws IOException {
 		Parser parser = getParserForPath(SETUP_XML);
 		Integer result = parser.getNodeValue_AsInteger("rBT");
@@ -457,6 +476,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest die positive Steigung an Kanal B aus dem Rotor", Name = "Lese positive Sensitivity an Kanal B aus dem Rotor")
 	public Double getRotorSensivityPositiveB() throws IOException {
 		Parser parser = getParserForPath(SETUP_XML);
 		Double result = parser.getNodeValue_AsDouble("rBP");
@@ -464,6 +484,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest die negative Steigung an Kanal B aus dem Rotor", Name = "Lese negative Sensitivity an Kanal B aus dem Rotor")
 	public Double getRotorSensivityNegativeB() throws IOException {
 		Parser parser = getParserForPath(SETUP_XML);
 		Double result = parser.getNodeValue_AsDouble("rBN");
@@ -485,6 +506,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest das Inkrement des Rotors aus", Name = "Lese Rotor Inkrement")
 	public Integer getRotorSpeedIncrements() throws IOException {
 		Parser parser = getParserForPath(SETUP_XML);
 		Integer result = parser.getNodeValue_AsInteger("rSI");
@@ -492,6 +514,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest die Nenndrehzahl des Rotors", Name = "Lese Nenndrehzahl des Rotors ")
 	public Integer getRotorRatedSpeed() throws IOException {
 		Parser parser = getParserForPath(SETUP_XML);
 		Integer result = parser.getNodeValue_AsInteger("rRS");
@@ -502,7 +525,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	@Keyword(Description = "Liest den aktuellen Wert von Kanal A aus", Name = "Lese Kanal A", Parameter = "", Return = "Wert als Kommazahl")
 	public Double getChannelA() throws IOException {
 		Parser parser = getParserForPath(STATUS_XML);
-		Double result = parser.getNodeValue_AsDouble("chA");		
+		Double result = parser.getNodeValue_AsDouble("chA");
 		return result;
 	}
 
@@ -542,6 +565,25 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 		return result;
 	}
 
+	@Keyword(Description = "Prüft ob ein Statusbit des Statusworts gesetzt ist und wirft einen Fehler falls nicht", Name = "Ist Statusbit gesetzt", Parameter = "(0)Receiver error, (1)Torque error, (2)Speed error, (3)Current error, (4)MD2/MD1 (Outputswitch aktiv/inaktiv), (5)Zero (Nullabgleich wurde durchgeführt), (6)Test mode rotor (Testsignal Rotor aktiv), (7)Test mode pic (Testsignal Controller aktiv), (8)Config mode (Empfang zwischen FPGA-PIC unterbrochen, Sendemodus-FPGA), (9)Calibration mode (Keine Datenverrechnung, Fixe CAN-Configuration), (10)Auto power supply (Suchlauf Speisespannung - aktiv), (11)CAN transmit (CAN-Modul sendet), (12)Acceleration error (Alarmschwelle wurde überschritten), (13)Startup (Wird nicht genutzt), (14)DHCP-Client aktiv, (15)SPS_POWER (Speisespannung ist eingeschaltet), (16)Neues elektronisches Datenblatt verfügbar, (17)Positionnierungsfehler (SpSp-Suchlauf Fehlgeschlagen), (18)Langsamer Speisespannungsregler aktiv, (19)Erste Warnung für Überstrom, (20)Letzte Warnung für Überstrom")
+	public void isStatuswordSet(int charAt) throws IOException {
+		if (!getStatusbitSet(charAt)) {
+			throw new AssertionError("Das Statusbit an Position " + charAt + " ist nicht gesetzt");
+		}
+	}
+
+	@Keyword(Description = "Prüft ob ein Statusbit des Statusworts nicht gesetzt ist und wirft einen Fehler falls doch", Name = "Ist Statusbit nicht gesetzt", Parameter = "(0)Receiver error, (1)Torque error, (2)Speed error, (3)Current error, (4)MD2/MD1 (Outputswitch aktiv/inaktiv), (5)Zero (Nullabgleich wurde durchgeführt), (6)Test mode rotor (Testsignal Rotor aktiv), (7)Test mode pic (Testsignal Controller aktiv), (8)Config mode (Empfang zwischen FPGA-PIC unterbrochen, Sendemodus-FPGA), (9)Calibration mode (Keine Datenverrechnung, Fixe CAN-Configuration), (10)Auto power supply (Suchlauf Speisespannung - aktiv), (11)CAN transmit (CAN-Modul sendet), (12)Acceleration error (Alarmschwelle wurde überschritten), (13)Startup (Wird nicht genutzt), (14)DHCP-Client aktiv, (15)SPS_POWER (Speisespannung ist eingeschaltet), (16)Neues elektronisches Datenblatt verfügbar, (17)Positionnierungsfehler (SpSp-Suchlauf Fehlgeschlagen), (18)Langsamer Speisespannungsregler aktiv, (19)Erste Warnung für Überstrom, (20)Letzte Warnung für Überstrom")
+	public void isStatuswordNotSet(int charAt) throws IOException {		
+		if (getStatusbitSet(charAt)) {
+			throw new AssertionError("Das Statusbit an Position " + charAt + " ist gesetzt");
+		}
+	}
+	
+	public boolean getStatusbitSet(int charAt) throws IOException{
+		char bit = getStatusword().charAt(charAt);
+		return bit == '1';
+	}
+
 	@Override
 	public String getFeatures() throws IOException {
 		Parser parser = getParserForPath(STATUS_XML);
@@ -571,6 +613,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest die Versorungsspannung am Rotor", Name = "Lese Versorgungsspannung am Rotor")
 	public Integer getRotorSupplyVoltage() throws IOException {
 		Parser parser = getParserForPath(STATUS_XML);
 		Integer result = parser.getNodeValue_AsInteger("sSu");
@@ -578,6 +621,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest die Versorgungsspannung aus", Name = "Lese Poti Wert", Return = "Gibt die eingestellte Versorgungsspannung in Prozent zurück")
 	public Double getPoti() throws IOException {
 		Parser parser = getParserForPath(STATUS_XML);
 		Double result = parser.getNodeValue_AsDouble("pot");
@@ -634,6 +678,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest die positive Steigung an Kanal A", Name = "Lese positive Sensitivity an Kanal A")
 	public Double getSensitivityPositiveA() throws IOException {
 		Parser parser = getParserForPath(TORQUE_XML);
 		Double result = parser.getNodeValue_AsDouble("sAP");
@@ -641,6 +686,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest die negative Steigung an Kanal A", Name = "Lese negative Sensitivity an Kanal A")
 	public Double getSensitivityNegativeA() throws IOException {
 		Parser parser = getParserForPath(TORQUE_XML);
 		Double result = parser.getNodeValue_AsDouble("sAN");
@@ -648,6 +694,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest die positive Steigung an Kanal B", Name = "Lese positive Sensitivity an Kanal B")
 	public Double getSensitivityPositiveB() throws IOException {
 		Parser parser = getParserForPath(TORQUE_XML);
 		Double result = parser.getNodeValue_AsDouble("sBP");
@@ -655,6 +702,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Liest die negative Steigung an Kanal B", Name = "Lese negative Sensitivity an Kanal B")
 	public Double getSensitivityNegativeB() throws IOException {
 		Parser parser = getParserForPath(TORQUE_XML);
 		Double result = parser.getNodeValue_AsDouble("sBN");
@@ -662,7 +710,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-	@Keyword(Description = "Setzt das Torque Input Limit auf den angegebenen Wert", Name = "Setze Torque Input Limit auf", Parameter="Integer")
+	@Keyword(Description = "Setzt das Torque Input Limit auf den angegebenen Wert", Name = "Setze Torque Input Limit auf", Parameter = "Integer")
 	public void setTorqueLimit(Integer value) throws IOException {
 		tcu.sendPOST(ALARM_XML, "tli", value.toString());
 	}
@@ -916,12 +964,12 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	@Override
 	@Keyword(Description = "Schaltet das Testsignal des Rotors um", Name = "Schalte das Testsignal des Rotors um")
 	public void setToggleRotorTestSignal() throws IOException {
-		try {			
+		try {
 			tcu.sendPOST(HOME_XML, "tesr", "1");
-			Thread.sleep(2000);			
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
 
 	@Override
@@ -939,14 +987,26 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	public void setApplyRotorValues(Boolean value) throws IOException {
 		tcu.sendPOST(NEWDATA_XML, "apl", value ? "1" : "0");
 	}
+	
+	@Keyword(Description = "Die Rotor-Werte werden übernommen", Name = "Behalte Rotor Werte")
+	public void applyRotorValues() throws IOException{
+		setApplyRotorValues(true);
+	}
+	
+	@Keyword(Description = "Die Stator-Werte werden übernommen", Name = "Behalte Stator Werte")
+	public void keepStatorValues() throws IOException{
+		setApplyRotorValues(false);
+	}
 
 	@Override
+	@Keyword(Description = "Setzt die Versorgungsspannung", Name = "Setze Versorgungsspannung auf", Parameter = "Prozentuale Angabe zwischen 0 und 100. Werte in0.5% Schritten angeben.")
 	public void setPotiInPercent(Double value) throws IOException {
 		Integer val = (int) (value * 10);
 		tcu.sendPOST(POWER_XML, "supV", val.toString());
 	}
 
 	@Override
+	@Keyword(Description = "Startet den automatische Speisespannungs Suchlauf", Name = "Aktiviere automatische Speisespannungs Suchlauf")
 	public void setSearchPowerSupply() throws IOException {
 		tcu.sendPOST(POWER_XML, "auto", "1");
 	}
@@ -954,6 +1014,16 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	@Override
 	public void setEnablePowerSuppy(Boolean value) throws IOException {
 		tcu.sendPOST(POWER_XML, "psps", value ? "1" : "0");
+	}
+	
+	@Keyword(Description = "Aktiviert die Stromversorgung des Rotors", Name = "Aktiviere die Stromversorgung des Rotors")
+	public void activateRotorSupplyVoltage() throws IOException{
+		setEnablePowerSuppy(true);
+	}
+	
+	@Keyword(Description = "Deaktiviert die Stromversorgung des Rotors", Name = "Deaktiviere die Stromversorgung des Rotors")
+	public void deactivateRotorSupplyVoltage() throws IOException{
+		setEnablePowerSuppy(true);
 	}
 
 	@Override
@@ -1016,23 +1086,34 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 		tcu.sendPOST(SETUP_XML, "conf", value ? "1" : "0");
 	}
 
-	@Override
+	@Override	
 	public void setFeatureSecondChannel(Boolean value) throws IOException {
 		tcu.sendPOST(SETUP_XML, "chnb", value ? "1" : "0");
 	}
+	
+	@Keyword(Description = "Aktiviert das Feature Kanal 2", Name = "Aktiviere das Feature Kanal 2")
+	public void activateFeatureSecondChannel() throws IOException {
+		setFeatureSecondChannel(Boolean.TRUE);
+	}
+
+	@Keyword(Description = "Deaktiviert das Feature Kanal 2", Name = "Deaktiviere das Feature Kanal 2")
+	public void deactivateFeatureSecondChannel() throws IOException {
+		setFeatureSecondChannel(Boolean.FALSE);
+	}
+	
 
 	@Override
 	public void setFeatureSpeed(Boolean value) throws IOException {
 		tcu.sendPOST(SETUP_XML, "feas", value ? "1" : "0");
 	}
-	
+
 	@Keyword(Description = "Aktiviert das Feature Speed", Name = "Aktiviere das Feature Speed")
-	public void activateFeatureSpeed() throws IOException{
+	public void activateFeatureSpeed() throws IOException {
 		setFeatureSpeed(Boolean.TRUE);
 	}
-	
+
 	@Keyword(Description = "Deaktiviert das Feature Speed", Name = "Deaktiviere das Feature Speed")
-	public void deactivateFeatureSpeed() throws IOException{
+	public void deactivateFeatureSpeed() throws IOException {
 		setFeatureSpeed(Boolean.FALSE);
 	}
 
@@ -1082,31 +1163,31 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die nominale Versorgungsspannung des Senders", Name = "Setze Nominalspannung auf", Parameter = "Double zwischen 4 und 10,5 mit maximal 2 Nachkommastellen")
 	public void setNominalVoltage(Double value) throws IOException {
-		DecimalFormat format = new DecimalFormat("#.00");
-		tcu.sendPOST(SETUP_XML, "spM", format.format(value));
+		int cut = (int) (value * 100);
+		tcu.sendPOST(SETUP_XML, "spM", "" + cut);
 	}
 
-	@Override	
+	@Override
 	public void setTestSignalController(Boolean value) throws IOException {
 		tcu.sendPOST(SETUP_XML, "tesc", value ? "1" : "0");
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}			
+		}
 	}
-	
+
 	@Keyword(Description = "Schaltet das Testsignal des Controllers ein", Name = "Aktiviere das Testsignal des Controllers")
-	public void activateTestSignalController() throws IOException{
+	public void activateTestSignalController() throws IOException {
 		setTestSignalController(Boolean.TRUE);
 	}
-	
+
 	@Keyword(Description = "Schaltet das Testsignal des Controllers aus", Name = "Deaktiviere das Testsignal des Controllers")
-	public void deactivateTestSignalController() throws IOException{
+	public void deactivateTestSignalController() throws IOException {
 		setTestSignalController(Boolean.FALSE);
 	}
-	
 
 	@Override
 	public void setCustomTestSignal(Double value) throws IOException {
@@ -1114,35 +1195,41 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die positive Steigung an Kanal A des Rotors", Name = "Setze positive Sensitivity an Kanal A des Rotors auf", Parameter="Integer zwischen 1 und 100000")
 	public void setSensitivyPositiveRotorA(Long value) throws IOException {
 		value = value * 100000;
 		tcu.sendPOST(SETUP_XML, "rAP", value.toString());
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die negative Steigung an Kanal A des Rotors", Name = "Setze negative Sensitivity an Kanal A des Rotors auf", Parameter="Integer zwischen 1 und 100000")
 	public void setSensitivyNegativeRotorA(Long value) throws IOException {
 		value = value * 100000;
 		tcu.sendPOST(SETUP_XML, "rAN", value.toString());
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die positive Steigung an Kanal B des Rotors", Name = "Setze positive Sensitivity an Kanal B des Rotors auf", Parameter="Integer zwischen 1 und 100000")
 	public void setSensitivyPositiveRotorB(Long value) throws IOException {
 		value = value * 100000;
 		tcu.sendPOST(SETUP_XML, "rBP", value.toString());
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die negative Steigung an Kanal B des Rotors", Name = "Setze negative Sensitivity an Kanal B des Rotors auf", Parameter="Integer zwischen 1 und 100000")
 	public void setSensitivyNegativeRotorB(Long value) throws IOException {
 		value = value * 100000;
 		tcu.sendPOST(SETUP_XML, "rBN", value.toString());
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die Nenndrehzahl des Rotors", Name = "Setze Nenndrehzahl des Rotors auf", Parameter="Integer zwischen 0 und 25000")
 	public void setRatedSpeedRotor(Integer value) throws IOException {
 		tcu.sendPOST(SETUP_XML, "rRS", value.toString());
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die Drehzahlinkremente des Rotors", Name = "Setze Inkremente des Rotors auf", Parameter="Integer zwischen 60 und 2896")
 	public void setSpeedIncrementsRotor(Integer value) throws IOException {
 		tcu.sendPOST(SETUP_XML, "rSI", value.toString());
 	}
@@ -1168,11 +1255,13 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Aktiviert/Deaktiviert den langsamen Regler", Name = "Verwende langsamen Regler", Parameter="true oder false")
 	public void setEnableVoltageRegulator(Boolean value) throws IOException {
-		tcu.sendPOST(SETUP_XML, "rRS", value ? "1" : "0");
+		tcu.sendPOST(SETUP_XML, "volr", value ? "1" : "0");
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die Nenndrehzahl der TCU", Name = "Setze Nenndrehzahl der TCU auf", Parameter="Integer zwischen 0 und 25000")
 	public void setRatedSpeedTCU(Integer value) throws IOException {
 		tcu.sendPOST(SPEED_XML, "rS", value.toString());
 	}
@@ -1183,6 +1272,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die Drehzahlinkremente der TCU", Name = "Setze Inkremente der TCU auf", Parameter="Integer zwischen 60 und 2896")
 	public void setSpeedIncrementTCU(Integer value) throws IOException {
 		tcu.sendPOST(SPEED_XML, "sI", value.toString());
 	}
@@ -1193,34 +1283,40 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
+	@Keyword(Description = "Setzt Rated Torque von Kanal A", Name = "Setze Rated Torque von Kanal A auf", Parameter = "Integer zwischen 1 und 60000")
 	public void setRatedTorqueA(Integer value) throws IOException {
 		tcu.sendPOST(TORQUE_XML, "rtA", value.toString());
 	}
 
 	@Override
+	@Keyword(Description = "Setzt Rated Torque von Kanal B", Name = "Setze Rated Torque von Kanal B auf", Parameter = "Integer zwischen 1 und 60000")
 	public void setRatedTorqueB(Integer value) throws IOException {
 		tcu.sendPOST(TORQUE_XML, "rtB", value.toString());
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die positive Steigung an Kanal A", Name = "Setze positive Sensitivity an Kanal A auf", Parameter="Integer zwischen 1 und 100000")
 	public void setSensitivityPositiveA(Long value) throws IOException {
 		value *= 100000;
 		tcu.sendPOST(TORQUE_XML, "sAP", value.toString());
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die negative Steigung an Kanal A", Name = "Setze negative Sensitivity an Kanal A auf", Parameter="Integer zwischen 1 und 100000")
 	public void setSensitivityNegativeA(Long value) throws IOException {
 		value *= 100000;
 		tcu.sendPOST(TORQUE_XML, "sAN", value.toString());
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die positive Steigung an Kanal B", Name = "Setze positive Sensitivity an Kanal B auf", Parameter="Integer zwischen 1 und 100000")
 	public void setSensitivityPositiveB(Long value) throws IOException {
 		value *= 100000;
 		tcu.sendPOST(TORQUE_XML, "sBP", value.toString());
 	}
 
 	@Override
+	@Keyword(Description = "Setzt die negative Steigung an Kanal B", Name = "Setze negative Sensitivity an Kanal B auf", Parameter="Integer zwischen 1 und 100000")
 	public void setSensitivityNegativeB(Long value) throws IOException {
 		value *= 100000;
 		tcu.sendPOST(TORQUE_XML, "sBN", value.toString());
@@ -1230,6 +1326,18 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	@Keyword(Description = "Setzt alle Alarmausgänge zurück", Name = "Setze Alarmausgänge zurück")
 	public void setResetAlarms() throws IOException {
 		tcu.sendPOST(VALUES_XML, "resa", "1");
+	}
+	
+	@Keyword(Description = "Sendet das elektronische Datenblatt an den Rotor", Name = "Sende Datenblatt an Rotor", Parameter="Pos. Sens. Kanal A, Neg. Sens. Kanal A, Pos. Sens. Kanal B, Neg. Sens. Kanal B, Nenndrehzahl, Inkremente")												
+	public void sendDatasheet(Integer rAP, Integer rAN, Integer rBP, Integer rBN, Integer rRS, Integer rSI) throws IOException{
+		PostParameter post_rap = new PostParameter("rAP", "" + rAP);
+		PostParameter post_ran = new PostParameter("rAN", "" +rAN);
+		PostParameter post_rbp = new PostParameter("rBP", "" + rBP);
+		PostParameter post_rbn = new PostParameter("rBN", "" + rBN);
+		PostParameter post_rrs = new PostParameter("rRS", "" + rRS);
+		PostParameter post_rsi = new PostParameter("rSI", "" + rSI);
+		String parameterString = PostParameter.concat(post_rap, post_ran, post_rbp, post_rbn, post_rrs, post_rsi);
+		tcu.sendPOST(SETUP_XML, parameterString);
 	}
 
 }

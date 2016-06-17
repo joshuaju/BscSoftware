@@ -1,7 +1,8 @@
 [AUTHOR] 	Joshua Jungen
 [TESTNAME] 	Überprüfung des Rotor Testsignals
-[DESC] 		
-[LIB]		"D:/Bsc/TCUIVKeywordLibrary.jar" tcu
+
+[LIB] 		"TCUIVKeywordLibrary.jar" tcu
+[VAR] 		"config.var"
 
 [REPEAT] 5
 [SETUP]	

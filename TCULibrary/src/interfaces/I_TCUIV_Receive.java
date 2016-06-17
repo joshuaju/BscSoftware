@@ -250,7 +250,7 @@ public interface I_TCUIV_Receive {
 	/* String getBenchName() throws IOException; */
 
 	// setup.xml
-	Double getSpM() throws IOException;
+	Double getNominalVoltage() throws IOException;
 
 	/*
 	 * String getSerialNumberStator() throws IOException; Boolean getRebootNow() throws IOException; Boolean get

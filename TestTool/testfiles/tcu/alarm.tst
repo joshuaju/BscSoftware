@@ -1,7 +1,8 @@
 [AUTHOR] 	Joshua Jungen
 [TESTNAME] 	Überprüfung des Rotor Testsignals
-[DESC] 		
-[LIB]		"TCUIVKeywordLibrary.jar" tcu
+
+[LIB] 		"TCUIVKeywordLibrary.jar" tcu
+[VAR] 		"config.var"
 
 [SETUP]			
 	Ist Torque Alarm inaktiv
