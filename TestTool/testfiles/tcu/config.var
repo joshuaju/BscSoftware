@@ -1,2 +1,4 @@
-{delay_short} = 	"500"
-{delay_long}  =		"1000"
+{delay_short} = 		"500"
+{delay_long}  =			"6000"
+{delay_extra_long} = 	"15000"
+{delay_datasheet}  = 	"35000"

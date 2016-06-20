@@ -10,14 +10,14 @@
 	Ist gleich						{poti}, "0.0"
 	Setze Nominalspannung auf		"9.50"
 	{nom} = 						Lese Nominalspannung
-	Ist gleich 						{nom}, "9.50"
+	Ist ungefähr gleich 						{nom}, "9.50", "0.0"
 [TEST]
 	Aktiviere automatische Speisespannungs Suchlauf
 	
 	Ist Statusbit gesetzt		"10"	
-	Warte für					{delay_short}
+	Warte für					{delay_long}
 	Ist Statusbit nicht gesetzt	"10"
 	
 	{sp} = 						Lese Versorgungsspannung am Rotor	
-	Ist ungeführ gleich		{sp}, {nom}, "0.25"
+	Ist ungefähr gleich		{sp}, {nom}, "0.25"
 [TEARDOWN]

@@ -8,8 +8,7 @@
 	Aktiviere das Feature Speed
 	Aktiviere das Testsignal des Controllers
 [TEST]				
-	# Flag im Statuswort prüfen	
-	Warte für 	"100"
+	Ist Statusbit gesetzt		"7"
 [TEARDOWN]
 	Deaktiviere das Testsignal des Controllers
 	Deaktiviere das Feature Speed

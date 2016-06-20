@@ -8,7 +8,7 @@ public class KeywordException extends KeywordLibraryException {
 		super(msg);
 	}
 	
-	public KeywordException(String msg, Exception cause){
+	public KeywordException(String msg, Throwable cause){
 		super(msg, cause);
 	}
 	

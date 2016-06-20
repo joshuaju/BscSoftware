@@ -34,8 +34,8 @@ public class ExecutableKeyword extends SimpleKeyword {
 	 *            ausführendes Objekt
 	 * @param args
 	 *            Übergabeparameter
-	 * @return Rückgabewert des Keyword 
-	 * @throws KeywordException 
+	 * @return Rückgabewert des Keyword
+	 * @throws KeywordException
 	 * @throws IllegalAccessException
 	 *             Fehler bei der Reflexion
 	 * @throws IllegalArgumentException
@@ -52,9 +52,12 @@ public class ExecutableKeyword extends SimpleKeyword {
 		for (int i = 0; i < getParameterTypes().length; i++) {
 			Class<?> tmpArgClass = getParameterTypes()[i];
 			Object tmpArg = args[i];
+			if (tmpArg == null) {
+				throw KeywordExceptionHandler.NullArgument(this, i);
+			}
 			tmpArg = parseArgument(tmpArgClass, tmpArg);
 			if (tmpArg == null) {
-				throw KeywordExceptionHandler.WrongArgument(this, tmpArg, i);
+				throw KeywordExceptionHandler.WrongArgument(this, args[i], tmpArgClass, args[i].getClass(), i);
 			}
 			args[i] = tmpArg;
 		}
@@ -65,24 +68,9 @@ public class ExecutableKeyword extends SimpleKeyword {
 			// cannot happen
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			throw KeywordExceptionHandler.WrongArgument(this, null, -1);
+			throw KeywordExceptionHandler.WrongArgument(this, e.getCause());
 		} catch (InvocationTargetException e) {
-//			String x = e.getTargetException().getMessage();
-//			if (x.contains("Not on FX application thread")) {
-//				ObjectProperty<Throwable> throwable = new SimpleObjectProperty<>();
-//				Platform.runLater(() -> {
-//					try {
-//						invoke(args);
-//					} catch (KeywordException | AssertionError e1) {
-//						throwable.set(e1);
-//					}
-//				});
-//				if (throwable.isNotNull().get()){
-//					throw new AssertionError(e.getCause().getMessage());
-//				}
-//			} else {
-				throw new AssertionError(e.getCause().getMessage());
-//			}
+			throw new AssertionError(e.getCause().getMessage());
 		}
 		return null;
 	}

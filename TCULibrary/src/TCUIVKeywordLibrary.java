@@ -431,9 +431,8 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	@Keyword(Description = "Liest die nominale Versorgungsspannung des Senders", Name = "Lese Nominalspannung", Return = "Double zwischen 4 und 10,5 mit maximal 2 Nachkommastellen")
 	public Double getNominalVoltage() throws IOException {
 		Parser parser = getParserForPath(SETUP_XML);
-		Double result = parser.getNodeValue_AsDouble("spM") / 100;
-		int cut = (int) (result * 100);
-		return (cut / 100.0);
+		Double result = parser.getNodeValue_AsDouble("spM");		
+		return result;
 	}
 
 	@Override
@@ -514,7 +513,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 
 	@Override
-	@Keyword(Description = "Liest die Nenndrehzahl des Rotors", Name = "Lese Nenndrehzahl des Rotors ")
+	@Keyword(Description = "Liest die Nenndrehzahl des Rotors", Name = "Lese Nenndrehzahl des Rotors")
 	public Integer getRotorRatedSpeed() throws IOException {
 		Parser parser = getParserForPath(SETUP_XML);
 		Integer result = parser.getNodeValue_AsInteger("rRS");
@@ -590,6 +589,11 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 		String result = parser.getNodeValue_AsString("fea");
 		return result;
 	}
+	
+	@Keyword(Description = "Ermittelt anhand des Feature-Statuswort, ob das angegeben Bit gesetzt ist", Name = "Lese Feauture Status von Bit", Return = "True oder False, bei aktivierten btw. deaktiviertem Feauture", Parameter="0 - Feature analog (Analog-Platine verbaut), 1 - Feature frequency (Frequenz-Platine verbaut), 2 - Feature Speed (Drehzahlmodul verbaut), 3 - Feature can (CAN-Modul aktiviert), 4 - Channel B (2. Kanal aktiviert), 5 - Current (Analoger Stromausgang statt dem Analogen-Spannungsausgang), 6 - Acceleration (Beschleunigung statt 2. Drehmomentkanal), 7 - Stationary (Flange ist stationär)")
+	public Boolean getFeatureStatus(Integer value) throws IOException{
+		return getFeatures().charAt(value) == '1';
+	}
 
 	@Override
 	public Integer getTemperatureCompensationA() throws IOException {
@@ -614,9 +618,9 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 
 	@Override
 	@Keyword(Description = "Liest die Versorungsspannung am Rotor", Name = "Lese Versorgungsspannung am Rotor")
-	public Integer getRotorSupplyVoltage() throws IOException {
+	public Double getRotorSupplyVoltage() throws IOException {
 		Parser parser = getParserForPath(STATUS_XML);
-		Integer result = parser.getNodeValue_AsInteger("sSu");
+		double result = parser.getNodeValue_AsInteger("sSu") / 100.0;
 		return result;
 	}
 
@@ -681,7 +685,8 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	@Keyword(Description = "Liest die positive Steigung an Kanal A", Name = "Lese positive Sensitivity an Kanal A")
 	public Double getSensitivityPositiveA() throws IOException {
 		Parser parser = getParserForPath(TORQUE_XML);
-		Double result = parser.getNodeValue_AsDouble("sAP");
+		Double result = parser.getNodeValue_AsDouble("sAP");	
+		System.err.println("Lese= " + result);
 		return result;
 	}
 
@@ -1086,7 +1091,8 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 		tcu.sendPOST(SETUP_XML, "conf", value ? "1" : "0");
 	}
 
-	@Override	
+	@Override
+	@Keyword(Description = "Setzt das Feature Kanal 2", Name = "Setze Feature Kanal 2 auf")
 	public void setFeatureSecondChannel(Boolean value) throws IOException {
 		tcu.sendPOST(SETUP_XML, "chnb", value ? "1" : "0");
 	}
@@ -1196,30 +1202,30 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 
 	@Override
 	@Keyword(Description = "Setzt die positive Steigung an Kanal A des Rotors", Name = "Setze positive Sensitivity an Kanal A des Rotors auf", Parameter="Integer zwischen 1 und 100000")
-	public void setSensitivyPositiveRotorA(Long value) throws IOException {
-		value = value * 100000;
-		tcu.sendPOST(SETUP_XML, "rAP", value.toString());
+	public void setSensitivyPositiveRotorA(Double value) throws IOException {
+		Long l = (long) (value * 100000);		
+		tcu.sendPOST(SETUP_XML, "rAP", l.toString());
 	}
 
 	@Override
 	@Keyword(Description = "Setzt die negative Steigung an Kanal A des Rotors", Name = "Setze negative Sensitivity an Kanal A des Rotors auf", Parameter="Integer zwischen 1 und 100000")
-	public void setSensitivyNegativeRotorA(Long value) throws IOException {
-		value = value * 100000;
-		tcu.sendPOST(SETUP_XML, "rAN", value.toString());
+	public void setSensitivyNegativeRotorA(Double value) throws IOException {
+		Long l = (long) (value * 100000);
+		tcu.sendPOST(SETUP_XML, "rAN", l.toString());
 	}
 
 	@Override
 	@Keyword(Description = "Setzt die positive Steigung an Kanal B des Rotors", Name = "Setze positive Sensitivity an Kanal B des Rotors auf", Parameter="Integer zwischen 1 und 100000")
-	public void setSensitivyPositiveRotorB(Long value) throws IOException {
-		value = value * 100000;
-		tcu.sendPOST(SETUP_XML, "rBP", value.toString());
+	public void setSensitivyPositiveRotorB(Double value) throws IOException {
+		Long l = (long) (value * 100000);
+		tcu.sendPOST(SETUP_XML, "rBP", l.toString());
 	}
 
 	@Override
 	@Keyword(Description = "Setzt die negative Steigung an Kanal B des Rotors", Name = "Setze negative Sensitivity an Kanal B des Rotors auf", Parameter="Integer zwischen 1 und 100000")
-	public void setSensitivyNegativeRotorB(Long value) throws IOException {
-		value = value * 100000;
-		tcu.sendPOST(SETUP_XML, "rBN", value.toString());
+	public void setSensitivyNegativeRotorB(Double value) throws IOException {
+		Long l = (long) (value * 100000);
+		tcu.sendPOST(SETUP_XML, "rBN", l.toString());
 	}
 
 	@Override
@@ -1296,30 +1302,31 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 
 	@Override
 	@Keyword(Description = "Setzt die positive Steigung an Kanal A", Name = "Setze positive Sensitivity an Kanal A auf", Parameter="Integer zwischen 1 und 100000")
-	public void setSensitivityPositiveA(Long value) throws IOException {
-		value *= 100000;
-		tcu.sendPOST(TORQUE_XML, "sAP", value.toString());
+	public void setSensitivityPositiveA(Double value) throws IOException {
+		Long l = (long) (value * 100000);
+		System.err.println("Schreibe " + value + "->" + l);
+		tcu.sendPOST(TORQUE_XML, "sAP", l.toString());
 	}
 
 	@Override
 	@Keyword(Description = "Setzt die negative Steigung an Kanal A", Name = "Setze negative Sensitivity an Kanal A auf", Parameter="Integer zwischen 1 und 100000")
-	public void setSensitivityNegativeA(Long value) throws IOException {
-		value *= 100000;
-		tcu.sendPOST(TORQUE_XML, "sAN", value.toString());
+	public void setSensitivityNegativeA(Double value) throws IOException {
+		Long l = (long) (value * 100000);
+		tcu.sendPOST(TORQUE_XML, "sAN", l.toString());
 	}
 
 	@Override
 	@Keyword(Description = "Setzt die positive Steigung an Kanal B", Name = "Setze positive Sensitivity an Kanal B auf", Parameter="Integer zwischen 1 und 100000")
-	public void setSensitivityPositiveB(Long value) throws IOException {
-		value *= 100000;
-		tcu.sendPOST(TORQUE_XML, "sBP", value.toString());
+	public void setSensitivityPositiveB(Double value) throws IOException {
+		Long l = (long) (value * 100000);
+		tcu.sendPOST(TORQUE_XML, "sBP", l.toString());
 	}
 
 	@Override
 	@Keyword(Description = "Setzt die negative Steigung an Kanal B", Name = "Setze negative Sensitivity an Kanal B auf", Parameter="Integer zwischen 1 und 100000")
-	public void setSensitivityNegativeB(Long value) throws IOException {
-		value *= 100000;
-		tcu.sendPOST(TORQUE_XML, "sBN", value.toString());
+	public void setSensitivityNegativeB(Double value) throws IOException {
+		Long l = (long) (value * 100000);
+		tcu.sendPOST(TORQUE_XML, "sBN", l.toString());
 	}
 
 	@Override
@@ -1329,11 +1336,11 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	}
 	
 	@Keyword(Description = "Sendet das elektronische Datenblatt an den Rotor", Name = "Sende Datenblatt an Rotor", Parameter="Pos. Sens. Kanal A, Neg. Sens. Kanal A, Pos. Sens. Kanal B, Neg. Sens. Kanal B, Nenndrehzahl, Inkremente")												
-	public void sendDatasheet(Integer rAP, Integer rAN, Integer rBP, Integer rBN, Integer rRS, Integer rSI) throws IOException{
-		PostParameter post_rap = new PostParameter("rAP", "" + rAP);
-		PostParameter post_ran = new PostParameter("rAN", "" +rAN);
-		PostParameter post_rbp = new PostParameter("rBP", "" + rBP);
-		PostParameter post_rbn = new PostParameter("rBN", "" + rBN);
+	public void sendDatasheet(Double rAP, Double rAN, Double rBP, Double rBN, Integer rRS, Integer rSI) throws IOException{
+		PostParameter post_rap = new PostParameter("rAP", "" + (long) (rAP * 100000));
+		PostParameter post_ran = new PostParameter("rAN", "" + (long) (rAN * 100000));
+		PostParameter post_rbp = new PostParameter("rBP", "" + (long) (rBP * 100000));
+		PostParameter post_rbn = new PostParameter("rBN", "" + (long) (rBN * 100000));
 		PostParameter post_rrs = new PostParameter("rRS", "" + rRS);
 		PostParameter post_rsi = new PostParameter("rSI", "" + rSI);
 		String parameterString = PostParameter.concat(post_rap, post_ran, post_rbp, post_rbn, post_rrs, post_rsi);

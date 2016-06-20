@@ -19,11 +19,13 @@
 	{tcu_inc} = 		Lese TCU Inkrement
 
 	# Rotor Werte speichern
+	{rot_rtA} =			Lese Rated Torque A aus dem Rotor
 	{rot_psA} = 		Lese positive Sensitivity an Kanal A aus dem Rotor
 	{rot_nsA} = 		Lese negative Sensitivity an Kanal A aus dem Rotor
+	{rot_rtB} =			Lese Rated Torque B aus dem Rotor
 	{rot_psB} = 		Lese positive Sensitivity an Kanal B aus dem Rotor
 	{rot_nsB} = 		Lese negative Sensitivity an Kanal B aus dem Rotor
-	{rot_nenn} = 		Setze Nenndrehzahl des Rotors auf
+	{rot_nenn}= 		Lese Nenndrehzahl des Rotors 				
 	{rot_inc} = 		Lese Rotor Inkrement
 
 	# TCU Werte setzen
@@ -37,35 +39,42 @@
 	Setze Inkremente der TCU auf				"60"
 
 	Sende Datenblatt an Rotor	"450", "450", "450", "450", "14000", "680"
-	Warte für 	{delay_long}
+	Warte für 	{delay_datasheet}
 	
 	Deaktiviere die Stromversorgung des Rotors
-[Test]
+	Warte für 				{delay_short}	
+[TEST]
 	Aktiviere die Stromversorgung des Rotors
-	Warte für 				{delay_long}
+	Warte für 				{delay_extra_long}
 	Ist Statusbit gesetzt	"16"
 	Behalte Rotor Werte
 	
 	# Vergleiche die aktuelle TCU Werte mit den Rotor Werten
+	{new_tcu_rtA} = Lese Rated Torque von Kanal A
+	Ist gleich 		{new_tcu_rtA}, {rot_rtA}
+	
 	{new_tcu_psA} = Lese positive Sensitivity an Kanal A
-	Ist gleich		{new_tcu_psA}, {rot_psA}
+	Ist gleich		{new_tcu_psA}, "450.0"
 	
 	{new_tcu_nsA} = Lese negative Sensitivity an Kanal A
-	Ist gleich		{new_tcu_nsA}, {rot_nsA}
-		
+	Ist gleich		{new_tcu_nsA}, "450.0"
+	
+	{new_tcu_rtB} = Lese Rated Torque von Kanal B
+	Ist gleich 		{new_tcu_rtB}, {rot_rtB}
+	
 	{new_tcu_psB} = Lese positive Sensitivity an Kanal B
-	Ist gleich			{new_tcu_psB}, {rot_psB}
+	Ist gleich			{new_tcu_psB}, "450.0"
 	
 	{new_tcu_nsB} = Lese negative Sensitivity an Kanal B
-	Ist gleich		{new_tcu_nsB}, {rot_nsB}
+	Ist gleich		{new_tcu_nsB}, "450.0"
 	
 	{new_tcu_nenn}= Lese Nenndrehzahl der TCU
-	Ist gleich		{new_tcu_nenn}, {rot_nenn}
+	Ist gleich		{new_tcu_nenn}, "14000"
 	
 	{new_tcu_inc} = Lese TCU Inkrement
-	Ist gleich		{new_tcu_inc}, {rot_inc}
-		
-[TEARDOWN]
+	Ist gleich		{new_tcu_inc}, "680"
+
+	[TEARDOWN]	
 	Setze Rated Torque von Kanal A auf			{tcu_rtA}
 	Setze positive Sensitivity an Kanal A auf	{tcu_psA}
 	Setze negative Sensitivity an Kanal A auf	{tcu_nsA}
@@ -75,7 +84,15 @@
 	Setze Nenndrehzahl der TCU auf				{tcu_nenn}
 	Setze Inkremente der TCU auf				{tcu_inc}	
 	
+	Deaktiviere die Stromversorgung des Rotors
+	Warte für 				{delay_short}
+	Aktiviere die Stromversorgung des Rotors
+	
 	Sende Datenblatt an Rotor {rot_psA}, {rot_nsA}, {rot_psB}, {rot_nsB}, {rot_nenn}, {rot_inc}
-	Warte für 				{delay_long}
+	Warte für 				{delay_datasheet}
 	Ist Statusbit gesetzt	"16"
 	Behalte Stator Werte
+	
+	
+	
+	

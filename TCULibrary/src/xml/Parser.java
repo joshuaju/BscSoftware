@@ -30,7 +30,7 @@ public class Parser {
 		String val = tag.substring(start, end);
 		Double result = Double.parseDouble(val);
 		if (result == 0) {
-			result = 10000.0;
+			result = 1.0;
 		}
 		return result;
 	}
@@ -55,9 +55,10 @@ public class Parser {
 		String val = getNodeValue_AsString(nodename);
 		Double res = Double.parseDouble(val);
 		Double div = getDivisor(nodename);
+		System.err.println("Node: " + res + "/" + div);
 		if (div > 0) {
 			res = res / div;
-		}
+		}		
 		return res;
 	}
 }

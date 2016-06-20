@@ -192,13 +192,13 @@ public interface I_TCUIV_Send {
 
 	void setCustomTestSignal(Double value) throws IOException;
 
-	void setSensitivyPositiveRotorA(Long value) throws IOException;
+	void setSensitivyPositiveRotorA(Double value) throws IOException;
 
-	void setSensitivyNegativeRotorA(Long value) throws IOException;
+	void setSensitivyNegativeRotorA(Double value) throws IOException;
 
-	void setSensitivyPositiveRotorB(Long value) throws IOException;
+	void setSensitivyPositiveRotorB(Double value) throws IOException;
 
-	void setSensitivyNegativeRotorB(Long value) throws IOException;
+	void setSensitivyNegativeRotorB(Double value) throws IOException;
 
 	void setRatedSpeedRotor(Integer value) throws IOException;
 
@@ -230,13 +230,13 @@ public interface I_TCUIV_Send {
 
 	void setRatedTorqueB(Integer value) throws IOException;
 
-	void setSensitivityPositiveA(Long value) throws IOException;
+	void setSensitivityPositiveA(Double value) throws IOException;
 
-	void setSensitivityNegativeA(Long value) throws IOException;
+	void setSensitivityNegativeA(Double value) throws IOException;
 
-	void setSensitivityPositiveB(Long value) throws IOException;
+	void setSensitivityPositiveB(Double value) throws IOException;
 
-	void setSensitivityNegativeB(Long value) throws IOException;
+	void setSensitivityNegativeB(Double value) throws IOException;
 
 	// values.xml
 	void setResetAlarms() throws IOException;

@@ -350,7 +350,7 @@ public interface I_TCUIV_Receive {
 	Integer getSignalQuality() throws IOException;
 
 	/** sSu */
-	Integer getRotorSupplyVoltage() throws IOException;
+	Double getRotorSupplyVoltage() throws IOException;
 
 	Double getPoti() throws IOException;
 
