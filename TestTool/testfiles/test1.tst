@@ -6,13 +6,13 @@
 [VAR]		"test.var"
 
 [TEST]	
-	Warte für {delay}
+	std.Warte für {delay}
 	{f1} = 		"1"	
-	Warte für {delay}
+	std.Warte für {delay}
 	{f2} = 		"-7"
-	Warte für {delay}
+	std.Warte für {delay}
 	{v1} = 		"[{f1}-{f2}]"			
-	Warte für {delay}
+	std.Warte für {delay}
 	Ist gleich 	{v1}, "8"	
 
 	

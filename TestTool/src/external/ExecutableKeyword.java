@@ -42,37 +42,35 @@ public class ExecutableKeyword extends SimpleKeyword {
 	 *             Die Übergabeparameter sind nicht gültig
 	 */
 	public Object invoke(Object... args) throws KeywordException {
-
 		Class<?>[] argClasses = getParameterTypes();
 
 		if (argClasses.length != args.length) {
 			throw KeywordExceptionHandler.TooManyArguments(this);
 		}
 
-		for (int i = 0; i < getParameterTypes().length; i++) {
-			Class<?> tmpArgClass = getParameterTypes()[i];
+		for (int i = 0; i < argClasses.length; i++) {
 			Object tmpArg = args[i];
+			Class<?> tmpArgClass = argClasses[i];
+			
 			if (tmpArg == null) {
 				throw KeywordExceptionHandler.NullArgument(this, i);
-			}
-			tmpArg = parseArgument(tmpArgClass, tmpArg);
+			}			
+			
+			tmpArg = parseArgument(tmpArgClass, tmpArg);			
 			if (tmpArg == null) {
 				throw KeywordExceptionHandler.WrongArgument(this, args[i], tmpArgClass, args[i].getClass(), i);
 			}
+			
 			args[i] = tmpArg;
 		}
 
 		try {
 			return method.invoke(libInstance, args);
-		} catch (IllegalAccessException e) {
-			// cannot happen
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException | IllegalAccessException e) {
 			throw KeywordExceptionHandler.WrongArgument(this, e.getCause());
 		} catch (InvocationTargetException e) {
 			throw new AssertionError(e.getCause().getMessage());
-		}
-		return null;
+		}		
 	}
 
 	/**
