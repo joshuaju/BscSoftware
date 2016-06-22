@@ -5,6 +5,8 @@
 [VAR] 		"config.var"
 
 [SETUP]
+	{status_ch2} = Lese Feature Status von Bit	"4"
+
 	Aktiviere das Feature Kanal 2
 	Aktiviere das Feature Speed
 
@@ -30,15 +32,15 @@
 
 	# TCU Werte setzen
 	Setze Rated Torque von Kanal A auf			"500"
-	Setze positive Sensitivity an Kanal A auf	"9000"
-	Setze negative Sensitivity an Kanal A auf	"9000"
+	Setze positive Sensitivity an Kanal A auf	"9000.0"
+	Setze negative Sensitivity an Kanal A auf	"9000.0"
 	Setze Rated Torque von Kanal B auf			"500"
-	Setze positive Sensitivity an Kanal B auf	"9000"
-	Setze negative Sensitivity an Kanal B auf	"9000"
+	Setze positive Sensitivity an Kanal B auf	"9000.0"
+	Setze negative Sensitivity an Kanal B auf	"9000.0"
 	Setze Nenndrehzahl der TCU auf				"25000"
 	Setze Inkremente der TCU auf				"60"
 
-	Sende Datenblatt an Rotor	"450", "450", "450", "450", "14000", "680"
+	Sende Datenblatt an Rotor	"450.0", "450.0", "450.0", "450.0", "14000", "680"
 	Warte für 	{delay_datasheet}
 	
 	Deaktiviere die Stromversorgung des Rotors
@@ -85,14 +87,16 @@
 	Setze Nenndrehzahl der TCU auf				{tcu_nenn}
 	Setze Inkremente der TCU auf				{tcu_inc}	
 	
-	Deaktiviere die Stromversorgung des Rotors
-	Warte für 				{delay_short}
-	Aktiviere die Stromversorgung des Rotors
+	
 	
 	Sende Datenblatt an Rotor {rot_psA}, {rot_nsA}, {rot_psB}, {rot_nsB}, {rot_nenn}, {rot_inc}
 	Warte für 				{delay_datasheet}
+	Deaktiviere die Stromversorgung des Rotors
+	Warte für 				{delay_short}
+	Aktiviere die Stromversorgung des Rotors
+	Warte für 				{delay_extra_long}
 	Ist Statusbit gesetzt	"16"
 	Behalte Stator Werte
 	
-	
+	Setze Feature Kanal 2 auf	{status_ch2}
 		

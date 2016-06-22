@@ -8,6 +8,8 @@
 	Setze Versorgungsspannung auf	"0.0"
 	{poti} = 						Lese Poti Wert
 	Ist gleich						{poti}, "0.0"
+	
+	{std_nom} = Lese Nominalspannung
 	Setze Nominalspannung auf		"9.50"
 	{nom} = 						Lese Nominalspannung
 	Ist ungefähr gleich 						{nom}, "9.50", "0.0"
@@ -19,5 +21,6 @@
 	Ist Statusbit nicht gesetzt	"10"
 	
 	{sp} = 						Lese Versorgungsspannung am Rotor	
-	Ist ungefähr gleich		{sp}, {nom}, "0.25"
+	Ist ungefähr gleich			{sp}, {nom}, "0.25"
 [TEARDOWN]
+	Setze Nominalspannung auf	{std_nom}

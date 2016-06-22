@@ -15,7 +15,7 @@
 	{ratedTorqueA} =	Lese Rated Torque von Kanal A
 	{chA} = Lese Kanal A
 #	{chB} = Lese Kanal B
-	Ist ungefähr gleich {chA}, "[0.5*{ratedTorqueA}]", "0.25"
+	Ist ungefähr gleich {chA}, "[0.5*{ratedTorqueA}]", "[0.01*{ratedTorqueA}]"
 #	Ist ungefähr gleich {chB}, "[0.5*{ratedTorque}]", "5"	
 [TEARDOWN]
 	Schalte das Testsignal des Rotors um

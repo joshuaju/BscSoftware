@@ -577,7 +577,8 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 			throw new AssertionError("Das Statusbit an Position " + charAt + " ist gesetzt");
 		}
 	}
-	
+
+	@Keyword(Description = "Ermittelt anhand des Statuswort, ob das angegeben Bit gesetzt ist", Name = "Lese Status von Bit", Return = "True oder False, bei gesetztem bzw. nicht gesetztem Bit", Parameter="(0)Receiver error, (1)Torque error, (2)Speed error, (3)Current error, (4)MD2/MD1 (Outputswitch aktiv/inaktiv), (5)Zero (Nullabgleich wurde durchgeführt), (6)Test mode rotor (Testsignal Rotor aktiv), (7)Test mode pic (Testsignal Controller aktiv), (8)Config mode (Empfang zwischen FPGA-PIC unterbrochen, Sendemodus-FPGA), (9)Calibration mode (Keine Datenverrechnung, Fixe CAN-Configuration), (10)Auto power supply (Suchlauf Speisespannung - aktiv), (11)CAN transmit (CAN-Modul sendet), (12)Acceleration error (Alarmschwelle wurde überschritten), (13)Startup (Wird nicht genutzt), (14)DHCP-Client aktiv, (15)SPS_POWER (Speisespannung ist eingeschaltet), (16)Neues elektronisches Datenblatt verfügbar, (17)Positionnierungsfehler (SpSp-Suchlauf Fehlgeschlagen), (18)Langsamer Speisespannungsregler aktiv, (19)Erste Warnung für Überstrom, (20)Letzte Warnung für Überstrom")
 	public boolean getStatusbitSet(int charAt) throws IOException{
 		char bit = getStatusword().charAt(charAt);
 		return bit == '1';
@@ -590,7 +591,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 		return result;
 	}
 	
-	@Keyword(Description = "Ermittelt anhand des Feature-Statuswort, ob das angegeben Bit gesetzt ist", Name = "Lese Feauture Status von Bit", Return = "True oder False, bei aktivierten btw. deaktiviertem Feauture", Parameter="0 - Feature analog (Analog-Platine verbaut), 1 - Feature frequency (Frequenz-Platine verbaut), 2 - Feature Speed (Drehzahlmodul verbaut), 3 - Feature can (CAN-Modul aktiviert), 4 - Channel B (2. Kanal aktiviert), 5 - Current (Analoger Stromausgang statt dem Analogen-Spannungsausgang), 6 - Acceleration (Beschleunigung statt 2. Drehmomentkanal), 7 - Stationary (Flange ist stationär)")
+	@Keyword(Description = "Ermittelt anhand des Feature-Statuswort, ob das angegeben Bit gesetzt ist", Name = "Lese Feature Status von Bit", Return = "True oder False, bei aktivierten btw. deaktiviertem Feauture", Parameter="0 - Feature analog (Analog-Platine verbaut), 1 - Feature frequency (Frequenz-Platine verbaut), 2 - Feature Speed (Drehzahlmodul verbaut), 3 - Feature can (CAN-Modul aktiviert), 4 - Channel B (2. Kanal aktiviert), 5 - Current (Analoger Stromausgang statt dem Analogen-Spannungsausgang), 6 - Acceleration (Beschleunigung statt 2. Drehmomentkanal), 7 - Stationary (Flange ist stationär)")
 	public Boolean getFeatureStatus(Integer value) throws IOException{
 		return getFeatures().charAt(value) == '1';
 	}

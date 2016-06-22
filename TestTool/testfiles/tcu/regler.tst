@@ -3,8 +3,9 @@
 
 [LIB] 		"TCUIVKeywordLibrary.jar" tcu
 [VAR] 		"config.var"
-# [REPEAT] 	10
-[SETUP]	
+
+[SETUP]
+	{status_reg} = Lese Status von Bit		"18"
 	Verwende langsamen Regler	"false"	
 	
 [TEST]
@@ -27,4 +28,4 @@
 	Ist ungefähr gleich			{rotor}, {nom}, "0.3"
 
 [TEARDOWN]
-	Verwende langsamen Regler	"false"
+	Verwende langsamen Regler	{status_reg}
