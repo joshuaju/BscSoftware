@@ -30,7 +30,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 public class TestExecuter {
 	private volatile BooleanProperty abortProperty = new SimpleBooleanProperty(false);
 	
-	private final String DEFAULT_LIBRARIES_NAME = "std";
+	private final String DEFAULT_LIBRARIES_NAME = "std"; // TODO aus properties lesen!
 	private final String path;
 	private VariableFile globalVariables;
 	private VariableFile localVariables;
@@ -81,13 +81,15 @@ public class TestExecuter {
 		executed = true;
 		testfile = null;
 		protocol = null;
-		try {
+		
+		try { // Testdatei einlesen
 			testfile = TestfileReader.read(path);
 		} catch (TestfileSyntaxException | IOException e) {
 			protocol = new TestProtocol(false, "-", path, e.getMessage());
 			throw new TestfileException(e.getMessage(), e);
 		}
 
+		// Anzahl Testschritte für Progressbar berechnen 
 		int teststeps = testfile.getSetupLines().length + testfile.getTestLines().length
 				+ testfile.getTeardownLines().length;
 		teststeps *= testfile.getRepetition();
@@ -95,7 +97,7 @@ public class TestExecuter {
 				+ teststeps;
 		progressHandler.setMax(max);
 		
-		try {
+		try { // Bibliotheken laden
 			loadLibraries(testfile);
 		} catch (ClassNotFoundException | IOException | KeywordLibraryException e) {
 			protocol = createProtocol(testfile, false, e.getMessage());
@@ -103,7 +105,7 @@ public class TestExecuter {
 		}		
 		
 		if (testfile.hasVariableFilePaths()) {
-			try {
+			try { // Globale Variablen laden 
 				globalVariables = VariableFileReader.readAll(path, testfile.getVariableFilePaths());
 				progressHandler.increment();				
 			} catch (TestfileSyntaxException | IOException e) {
@@ -113,20 +115,20 @@ public class TestExecuter {
 		}
 
 		for (int round = 1; round <= testfile.getRepetition(); round++) {
-			try {
+			try { // Aufbauphase
 				executeLines(testfile.getSetupLines());
 			} catch (TestfileException | KeywordException | AssertionError e) {
 				protocol = createProtocol(testfile, false, "Setup: " + e.getMessage());
 				throw new SetupException(e.getMessage(), e);
 			}
 
-			try {
+			try { // Testphase
 				executeLines(testfile.getTestLines());
 			} catch (TestfileException | KeywordException | AssertionError e) {
 				protocol = createProtocol(testfile, false, "Test: " + e.getMessage());
 			}
 
-			try {
+			try { // Abbauphase
 				executeLines(testfile.getTeardownLines());
 			} catch (TestfileException | KeywordException | AssertionError e) {
 				protocol = createProtocol(testfile, false, "Teardown: " + e.getMessage());
