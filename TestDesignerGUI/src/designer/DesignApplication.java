@@ -26,6 +26,7 @@ public class DesignApplication extends Application {
 				getClass().getClassLoader().getResource("designer/fxml/TestDesignerMainView.fxml"));
 		Parent root = loader.load();
 		Scene scene = new Scene(root);
+		scene.getStylesheets().add(getClass().getClassLoader().getResource("style/root.css").toExternalForm());
 		primaryStage.setScene(scene);
 
 		primaryStage.setOnCloseRequest(event -> UserPreferences.get().store());

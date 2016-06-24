@@ -24,7 +24,9 @@ public class ExecuterApplication extends Application {
 		FXMLLoader loader = new FXMLLoader(
 				getClass().getClassLoader().getResource("executer/fxml/TestExecuterView.fxml"));
 		Parent root = loader.load();
+		
 		Scene scene = new Scene(root);
+		scene.getStylesheets().add(getClass().getClassLoader().getResource("style/root.css").toExternalForm());
 		primaryStage.setScene(scene);
 		
 		

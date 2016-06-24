@@ -6,7 +6,9 @@ import interfaces.I_TCUIV_Receive;
 import interfaces.I_TCUIV_Send;
 import xml.Parser;
 
-@KeywordLibrary(Author = "Joshua Jungen", Description = "Die Bibliothek stellt alle Schnittstellen zur TCU bereit")
+@KeywordLibrary(
+		Author = "Joshua Jungen", 
+		Description = "Diese Bibliothek implementiert die Schnittstellen der TCU. Der Verbindungsaufbau zur TCU erfolgt automatisch (IP-Adresse '172.16.86.3').")
 public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 
 	private static final String TORQUE_XML = "response/torque.xml";
