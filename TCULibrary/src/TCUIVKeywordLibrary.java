@@ -688,8 +688,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	@Keyword(Description = "Liest die positive Steigung an Kanal A", Name = "Lese positive Sensitivity an Kanal A")
 	public Double getSensitivityPositiveA() throws IOException {
 		Parser parser = getParserForPath(TORQUE_XML);
-		Double result = parser.getNodeValue_AsDouble("sAP");	
-		System.err.println("Lese= " + result);
+		Double result = parser.getNodeValue_AsDouble("sAP");			
 		return result;
 	}
 
@@ -1306,8 +1305,7 @@ public class TCUIVKeywordLibrary implements I_TCUIV_Receive, I_TCUIV_Send {
 	@Override
 	@Keyword(Description = "Setzt die positive Steigung an Kanal A", Name = "Setze positive Sensitivity an Kanal A auf", Parameter="Integer zwischen 1 und 100000")
 	public void setSensitivityPositiveA(Double value) throws IOException {
-		Long l = (long) (value * 100000);
-		System.err.println("Schreibe " + value + "->" + l);
+		Long l = (long) (value * 100000);		
 		tcu.sendPOST(TORQUE_XML, "sAP", l.toString());
 	}
 

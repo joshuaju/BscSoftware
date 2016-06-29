@@ -54,8 +54,7 @@ public class Parser {
 	public Double getNodeValue_AsDouble(String nodename) throws NumberFormatException {
 		String val = getNodeValue_AsString(nodename);
 		Double res = Double.parseDouble(val);
-		Double div = getDivisor(nodename);
-		System.err.println("Node: " + res + "/" + div);
+		Double div = getDivisor(nodename);		
 		if (div > 0) {
 			res = res / div;
 		}		

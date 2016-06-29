@@ -19,7 +19,6 @@ public class Connection {
 		URL url = new URL(base + path);
 
 		connection = (HttpURLConnection) url.openConnection();
-		// connection.setRequestProperty("User-Agent", USER_AGENT);
 
 		int responseCode = connection.getResponseCode();
 

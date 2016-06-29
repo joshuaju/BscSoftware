@@ -81,14 +81,14 @@ public class TestExecuter {
 		executed = true;
 		testfile = null;
 		protocol = null;
-		
+		long startTime = System.currentTimeMillis();
 		try { // Testdatei einlesen
 			testfile = TestfileReader.read(path);
 		} catch (TestfileSyntaxException | IOException e) {
 			protocol = new TestProtocol(false, "-", path, e.getMessage());
 			throw new TestfileException(e.getMessage(), e);
 		}
-
+		
 		// Anzahl Testschritte für Progressbar berechnen 
 		int teststeps = testfile.getSetupLines().length + testfile.getTestLines().length
 				+ testfile.getTeardownLines().length;
@@ -141,7 +141,9 @@ public class TestExecuter {
 		}
 		if (protocol == null) {
 			// Es ist kein Fehler aufgetreten
-			protocol = createProtocol(testfile, true, "");			
+			protocol = createProtocol(testfile, true, "");	
+			long endTime = System.currentTimeMillis();
+			System.out.println("Test finished: " + testfile.getTestname() + ": Time(ms): " + (endTime - startTime));
 		}
 	}
 

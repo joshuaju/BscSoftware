@@ -1,5 +1,5 @@
 [AUTHOR] 	Joshua Jungen
-[TESTNAME] 	Überprüfung des Rotor Testsignals
+[TESTNAME] 	Überprüfung des TCU Testsignals
 
 [LIB] 		"TCUIVKeywordLibrary.jar" tcu
 [VAR] 		"config.var"

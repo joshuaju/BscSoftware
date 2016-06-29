@@ -29,17 +29,17 @@ public class AsyncTestSuiteExecuter {
 			}
 		});
 	}
-		
-	public void execute(){
+			
+	public void execute(){		
 		async.start();
 	}
 	
 	public void setOnFinish(Consumer<TestSuiteProtocol> onFinish) {
-		this.onFinish = onFinish;
+		this.onFinish = onFinish;		
 	}
 
 	public void setOnAbort(Runnable onAbort) {
-		this.onAbort = onAbort;
+		this.onAbort = onAbort;		
 	}
 	
 	public boolean isExecuting(){

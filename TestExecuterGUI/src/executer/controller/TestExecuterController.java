@@ -129,21 +129,12 @@ public class TestExecuterController {
 		btnAbort.disableProperty().bind(executionRunning.not().or(abortionRunning));
 		btnBrowseProtocolFile.disableProperty().bind(executionRunning);
 		abortionRunning.addListener((obs, oldVal, newVal) -> {
-			// final double progress;
 			if (newVal) {
-				// progress = -1;
-				// pbTest.progressProperty().unbind();
-				// pbSuite.progressProperty().unbind();
 				btnStart.getScene().setCursor(Cursor.WAIT);
 			} else {
-				// progress = 0;
+
 				btnStart.getScene().setCursor(Cursor.DEFAULT);
 			}
-
-			Platform.runLater(() -> {
-				// pbTest.setProgress(progress);
-				// pbSuite.setProgress(progress);
-			});
 		});
 
 		setDefaultAuthorText();
@@ -234,11 +225,14 @@ public class TestExecuterController {
 		asyncExecuter.setOnFinish(protocol -> finishedExecution(protocol));
 		asyncExecuter.setOnAbort(() -> abortedExecution());
 
+		
 		asyncExecuter.execute();		
 		executionRunning.set(true);
 	}
 
 	private void finishedExecution(TestSuiteProtocol protocol) {
+		
+		
 		pbSuite.progressProperty().unbind();
 		pbTest.progressProperty().unbind();
 		pbSuite.setProgress(0);
@@ -261,7 +255,7 @@ public class TestExecuterController {
 		executionRunning.set(false);
 	}
 
-	private void abortedExecution() {
+	private void abortedExecution() {		
 		abortionRunning.set(false);
 		finishedExecution(null);
 		taOutput.setText("Testdurchführung wurde abgebrochen.");
