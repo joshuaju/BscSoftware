@@ -19,10 +19,16 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
+/**
+ * This class is responsible for the execution of multiple testfiles.
+ * 
+ * @author JJungen
+ *
+ */
 public class TestSuiteExecuter {
 
 	private volatile BooleanProperty abortProperty = new SimpleBooleanProperty(false);
-	
+
 	private final String author;
 	private final ArrayList<String> paths;
 	private ProgressHandler progressHandler;
@@ -30,6 +36,14 @@ public class TestSuiteExecuter {
 	private DoubleProperty suiteProgress = new SimpleDoubleProperty();
 	private DoubleProperty testProgress = new SimpleDoubleProperty();
 
+	/**
+	 * Create a new testsuite with the name of the executing person
+	 * 
+	 * @param author
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws KeywordLibraryException
+	 */
 	public TestSuiteExecuter(String author) throws ClassNotFoundException, IOException, KeywordLibraryException {
 		this.author = author;
 		this.paths = new ArrayList<>();
@@ -37,6 +51,12 @@ public class TestSuiteExecuter {
 		LibraryLoader.createInstance();
 	}
 
+	/**
+	 * Execute all specified testfile one after an other
+	 * 
+	 * @return
+	 * @throws InterruptedException
+	 */
 	public TestSuiteProtocol execute() throws InterruptedException {
 		TestSuiteProtocol suiteprotocol = new TestSuiteProtocol(author);
 
@@ -53,16 +73,17 @@ public class TestSuiteExecuter {
 			progressHandler.increment();
 		}
 
-		if (abortProperty.get()){
+		if (abortProperty.get()) {
 			throw new InterruptedException();
 		}
 		return suiteprotocol;
 	}
 
-	private void executePath(TestSuiteProtocol suiteprotocol, String tmpPath) throws SetupException, TeardownException, InterruptedException {
+	private void executePath(TestSuiteProtocol suiteprotocol, String tmpPath)
+			throws SetupException, TeardownException, InterruptedException {
 		TestExecuter tmpExecuter = new TestExecuter(tmpPath);
 		tmpExecuter.abortProperty().bind(abortProperty);
-		
+
 		testProgress.bind(tmpExecuter.progressProperty());
 
 		try {
@@ -80,6 +101,13 @@ public class TestSuiteExecuter {
 		}
 	}
 
+	/**
+	 * Add all testfiles to the testsuite
+	 * 
+	 * @param filepaths
+	 * @throws TestfileException
+	 * @throws FileNotFoundException
+	 */
 	public void addFile(String... filepaths) throws TestfileException, FileNotFoundException {
 		for (String filepath : filepaths) {
 			File file = new File(filepath);
@@ -93,6 +121,14 @@ public class TestSuiteExecuter {
 		}
 	}
 
+	/**
+	 * Add all files from a directory recursively to the testsuite
+	 * 
+	 * @param recursive
+	 * @param dirpaths
+	 * @throws TestfileException
+	 * @throws FileNotFoundException
+	 */
 	public void addDirectory(boolean recursive, String... dirpaths) throws TestfileException, FileNotFoundException {
 		for (String dirpath : dirpaths) {
 			File dirFile = new File(dirpath);
@@ -112,19 +148,34 @@ public class TestSuiteExecuter {
 		}
 	}
 
+	/**
+	 * Indicates the progess of all test. (amount of executed tests / amount of
+	 * tests)
+	 * 
+	 * @return
+	 */
 	public ReadOnlyDoubleProperty suiteProgressProperty() {
 		return suiteProgress;
 	}
 
+	/**
+	 * Indicates the progess of the currently executing test. (amount of
+	 * executed test steps / amount of test steps)
+	 * 
+	 * @return
+	 */
 	public ReadOnlyDoubleProperty testProgressProperty() {
 		return testProgress;
 	}
-	
-	public void abort(){
+
+	/**
+	 * Abort a running testsuite execution.
+	 */
+	public void abort() {
 		abortProperty.set(true);
 	}
-	
-	BooleanProperty abortProperty(){
+
+	BooleanProperty abortProperty() {
 		return abortProperty;
 	}
 }

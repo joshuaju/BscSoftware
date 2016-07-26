@@ -6,8 +6,9 @@ import exceptions.keywordlibrary.KeywordExceptionHandler;
 import exceptions.keywordlibrary.KeywordLibraryException;
 
 /**
- * Diese Klasse repräsentiert ein Keyword
+ * This class stores information on a single keyword
  * 
+ * @see ExecutableKeyword
  * @author JJungen
  *
  */
@@ -15,18 +16,18 @@ public class SimpleKeyword {
 
 	protected final Method method;
 	private final annotations.Keyword annotation;
-	
 
 	SimpleKeyword(Method method) throws KeywordLibraryException {
 		if (!SimpleKeyword.isKeywordMethod(method)) {
 			throw KeywordExceptionHandler.MethodIsNotAKeyword(method);
 		}
-		this.method = method;	
-		this.annotation = method.getAnnotation(annotations.Keyword.class);			
+		this.method = method;
+		this.annotation = method.getAnnotation(annotations.Keyword.class);
 	}
 
 	/**
 	 * Den Namen, also die String-Darstellung des Schlüsselworts
+	 * 
 	 * @return Name
 	 */
 	public String getName() {
@@ -34,7 +35,8 @@ public class SimpleKeyword {
 	}
 
 	/**
-	 * Die Beschreibung zum Schlüsselwort 
+	 * Die Beschreibung zum Schlüsselwort
+	 * 
 	 * @return
 	 */
 	public String getDescription() {
@@ -43,6 +45,7 @@ public class SimpleKeyword {
 
 	/**
 	 * Die Beschreibung zu den Übergabeparametern
+	 * 
 	 * @return
 	 */
 	public String getParameter() {
@@ -51,6 +54,7 @@ public class SimpleKeyword {
 
 	/**
 	 * Die Beschreibung zum Rückgabewert
+	 * 
 	 * @return
 	 */
 	public String getReturn() {
@@ -60,7 +64,8 @@ public class SimpleKeyword {
 
 	/**
 	 * Die Typen der Übergabeparamter (von links nach rechts)
-	 * @return Array der Typen 
+	 * 
+	 * @return Array der Typen
 	 */
 	public Class<?>[] getParameterTypes() {
 		return method.getParameterTypes();
@@ -68,7 +73,8 @@ public class SimpleKeyword {
 
 	/**
 	 * Den Typ des Rückgabewerts
-	 * @return 
+	 * 
+	 * @return
 	 */
 	public Class<?> getReturntype() {
 		return method.getReturnType();

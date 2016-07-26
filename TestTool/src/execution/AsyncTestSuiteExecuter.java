@@ -6,16 +6,26 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+/**
+ * Offers methods to asynchronously execute testsuites.
+ * 
+ * @author JJungen
+ *
+ */
 public class AsyncTestSuiteExecuter {
 
 	private Consumer<TestSuiteProtocol> onFinish = null;
 
 	private Runnable onAbort = null;
-	
+
 	private Thread async = null;
-		
+
 	private TestSuiteExecuter executer;
-	
+
+	/**
+	 * Create a new instance
+	 * 
+	 */
 	public AsyncTestSuiteExecuter(TestSuiteExecuter executer) {
 		this.executer = executer;
 		async = new Thread(() -> {
@@ -29,37 +39,58 @@ public class AsyncTestSuiteExecuter {
 			}
 		});
 	}
-			
-	public void execute(){		
+
+	/**
+	 * Start async testsuite execution.
+	 */
+	public void execute() {
 		async.start();
 	}
-	
+
+	/**
+	 * Specify a methode that is called when execution has been finished.
+	 * 
+	 * @param onFinish
+	 */
 	public void setOnFinish(Consumer<TestSuiteProtocol> onFinish) {
-		this.onFinish = onFinish;		
+		this.onFinish = onFinish;
 	}
 
+	/**
+	 * Specify a methode that is called when execution has been aborted.
+	 * 
+	 * @param onAbort
+	 */
 	public void setOnAbort(Runnable onAbort) {
-		this.onAbort = onAbort;		
+		this.onAbort = onAbort;
 	}
-	
-	public boolean isExecuting(){
+
+	/**
+	 * Returns if execution is still running.
+	 * 
+	 * @return
+	 */
+	public boolean isExecuting() {
 		return async.isAlive();
 	}
-	
-	public void abort(){
-		if (isExecuting()){
-			executer.abort();	
-		}		
+
+	/**
+	 * Abort testsuite execution.
+	 */
+	public void abort() {
+		if (isExecuting()) {
+			executer.abort();
+		}
 	}
-	
-	private void performOnFinish(TestSuiteProtocol protocol){
-		if (onFinish != null){
+
+	private void performOnFinish(TestSuiteProtocol protocol) {
+		if (onFinish != null) {
 			Platform.runLater(() -> onFinish.accept(protocol));
 		}
 	}
-	
-	private void performOnAbort(){
-		if (onAbort != null){
+
+	private void performOnAbort() {
+		if (onAbort != null) {
 			Platform.runLater(() -> onAbort.run());
 		}
 	}

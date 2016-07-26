@@ -7,6 +7,11 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
+/**
+ * This class is used the manage progress (of test and test suite execution)
+ * @author JJungen
+ *
+ */
 public class ProgressHandler  {
 	
 	private DoubleProperty progress = new SimpleDoubleProperty();

@@ -10,18 +10,15 @@ import java.util.List;
 
 import exceptions.testfile.TestfileExceptionHandler;
 
-abstract class AbstractFileReader {	
-	
+abstract class AbstractFileReader {
+
 	/**
-	 * Prüft ob es an dem Pfad eine Datei gibt. Sofern eine Datei vorhanden ist
-	 * wird diese zurückgegebn.
+	 * Retrieves a file from the specified path
 	 * 
 	 * @param path
-	 *            Pfad
-	 * @return Datei
+	 * @return
 	 * @throws FileNotFoundException
-	 *             Datei wurde nicht gefunden oder der Pfad führt zu einem
-	 *             Verzeichnis
+	 *             File not found or file is directory
 	 */
 	public File getFileFromPath(String path) throws FileNotFoundException {
 		File file = new File(path);
@@ -31,15 +28,13 @@ abstract class AbstractFileReader {
 
 		return file;
 	}
-		
+
 	/**
-	 * Liest aus der angegeben Datei alle Zeilen
+	 * Retrieves all lines from a file
 	 * 
 	 * @param file
-	 *            Datei die gelesen wird
-	 * @return alle Zeilen
+	 * @return
 	 * @throws IOException
-	 *             Wenn die Datei nicht gelesen werden kann
 	 */
 	public String[] getLinesFromFile(File file) throws IOException {
 		List<String> lines = new ArrayList<>();
@@ -51,5 +46,5 @@ abstract class AbstractFileReader {
 		}
 		return lines.toArray(new String[0]);
 	}
-	
+
 }

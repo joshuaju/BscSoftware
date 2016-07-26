@@ -8,6 +8,13 @@ import java.util.Arrays;
 import exceptions.keywordlibrary.KeywordLibraryException;
 import exceptions.keywordlibrary.KeywordLibraryExceptionHandler;
 
+/**
+ * This class offers information on a single keyword library. Further, the
+ * library's keywords are created and stored.
+ * 
+ * @author JJungen
+ *
+ */
 public class SimpleKeywordLibrary {
 
 	private final String thisname;
@@ -18,12 +25,13 @@ public class SimpleKeywordLibrary {
 	private ArrayList<SimpleKeyword> keywordList;
 
 	private final File file;
+
 	public SimpleKeywordLibrary(Class<?> thisclass, File file) throws KeywordLibraryException {
 		this.thisclass = thisclass;
 		this.thisname = thisclass.getSimpleName();
 		this.file = file;
 		keywordList = new ArrayList<>();
-		
+
 		annotations.KeywordLibrary klAnnotation = thisclass.getAnnotation(annotations.KeywordLibrary.class);
 		if (klAnnotation == null) {
 			throw KeywordLibraryExceptionHandler.ClassIsNotAKeywordLibrary(thisclass);
@@ -37,8 +45,8 @@ public class SimpleKeywordLibrary {
 			}
 		}
 	}
-	
-	public SimpleKeywordLibrary(SimpleKeywordLibrary simple){
+
+	public SimpleKeywordLibrary(SimpleKeywordLibrary simple) {
 		this.thisclass = simple.getClass();
 		this.thisname = simple.getName();
 		this.author = simple.getAuthor();
@@ -47,48 +55,47 @@ public class SimpleKeywordLibrary {
 		this.file = simple.file;
 	}
 
-	/**
-	 * Gibt die Klasse der Bibliothek zurück
-	 * 
-	 * @return Klasse
-	 */
 	public Class<?> getLibraryClass() {
 		return thisclass;
 	}
 
 	/**
-	 * Gibt den Namen der Bibliothek zurück. Der Name einer Bibliothek wird in
-	 * der Testdatei festgelegt.
 	 * 
-	 * @return Name
+	 * @return name of keyword library
 	 */
 	public String getName() {
 		return thisname;
 	}
 
 	/**
-	 * Gibt den Names des Erstellers der Bibliothek zurück
 	 * 
-	 * @return Name
+	 * @return name of author
 	 */
 	public String getAuthor() {
 		return author;
 	}
 
 	/**
-	 * Gibt die Beschreibung der Bibliothek zurück
 	 * 
-	 * @return Beschreibung
+	 * @return description of library
 	 */
 	public String getDescription() {
 		return description;
 	}
 
+	/**
+	 * 
+	 * @return all keywords
+	 */
 	public SimpleKeyword[] getKeywords() {
 		return keywordList.toArray(new SimpleKeyword[0]);
 	}
-	
-	public String getAbsolutePath(){
+
+	/**
+	 * 
+	 * @return path to library file
+	 */
+	public String getAbsolutePath() {
 		return file.getAbsolutePath();
 	}
 

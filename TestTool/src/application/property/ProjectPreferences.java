@@ -5,6 +5,11 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.Set;
 
+/**
+ * This class handles the project's preferences.
+ * @author JJungen
+ *
+ */
 public class ProjectPreferences extends PrefHelper {
 
 	public static final String PROJECT_NAME = "project.name";		

@@ -8,7 +8,8 @@ import exceptions.keywordlibrary.KeywordExceptionHandler;
 import exceptions.keywordlibrary.KeywordLibraryException;
 
 /**
- * Diese Klasse repräsentiert ein Keyword
+ * This class extends {@link SimpleKeyword}. Additionally this class can invokes
+ * the keywords program logic.
  * 
  * @author JJungen
  *
@@ -27,19 +28,12 @@ public class ExecutableKeyword extends SimpleKeyword {
 	}
 
 	/**
-	 * Dieses Keyword wird an dem Object instance, mit den Übergabeparametern
-	 * args, aufegerufen
+	 * Invokes the keyword's program logic
 	 * 
-	 * @param instance
-	 *            ausführendes Objekt
 	 * @param args
-	 *            Übergabeparameter
-	 * @return Rückgabewert des Keyword
+	 *            Arguments
+	 * @return Return values
 	 * @throws KeywordException
-	 * @throws IllegalAccessException
-	 *             Fehler bei der Reflexion
-	 * @throws IllegalArgumentException
-	 *             Die Übergabeparameter sind nicht gültig
 	 */
 	public Object invoke(Object... args) throws KeywordException {
 		Class<?>[] argClasses = getParameterTypes();
@@ -51,16 +45,16 @@ public class ExecutableKeyword extends SimpleKeyword {
 		for (int i = 0; i < argClasses.length; i++) {
 			Object tmpArg = args[i];
 			Class<?> tmpArgClass = argClasses[i];
-			
+
 			if (tmpArg == null) {
 				throw KeywordExceptionHandler.NullArgument(this, i);
-			}			
-			
-			tmpArg = parseArgument(tmpArgClass, tmpArg);			
+			}
+
+			tmpArg = parseArgument(tmpArgClass, tmpArg);
 			if (tmpArg == null) {
 				throw KeywordExceptionHandler.WrongArgument(this, args[i], tmpArgClass, args[i].getClass(), i);
 			}
-			
+
 			args[i] = tmpArg;
 		}
 
@@ -70,7 +64,7 @@ public class ExecutableKeyword extends SimpleKeyword {
 			throw KeywordExceptionHandler.WrongArgument(this, e.getCause());
 		} catch (InvocationTargetException e) {
 			throw new AssertionError(e.getCause().getMessage());
-		}		
+		}
 	}
 
 	/**
@@ -82,6 +76,16 @@ public class ExecutableKeyword extends SimpleKeyword {
 	 *            Argument
 	 * @return Instanz des Argument der Klasse, oder NULL wenn das Parsen nicht
 	 *         möglich ist
+	 */
+
+	/**
+	 * Parses the specified argument into the class
+	 * 
+	 * @param argClass
+	 *            expected class
+	 * @param arg
+	 *            argument
+	 * @return parsed argument
 	 */
 	private Object parseArgument(Class<?> argClass, Object arg) {
 		try {

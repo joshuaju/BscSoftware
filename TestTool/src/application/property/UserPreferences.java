@@ -8,6 +8,11 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.Set;
 
+/**
+ * This class handles the user's preferences
+ * @author JJungen
+ *
+ */
 public class UserPreferences extends PrefHelper {
 
 	public static final String EDITOR_EXE = "editor.exe";

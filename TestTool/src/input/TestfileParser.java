@@ -5,15 +5,18 @@ import java.util.regex.Pattern;
 import exceptions.testfile.TestfileSyntaxException;
 
 /**
- * Die Klasse prüft eine Testdatei auf syntaktische und lexikalische
- * Korrektheit. Eine semantische Prüfung findet nicht statt.
+ * Parser and Screener for Testfile
  * 
  * @author JJungen
  *
  */
-public class TestfileSyntaxer {
+public class TestfileParser {
 
+	/**
+	 * First char of a tag
+	 */
 	public static final String TAG_FIRST_CHAR = "[";
+
 	public static final String TAG_AUTHOR = "[AUTHOR]";
 	public static final String TAG_TESTNAME = "[TESTNAME]";
 	public static final String TAG_DESCRIPTION = "[DESC]";
@@ -25,17 +28,21 @@ public class TestfileSyntaxer {
 	public static final String TAG_REPEAT = "[REPEAT]";
 	public static final String TAG_COMMENT = "#";
 
+	/**
+	 * Char to indicate an assignment
+	 */
 	public static final String OPERATOR_ASSIGN = "=";
+
+	/**
+	 * Char to seperate values
+	 */
 	public static final String SPLIT_ARGUMENT = ",";
 
 	/**
-	 * Überprüft die Zeilen einer Variabel-Datei auf syntaktische und
-	 * lexikalische Korrektheit
+	 * Check lines of a file with global variables
 	 * 
 	 * @param lines
-	 *            Zeilen der Datei
 	 * @throws TestfileSyntaxException
-	 *             Ungültige Zeile entdeckt
 	 */
 	public void checkVariableLines(String... lines) throws TestfileSyntaxException {
 		for (int lineIndex = 0; lineIndex < lines.length; lineIndex++) {
@@ -44,7 +51,7 @@ public class TestfileSyntaxer {
 				// ignore
 			} else {
 				try {
-					checkAssign(line, false);
+					checkAssignLine(line, false);
 				} catch (TestfileSyntaxException e) {
 					throw new TestfileSyntaxException(lineIndex + 1, e.getMessage());
 				}
@@ -54,13 +61,10 @@ public class TestfileSyntaxer {
 	}
 
 	/**
-	 * Überprüft die Zeilen einer Testdatei auf syntaktischer und lexikalische
-	 * Korrektheit
+	 * Validates syntax and semantic of the specified lines
 	 * 
 	 * @param lines
-	 *            Zeilen der Testdatei
 	 * @throws TestfileSyntaxException
-	 *             Ungültige Zeile entdeckt
 	 */
 	public void check(String... lines) throws TestfileSyntaxException {
 		int lineIndex = 0;
@@ -144,19 +148,13 @@ public class TestfileSyntaxer {
 
 	private void checkTestStepLine(String line) throws TestfileSyntaxException {
 		if (line.contains(OPERATOR_ASSIGN)) {
-			checkAssign(line, true);
+			checkAssignLine(line, true);
 		} else {
-			checkRegular(line);
+			checkKeywordLine(line);
 		}
 	}
 
-	/**
-	 * Prüft, ob eine Zuweisung gültig ist
-	 * 
-	 * @param line
-	 * @throws TestfileSyntaxException
-	 */
-	private void checkAssign(String line, boolean keywordAllowed) throws TestfileSyntaxException {
+	private void checkAssignLine(String line, boolean keywordAllowed) throws TestfileSyntaxException {
 		String[] split = line.split(OPERATOR_ASSIGN);
 		if (split.length != 2) {
 			throw TestfileSyntaxException.InvalidAssignLine();
@@ -170,22 +168,15 @@ public class TestfileSyntaxer {
 		}
 		// rechts darf alles sein
 		if (checkArgument(right)) {
-		
+
 		} else if (keywordAllowed) {
-			checkRegular(right);
+			checkKeywordLine(right);
 		} else {
 			throw TestfileSyntaxException.InvalidArgForAssign();
 		}
 	}
 
-	/**
-	 * Prüft, ob eine regüläre Zeile in Ordnung ist. Eine regüläre Zeile enthält
-	 * zuerst ein Keyword und dann optional Argumente
-	 * 
-	 * @param line
-	 * @throws TestfileSyntaxException
-	 */
-	private void checkRegular(String line) throws TestfileSyntaxException {
+	private void checkKeywordLine(String line) throws TestfileSyntaxException {
 		int firstValIndex = line.indexOf("\"");
 		int firstVarIndex = line.indexOf("{");
 
@@ -213,12 +204,6 @@ public class TestfileSyntaxer {
 		}
 	}
 
-	/**
-	 * Prüft, ob ein String ein Keyword ist
-	 * 
-	 * @param keyword
-	 * @return
-	 */
 	private boolean checkKeyword(String keyword) {
 		String libName = null;
 		if (keyword.contains(".")) {
@@ -241,12 +226,6 @@ public class TestfileSyntaxer {
 		return true;
 	}
 
-	/**
-	 * Prüft, ob ein String ein Bibliotheksname ist
-	 * 
-	 * @param name
-	 * @return
-	 */
 	private boolean checkLibraryName(String name) {
 		if (Pattern.matches("[\\d\\w]{1,}", name)) {
 			return true;
@@ -254,13 +233,6 @@ public class TestfileSyntaxer {
 		return false;
 	}
 
-	/**
-	 * Prüft, ob ein String eine Variable ist. Ein Variable steht immer in
-	 * geschwungenen Klammern
-	 * 
-	 * @param var
-	 * @return
-	 */
 	private boolean checkVariable(String var) {
 		if (Pattern.matches("[{].+[}]", var)) {
 			var = var.substring(1, var.length() - 1);
@@ -271,13 +243,6 @@ public class TestfileSyntaxer {
 		return false;
 	}
 
-	/**
-	 * Prüft, ob ein String ein Wert ist. Ein Wert steht immer in doppelten
-	 * Anführungszeichen
-	 * 
-	 * @param val
-	 * @return
-	 */
 	private boolean checkValue(String val) {
 		if (Pattern.matches("\".*\"", val)) {
 			val = val.substring(1, val.length() - 1);
@@ -288,12 +253,6 @@ public class TestfileSyntaxer {
 		return false;
 	}
 
-	/**
-	 * Prüft, ob ein String ein Argument ein Wert oder eine Variable ist
-	 * 
-	 * @param arg
-	 * @return
-	 */
 	private boolean checkArgument(String arg) {
 		arg = arg.trim();
 		if (checkVariable(arg) || checkValue(arg)) {
@@ -302,14 +261,6 @@ public class TestfileSyntaxer {
 		return false;
 	}
 
-	/**
-	 * Überprüft ein Feld von Argumenten
-	 * 
-	 * @see TestfileSyntaxer#checkArgument(String)
-	 * @param args
-	 * @return Bis zu welchem Argument kein Fehler aufgetreteb ist, oder die
-	 *         Länge des Arrays wenn kein Fehler aufgetreten ist
-	 */
 	private int checkArguments(String[] args) {
 		for (int argNumber = 0; argNumber < args.length; argNumber++) {
 			String arg = args[argNumber].trim();

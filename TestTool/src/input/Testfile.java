@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import exceptions.testfile.TestfileException;
 import exceptions.testfile.TestfileExceptionHandler;
 
+/**
+ * This class stores information about test files
+ * 
+ * @author JJungen
+ *
+ */
 public class Testfile {
 	private String author;
 	private String testname;

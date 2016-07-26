@@ -8,6 +8,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+/**
+ * Store information about a testsuite execution
+ * @author JJungen
+ *
+ */
 public class TestSuiteProtocol {
 
 	public static final String STATE_PASS = "PASS";

@@ -9,7 +9,7 @@ import exceptions.testfile.TestfileExceptionHandler;
 import exceptions.testfile.TestfileSyntaxException;
 
 /**
- * Die Klasse ist verantwortlich für das einlesen von Testdateien.
+ * This class reads test files
  * 
  * @author JJungen
  *
@@ -25,15 +25,12 @@ public class TestfileReader extends AbstractFileReader {
 	}
 
 	/**
-	 * Liest eine Testdatei ein, unter beachtung der syntaktishen und
-	 * lexikalischen Korrektheit.
+	 * Reads the specified test file
 	 * 
 	 * @param path
-	 *            Pfad der Testdatei
-	 * @return Inhalt der Testdatei
+	 *            test file
+	 * @return
 	 * @throws IOException
-	 *             Wenn die Datei nicht gefunden wird, oder beim lesen der Datei
-	 *             fehler auftreten
 	 * @throws TestfileSyntaxException
 	 */
 	public static Testfile read(String path) throws IOException, TestfileSyntaxException {
@@ -50,23 +47,15 @@ public class TestfileReader extends AbstractFileReader {
 	private final boolean NEEDS_TEARDOWN;
 
 	/**
-	 * Erzeugt eine neue Instanz der Klasse.
+	 * Creates a new instance with the specified configurations
 	 * 
 	 * @param needsAuthor
-	 *            eingelesene Testfile benötigt einen Autoren
 	 * @param needsTestname
-	 *            eingelesene Testfile benötigt einen Testnamen
 	 * @param needsDescription
-	 *            eingelesene Testfile benötigt eine Beschreibung
 	 * @param needsLibraries
-	 *            eingelesene Testfile benötigt mindestens eine referenziert
-	 *            Bibliothek
 	 * @param needsSetup
-	 *            eingelesene Testfile benötigt eine Testaufbauphase
 	 * @param needsTest
-	 *            eingelesene Testfile benötigt eine Testphase
 	 * @param needsTeardown
-	 *            eingelesene Testfile benötigt eine Testabbauphase
 	 */
 	private TestfileReader(boolean needsAuthor, boolean needsTestname, boolean needsDescription, boolean needsLibraries,
 			boolean needsSetup, boolean needsTest, boolean needsTeardown) {
@@ -80,8 +69,7 @@ public class TestfileReader extends AbstractFileReader {
 	}
 
 	/**
-	 * Erzeugt eine neue Instanz. Die benötigten Inhalten von Testfiles werden
-	 * auf Standardwerte gesetzt.
+	 * Creates a new instance with default configurations
 	 */
 	private TestfileReader() {
 		NEEDS_AUTHOR = true;
@@ -93,17 +81,11 @@ public class TestfileReader extends AbstractFileReader {
 		NEEDS_TEARDOWN = false;
 	}
 
-	/**
-	 * Liest datei
-	 * 
-	 * @throws TestfileSyntaxException
-	 * @see TestfileReader#read(String)
-	 */
 	private Testfile _read(String path) throws IOException, TestfileSyntaxException {
 		File file = getFileFromPath(path);
 		String[] lines = getLinesFromFile(file);
 
-		TestfileSyntaxer syntaxer = new TestfileSyntaxer();
+		TestfileParser syntaxer = new TestfileParser();
 		syntaxer.check(lines);
 
 		Testfile testfile = readLinesToTestfile(lines);
@@ -112,14 +94,11 @@ public class TestfileReader extends AbstractFileReader {
 	}
 
 	/**
-	 * Erstellt aus den angegebenen Zeilen eine {@linkplain Testfile}
+	 * Create a {@link Testfile}-Object from the specified lines
 	 * 
 	 * @param lines
-	 *            Zeilen zum erstellen der Testfile
 	 * @return
-	 * @throws TestfileSyntaxException
-	 * @throws TestfileContentException
-	 * @throws IOException
+	 * @throws TestfileException
 	 */
 	private Testfile readLinesToTestfile(String[] lines) throws TestfileException {
 		Testfile testfile = new Testfile();
@@ -197,13 +176,11 @@ public class TestfileReader extends AbstractFileReader {
 	}
 
 	/**
-	 * Überprüft ob der Inhalt der Testfile korrekt ist. Im Konstruktor werden
-	 * die notwendigen Inhalte definiert. Wenn ein notwendiger Inhalte nicht
-	 * gesetzt ist, dann wird ein Fehler geworfen.
+	 * Checks if all necessary tags are present. The necessary tags are
+	 * configured in the constructor.
 	 * 
 	 * @param testfile
-	 *            Testfile die überprüft wird
-	 * @throws TestfileContentException
+	 * @throws TestfileException
 	 */
 	private void checkTestfileContent(Testfile testfile) throws TestfileException {
 		ArrayList<String> errorMessages = new ArrayList<>();
@@ -235,13 +212,11 @@ public class TestfileReader extends AbstractFileReader {
 	}
 
 	/**
-	 * Entfernt (äußere) Leerzeichen und einen Teil des Strings
+	 * Cuts off and trim the specified line
 	 * 
 	 * @param remove
-	 *            Teil der Entfernt wird
 	 * @param line
-	 *            String der bearbeitet wird
-	 * @return verarbeiteten String
+	 * @return
 	 */
 	private String getLineContent(String remove, String line) {
 		line = line.replace(remove, "").trim();

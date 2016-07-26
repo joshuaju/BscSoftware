@@ -27,10 +27,17 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
+/**
+ * This class is responsible for the execution of a single testfile.
+ * 
+ * @author JJungen
+ *
+ */
 public class TestExecuter {
 	private volatile BooleanProperty abortProperty = new SimpleBooleanProperty(false);
-	
-	private final String DEFAULT_LIBRARIES_NAME = "std"; // TODO aus properties lesen!
+
+	private final String DEFAULT_LIBRARIES_NAME = "std"; // TODO aus properties
+															// lesen!
 	private final String path;
 	private VariableFile globalVariables;
 	private VariableFile localVariables;
@@ -44,9 +51,15 @@ public class TestExecuter {
 
 	private ProgressHandler progressHandler;
 
+	/**
+	 * Create a new TestExecuter
+	 * 
+	 * @param path
+	 *            Path to a testfile
+	 */
 	public TestExecuter(String path) {
 		this.path = path;
-		
+
 		libnamesMap = new HashMap<>();
 
 		globalVariables = new VariableFile();
@@ -57,6 +70,9 @@ public class TestExecuter {
 	}
 
 	/**
+	 * This methode reads the specified testfile and executes the contained test
+	 * procedure. After test execution the protocol is received via
+	 * {@link TestExecuter#getProtocol()}
 	 * 
 	 * @throws TestfileException
 	 *             Probleme beim lesen der Testdatei -> Abbruch des einzelnen
@@ -69,12 +85,13 @@ public class TestExecuter {
 	 *             Tests
 	 * @throws TeardownException
 	 *             -> Abbruch des gesamten Testlauf
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 * @throws TestException
 	 *             -> Abbruch des einzelnen Tests
 	 * @throws TestfileSyntaxException
 	 */
-	public void execute() throws TestfileException, KeywordLibraryException, SetupException, TeardownException, InterruptedException {	
+	public void execute()
+			throws TestfileException, KeywordLibraryException, SetupException, TeardownException, InterruptedException {
 		if (executed) {
 			throw new IllegalStateException("Der Test wurde bereits ausgeführt");
 		}
@@ -88,26 +105,26 @@ public class TestExecuter {
 			protocol = new TestProtocol(false, "-", path, e.getMessage());
 			throw new TestfileException(e.getMessage(), e);
 		}
-		
-		// Anzahl Testschritte für Progressbar berechnen 
+
+		// Anzahl Testschritte für Progressbar berechnen
 		int teststeps = testfile.getSetupLines().length + testfile.getTestLines().length
 				+ testfile.getTeardownLines().length;
 		teststeps *= testfile.getRepetition();
 		int max = testfile.getLibraryFilePaths().length + ((testfile.getVariableFilePaths().length > 0) ? 1 : 0)
 				+ teststeps;
 		progressHandler.setMax(max);
-		
+
 		try { // Bibliotheken laden
 			loadLibraries(testfile);
 		} catch (ClassNotFoundException | IOException | KeywordLibraryException e) {
 			protocol = createProtocol(testfile, false, e.getMessage());
 			throw new KeywordLibraryException(e.getMessage(), e);
-		}		
-		
+		}
+
 		if (testfile.hasVariableFilePaths()) {
-			try { // Globale Variablen laden 
+			try { // Globale Variablen laden
 				globalVariables = VariableFileReader.readAll(path, testfile.getVariableFilePaths());
-				progressHandler.increment();				
+				progressHandler.increment();
 			} catch (TestfileSyntaxException | IOException e) {
 				protocol = createProtocol(testfile, false, e.getMessage());
 				throw new TestfileException(e.getMessage(), e);
@@ -135,13 +152,13 @@ public class TestExecuter {
 				throw new TeardownException(e.getMessage(), e);
 			}
 		}
-				
-		if (abortProperty.get()){
+
+		if (abortProperty.get()) {
 			throw new InterruptedException();
 		}
 		if (protocol == null) {
 			// Es ist kein Fehler aufgetreten
-			protocol = createProtocol(testfile, true, "");	
+			protocol = createProtocol(testfile, true, "");
 			long endTime = System.currentTimeMillis();
 			System.out.println("Test finished: " + testfile.getTestname() + ": Time(ms): " + (endTime - startTime));
 		}
@@ -151,6 +168,10 @@ public class TestExecuter {
 		return new TestProtocol(passed, testfile.getTestname(), testfile.getPath(), message);
 	}
 
+	/**
+	 * This method needs to be called after a finished test execution.
+	 * @return Test protocol or {@link IllegalStateException} if execution has not started or finished
+	 */
 	public TestProtocol getProtocol() {
 		if (!executed) {
 			throw new IllegalStateException("Der Test wurde noch nicht ausgeführt");
@@ -480,16 +501,24 @@ public class TestExecuter {
 		}
 	}
 
+	/**
+	 * Receive the current test progress 
+	 * @return
+	 */
 	public ReadOnlyDoubleProperty progressProperty() {
 		return progressHandler.progressProperty();
 	}
-	
-	public void abort(){
+
+	/**
+	 * Call this method to abort a running test execution. This mehtod needs to
+	 * be invoked from an other thread than {@link TestExecuter#execute()}.
+	 */
+	public void abort() {
 		abortProperty.set(true);
 	}
-	
-	BooleanProperty abortProperty(){
+
+	BooleanProperty abortProperty() {
 		return abortProperty;
 	}
-	
+
 }

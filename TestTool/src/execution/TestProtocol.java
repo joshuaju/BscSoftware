@@ -1,5 +1,10 @@
 package execution;
 
+/**
+ * Store information about a test execution
+ * @author JJungen
+ *
+ */
 public class TestProtocol {
 
 	private final boolean passed;

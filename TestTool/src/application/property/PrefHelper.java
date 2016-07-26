@@ -3,11 +3,20 @@ package application.property;
 import java.util.HashMap;
 import java.util.Set;
 
+/**
+ * Abstract class for preference handling. Information are stored in a map. To store and load preferences override
+ * both methods {@link PrefHelper#store()} and {@link PrefHelper#load()}.
+ * 
+ * 
+ * @see {@link UserPreferences}, {@link ProjectPreferences}
+ * @author JJungen
+ *
+ */
 public abstract class PrefHelper {
 
 	private final HashMap<String, String> map;
-	
-	public PrefHelper(){
+
+	public PrefHelper() {
 		map = new HashMap<>();
 		load();
 	}
@@ -28,17 +37,17 @@ public abstract class PrefHelper {
 	public String getOrDefault(String key, String def) {
 		return map.getOrDefault(key, def);
 	}
-	
+
 	protected abstract void load();
 
 	public abstract void store();
-			
-	public String getDefaultValue(String key){
+
+	public String getDefaultValue(String key) {
 		return null;
 	}
-	
-	protected final Set<String> keySet(){
+
+	protected final Set<String> keySet() {
 		return map.keySet();
 	}
-	
+
 }
