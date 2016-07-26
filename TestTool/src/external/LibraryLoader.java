@@ -15,7 +15,6 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import annotations.Keyword;
 import annotations.KeywordLibrary;
 import application.property.UserPreferences;
 import exceptions.keywordlibrary.KeywordLibraryException;
