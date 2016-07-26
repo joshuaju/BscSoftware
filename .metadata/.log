@@ -1,0 +1,162 @@
+!SESSION 2016-07-08 10:33:19.616 -----------------------------------------------
+eclipse.buildId=4.6.0.I20160606-1100
+java.version=1.8.0_91
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_DE
+Framework arguments:  -product org.eclipse.epp.package.java.product -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product -data D:\Benutzer\JJungen\Documents\BscSoftware -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-08 10:33:21.895
+!MESSAGE System property http.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-08 10:33:21.903
+!MESSAGE System property http.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-08 10:33:21.905
+!MESSAGE System property https.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-08 10:33:21.906
+!MESSAGE System property https.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-08 10:33:21.911
+!MESSAGE System property https.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-08 10:33:21.913
+!MESSAGE System property https.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.egit.ui 2 0 2016-07-08 10:33:24.821
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'U:\'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+!SESSION 2016-07-25 10:06:38.457 -----------------------------------------------
+eclipse.buildId=4.6.0.I20160606-1100
+java.version=1.8.0_91
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_DE
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 10:06:58.574
+!MESSAGE System property http.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 10:06:58.714
+!MESSAGE System property http.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 10:06:58.730
+!MESSAGE System property https.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 10:06:58.730
+!MESSAGE System property https.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 10:06:58.746
+!MESSAGE System property https.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 10:06:58.746
+!MESSAGE System property https.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.egit.ui 2 0 2016-07-25 10:07:12.715
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'U:\'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+!SESSION 2016-07-25 13:00:22.739 -----------------------------------------------
+eclipse.buildId=4.6.0.I20160606-1100
+java.version=1.8.0_91
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_DE
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 13:00:31.861
+!MESSAGE System property http.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 13:00:31.865
+!MESSAGE System property http.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 13:00:31.869
+!MESSAGE System property https.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 13:00:31.871
+!MESSAGE System property https.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 13:00:31.877
+!MESSAGE System property https.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-25 13:00:31.879
+!MESSAGE System property https.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.egit.ui 2 0 2016-07-25 13:00:35.277
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'U:\'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+!SESSION 2016-07-26 08:59:11.350 -----------------------------------------------
+eclipse.buildId=4.6.0.I20160606-1100
+java.version=1.8.0_91
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_DE
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-26 08:59:17.319
+!MESSAGE System property http.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-26 08:59:17.325
+!MESSAGE System property http.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-26 08:59:17.329
+!MESSAGE System property https.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-26 08:59:17.332
+!MESSAGE System property https.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-26 08:59:17.337
+!MESSAGE System property https.proxyHost is not set but should be proxy2.
+
+!ENTRY org.eclipse.core.net 1 0 2016-07-26 08:59:17.340
+!MESSAGE System property https.proxyPort is not set but should be 3128.
+
+!ENTRY org.eclipse.egit.ui 2 0 2016-07-26 08:59:22.057
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'U:\'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.recommenders.types.rcp 1 4 2016-07-26 09:51:03.005
+!MESSAGE Full project indexing required:
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\charsets.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\access-bridge-64.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\cldrdata.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\dnsns.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\jaccess.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\jfxrt.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\localedata.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\nashorn.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\sunec.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\sunjce_provider.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\sunmscapi.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\sunpkcs11.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\ext\zipfs.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\jce.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\jfr.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\jsse.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\resources.jar
+  [+] C:\Program Files\Java\jre1.8.0_91\lib\rt.jar
+  [+] D:\Benutzer\JJungen\.p2\pool\plugins\org.hamcrest.core_1.3.0.v201303031735.jar
+  [+] D:\Benutzer\JJungen\.p2\pool\plugins\org.junit_4.12.0.v201504281640\junit.jar
+  [+] D:\Benutzer\JJungen\Documents\BscSoftware\TestTool\ref\expr.jar
+
+!STACK 0
+org.eclipse.recommenders.utils.Logs$LogTraceException
+	at org.eclipse.recommenders.utils.Logs$LogTraceException.newTrace(Logs.java:381)
+	at org.eclipse.recommenders.utils.Logs.log(Logs.java:134)
+	at org.eclipse.recommenders.internal.types.rcp.ProjectTypesIndex.needsRebuild(ProjectTypesIndex.java:169)
+	at org.eclipse.recommenders.internal.types.rcp.ProjectTypesIndex.startUp(ProjectTypesIndex.java:122)
+	at com.google.common.util.concurrent.AbstractIdleService$2$1.run(AbstractIdleService.java:54)
+	at com.google.common.util.concurrent.Callables$3.run(Callables.java:93)
+	at java.lang.Thread.run(Unknown Source)

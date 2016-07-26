@@ -1,0 +1,7 @@
+1469520212123	Rename method 'getSimpleLibraryInstance'
+1469520216527	Rename method 'getExecutableLibraryInstance'
+1469520424978	Rename method 'makeURLArray'
+1469520482438	Rename method 'getSimplePath'
+1469522063727	Rename type 'TestfileSyntaxer'
+1469522372752	Rename method 'checkRegular'
+1469522410321	Rename method 'checkAssign'

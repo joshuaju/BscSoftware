@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="info_mainpane" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Kein Keyword ausgewählt" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="designer.controller.KeywordInformationController">
+   <content>
+      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+         <children>
+            <Label alignment="TOP_LEFT" text="Beschreibung">
+               <VBox.margin>
+                  <Insets left="5.0" />
+               </VBox.margin>
+            </Label>
+            <TextArea fx:id="ta_description" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="250.0" promptText="Keine Beschreibung" wrapText="true">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </TextArea>
+            <Label text="Parameter">
+               <VBox.margin>
+                  <Insets left="5.0" />
+               </VBox.margin>
+            </Label>
+            <TextArea fx:id="ta_parameter" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="250.0" promptText="Keine Inforamtionen zu Parametern" wrapText="true">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </TextArea>
+            <Label text="Rückgabewert">
+               <VBox.margin>
+                  <Insets left="5.0" />
+               </VBox.margin>
+            </Label>
+            <TextArea fx:id="ta_return" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="250.0" promptText="Keine Informationen zum Rückgabewert" wrapText="true">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </TextArea>
+         </children>
+         <opaqueInsets>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </opaqueInsets>
+      </VBox>
+   </content>
+</TitledPane>

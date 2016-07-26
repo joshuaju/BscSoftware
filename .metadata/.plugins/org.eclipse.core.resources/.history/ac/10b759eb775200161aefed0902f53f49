@@ -1,0 +1,46 @@
+package execution;
+
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
+public class ProgressHandler  {
+	
+	private DoubleProperty progress = new SimpleDoubleProperty();
+	private IntegerProperty currentStep = new SimpleIntegerProperty();
+	private IntegerProperty totalSteps = new SimpleIntegerProperty();
+	
+	public ProgressHandler(){
+		progress.set(0);
+		currentStep.set(0);
+		totalSteps.set(1);
+		
+		progress.bind(new DoubleBinding() {
+			{
+				super.bind(currentStep);
+				super.bind(totalSteps);
+			}
+
+			@Override
+			protected double computeValue() {				
+				return currentStep.doubleValue() / totalSteps.doubleValue();
+			}
+		});
+	}
+	
+	public void increment(){
+		int tmp = currentStep.get();
+		currentStep.set(tmp + 1);
+	}	
+	
+	public void setMax(int max){
+		totalSteps.set(max);
+	}
+	
+	public ReadOnlyDoubleProperty progressProperty(){
+		return progress;
+	}
+}

@@ -1,0 +1,16 @@
+2016-07-08 10:33:24,588 [Worker-1] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2016-07-08 11:06:31,581 [Start Help Server] INFO  org.eclipse.jetty.util.log - Logging initialized @1992064ms
+2016-07-08 11:06:31,741 [Start Help Server] INFO  org.eclipse.jetty.server.Server - jetty-9.3.9.v20160517
+2016-07-08 11:06:31,771 [Start Help Server] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@5755338b{/help,null,AVAILABLE}
+2016-07-08 11:06:31,783 [Start Help Server] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@7a81f390{HTTP/1.1,[http/1.1]}{127.0.0.1:51233}
+2016-07-08 11:06:31,784 [Start Help Server] INFO  org.eclipse.jetty.server.Server - Started @1992267ms
+2016-07-08 12:15:02,599 [Stop Help Server] INFO  o.e.jetty.server.AbstractConnector - Stopped ServerConnector@7a81f390{HTTP/1.1,[http/1.1]}{127.0.0.1:0}
+2016-07-08 12:15:02,648 [Stop Help Server] INFO  o.e.j.server.handler.ContextHandler - Stopped o.e.j.s.ServletContextHandler@5755338b{/help,null,UNAVAILABLE}
+2016-07-25 10:07:12,590 [Worker-0] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
+2016-07-25 13:00:35,300 [Worker-2] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2016-07-26 08:59:22,140 [Worker-2] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2016-07-26 13:14:27,572 [Start Help Server] INFO  org.eclipse.jetty.util.log - Logging initialized @15316541ms
+2016-07-26 13:14:27,988 [Start Help Server] INFO  org.eclipse.jetty.server.Server - jetty-9.3.9.v20160517
+2016-07-26 13:14:28,034 [Start Help Server] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@5cb74e1a{/help,null,AVAILABLE}
+2016-07-26 13:14:28,056 [Start Help Server] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@2ced55e9{HTTP/1.1,[http/1.1]}{127.0.0.1:57815}
+2016-07-26 13:14:28,057 [Start Help Server] INFO  org.eclipse.jetty.server.Server - Started @15317026ms

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<SplitPane dividerPositions="0.351" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="designer.controller.LibraryInformationListController">
+   <items>
+      <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="266.0" prefWidth="176.0">
+         <center>
+            <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="50.0" minWidth="75.0">
+               <children>
+                  <ListView fx:id="lv_libraries" maxHeight="1.7976931348623157E308" minHeight="50.0" minWidth="75.0" StackPane.alignment="CENTER">
+                     <contextMenu>
+                        <ContextMenu>
+                          <items>
+                            <MenuItem fx:id="miAddLibraries" mnemonicParsing="false" onAction="#contextMenuAddLibrariesAction" text="Bibliotheken hinzufügen" />
+                              <MenuItem fx:id="miRemove" mnemonicParsing="false" onAction="#contextMenuRemoveAction" text="Entfernen" />
+                              <MenuItem fx:id="miRemoveAll" mnemonicParsing="false" onAction="#contextMenuRemoveAllAction" text="Alle entfernen" />
+                          </items>
+                        </ContextMenu>
+                     </contextMenu></ListView>
+                  <Label fx:id="lblAddLibrary" StackPane.alignment="BOTTOM_RIGHT">
+                     <StackPane.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </StackPane.margin>
+                  </Label>
+               </children>
+            </StackPane>
+         </center>
+         <top>
+            <fx:include fx:id="search" source="searchfield.fxml" />
+         </top>
+      </BorderPane>
+      <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+	      <center>
+	      	<fx:include fx:id="libraryInfo" source="LibraryInformationView.fxml" />
+	      </center>
+      </BorderPane>
+   </items>
+</SplitPane>

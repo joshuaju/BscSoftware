@@ -1,0 +1,122 @@
+package external;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import exceptions.keywordlibrary.KeywordException;
+import exceptions.keywordlibrary.KeywordExceptionHandler;
+import exceptions.keywordlibrary.KeywordLibraryException;
+
+/**
+ * This class extends {@link SimpleKeyword} by providing a method to invoke the keyword 
+ * 
+ * @author JJungen
+ *
+ */
+public class ExecutableKeyword extends SimpleKeyword {
+
+	private final Object libInstance;
+
+	ExecutableKeyword(Object libInstance, Method method) throws KeywordLibraryException {
+		super(method);
+		this.libInstance = libInstance;
+	}
+
+	public ExecutableKeyword(Object libInstance, SimpleKeyword simple) throws KeywordLibraryException {
+		this(libInstance, simple.method);
+	}
+
+	/**
+	 * Dieses Keyword wird an dem Object instance, mit den Übergabeparametern
+	 * args, aufegerufen
+	 * 
+	 * @param instance
+	 *            ausführendes Objekt
+	 * @param args
+	 *            Übergabeparameter
+	 * @return Rückgabewert des Keyword
+	 * @throws KeywordException
+	 * @throws IllegalAccessException
+	 *             Fehler bei der Reflexion
+	 * @throws IllegalArgumentException
+	 *             Die Übergabeparameter sind nicht gültig
+	 */
+	public Object invoke(Object... args) throws KeywordException {
+		Class<?>[] argClasses = getParameterTypes();
+
+		if (argClasses.length != args.length) {
+			throw KeywordExceptionHandler.TooManyArguments(this);
+		}
+
+		for (int i = 0; i < argClasses.length; i++) {
+			Object tmpArg = args[i];
+			Class<?> tmpArgClass = argClasses[i];
+			
+			if (tmpArg == null) {
+				throw KeywordExceptionHandler.NullArgument(this, i);
+			}			
+			
+			tmpArg = parseArgument(tmpArgClass, tmpArg);			
+			if (tmpArg == null) {
+				throw KeywordExceptionHandler.WrongArgument(this, args[i], tmpArgClass, args[i].getClass(), i);
+			}
+			
+			args[i] = tmpArg;
+		}
+
+		try {
+			return method.invoke(libInstance, args);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			throw KeywordExceptionHandler.WrongArgument(this, e.getCause());
+		} catch (InvocationTargetException e) {
+			throw new AssertionError(e.getCause().getMessage());
+		}		
+	}
+
+	/**
+	 * Die Methode versucht das Argument in die ArgumentKlasse zu 'parsen'.
+	 * 
+	 * @param argClass
+	 *            Klasse des Arguments
+	 * @param arg
+	 *            Argument
+	 * @return Instanz des Argument der Klasse, oder NULL wenn das Parsen nicht
+	 *         möglich ist
+	 */
+	private Object parseArgument(Class<?> argClass, Object arg) {
+		try {
+			if (argClass.equals(String.class) || argClass.equals(Object.class)) {
+				return arg.toString();
+			} else if (argClass.equals(Boolean.class) || argClass.equals(boolean.class)) {
+				return Boolean.parseBoolean(arg.toString());
+			} else if (argClass.equals(Character.class) || argClass.equals(char.class)) {
+				String str = arg.toString();
+				if (str.length() == 1) {
+					return str.charAt(0);
+				}
+			} else if (argClass.equals(Byte.class) || argClass.equals(byte.class)) {
+				return Byte.parseByte(arg.toString());
+			} else if (argClass.equals(Short.class) || argClass.equals(short.class)) {
+				return Short.parseShort(arg.toString());
+			} else if (argClass.equals(Integer.class) || argClass.equals(int.class)) {
+				return Integer.parseInt(arg.toString());
+			} else if (argClass.equals(Long.class) || argClass.equals(long.class)) {
+				return Long.parseLong(arg.toString());
+			} else if (argClass.equals(Float.class) || argClass.equals(float.class)) {
+				return Float.parseFloat(arg.toString());
+			} else if (argClass.equals(Double.class) || argClass.equals(double.class)) {
+				return Double.parseDouble(arg.toString());
+			}
+		} catch (Exception e) {
+			// Keine Fehlerbehandlung, es soll NULL zurückgegeben werden
+		}
+		return null;
+	}
+
+	@Override
+	public String toString() {
+		return "[NAME] " + getName() + ", [DESC] " + getDescription() + ", [PARA] " + getParameter() + ", [RET] "
+				+ getReturn();
+	}
+
+}

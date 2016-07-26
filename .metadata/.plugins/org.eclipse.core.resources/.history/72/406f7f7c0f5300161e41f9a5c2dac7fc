@@ -1,0 +1,15 @@
+package input;
+
+import exceptions.testfile.TestfileException;
+
+public class Testline {
+
+	public final int number;
+	public final String text;
+
+	public Testline(int number, String text) throws TestfileException {
+		this.number = number;
+		this.text = text.trim();
+	}
+	
+}
