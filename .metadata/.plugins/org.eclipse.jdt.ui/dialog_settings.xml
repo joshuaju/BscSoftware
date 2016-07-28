@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<item value="D:\Benutzer\JJungen\Documents\BscSoftware" key="org.eclipse.jdt.ui.lastextjar"/>
+	<section name="org.eclipse.ltk.ui.refactoring.settings">
+	</section>
 	<section name="FatJarPackageWizard">
 		<item value="D:\Benutzer\JJungen\Documents\BscSoftware" key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION"/>
 		<item value="Main - TCULibrary" key="FatJarPackageWizardPage.LAUNCH_CONFIGURATION_SELECTION_NAME"/>
@@ -23,6 +25,8 @@
 		<item value="false" key="linkWithEditor"/>
 	</section>
 	<section name="BreadcrumbItemDropDown">
+	</section>
+	<section name="RenameInformationPopup">
 	</section>
 	<section name="ClasspathContainerSelectionPage">
 		<item value="3" key="index"/>

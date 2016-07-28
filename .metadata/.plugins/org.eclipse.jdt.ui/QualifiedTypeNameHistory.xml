@@ -5,4 +5,12 @@
 <fullyQualifiedTypeName name="application.property.PrefHelper"/>
 <fullyQualifiedTypeName name="execution.TestExecuter"/>
 <fullyQualifiedTypeName name="java.lang.IllegalStateException"/>
+<fullyQualifiedTypeName name="java.net.URLClassLoader"/>
+<fullyQualifiedTypeName name="annotations.Keyword"/>
+<fullyQualifiedTypeName name="annotations.KeywordLibrary"/>
+<fullyQualifiedTypeName name="external.ExecutableKeywordLibrary"/>
+<fullyQualifiedTypeName name="external.ExecutableKeyword"/>
+<fullyQualifiedTypeName name="external.SimpleKeyword"/>
+<fullyQualifiedTypeName name="external.SimpleKeywordLibrary"/>
+<fullyQualifiedTypeName name="input.Testfile"/>
 </qualifiedTypeNameHistroy>
