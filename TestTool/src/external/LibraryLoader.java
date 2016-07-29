@@ -140,7 +140,7 @@ public class LibraryLoader implements Closeable {
 	 * @throws IOException
 	 * @throws KeywordLibraryException
 	 */
-	public ExecutableKeywordLibrary loadInstantiatedKeywordLibrary(String path)
+	public ExecutableKeywordLibrary loadExecutableKeywordLibrary(String path)
 			throws ClassNotFoundException, IOException, KeywordLibraryException {
 
 		SimpleKeywordLibrary simpleLibrary = loadSimpleKeywordLibrary(path);

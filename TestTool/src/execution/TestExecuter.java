@@ -110,10 +110,12 @@ public class TestExecuter {
 		int teststeps = testfile.getSetupLines().length + testfile.getTestLines().length
 				+ testfile.getTeardownLines().length;
 		teststeps *= testfile.getRepetition();
+
+		// Alle globalen Variablen werden in einer Instanz gespeichert -> daher hier nur +1 
 		int max = testfile.getLibraryFilePaths().length + ((testfile.getVariableFilePaths().length > 0) ? 1 : 0)
 				+ teststeps;
 		progressHandler.setMax(max);
-
+		
 		try { // Bibliotheken laden
 			loadLibraries(testfile);
 		} catch (ClassNotFoundException | IOException | KeywordLibraryException e) {
@@ -158,7 +160,9 @@ public class TestExecuter {
 		}
 		if (protocol == null) {
 			// Es ist kein Fehler aufgetreten
+			
 			protocol = createProtocol(testfile, true, "");
+			// TODO Testlaufzeit in Protokoll aufnehmen
 			long endTime = System.currentTimeMillis();
 			System.out.println("Test finished: " + testfile.getTestname() + ": Time(ms): " + (endTime - startTime));
 		}
@@ -389,7 +393,7 @@ public class TestExecuter {
 	 * Gibt die verfügbaren Bibliotheken zurück. Kein Name bedeuted, dass alle
 	 * Standard und im Testfall geladenen Bibliotheken zurückgegeben werden.
 	 * Ansonsten wird nur die Bibliothek mit dem Bezeichner geladen. Wenn der
-	 * Standard-Bezeichner verwendet wird, dann werden alle
+	 * Standard-Bezeichner (std) verwendet wird, dann werden alle
 	 * Standard-Bibliotheken geladen.
 	 * 
 	 * @param libraryname
@@ -495,7 +499,8 @@ public class TestExecuter {
 			int last = line.lastIndexOf("\"");
 			String path = line.substring(1, last);
 			String name = line.substring(last + 1).trim();
-			ExecutableKeywordLibrary library = LibraryLoader.getInstance().loadInstantiatedKeywordLibrary(path);
+			ExecutableKeywordLibrary library = LibraryLoader.getInstance().loadExecutableKeywordLibrary(path);
+			// FIXME: Libraries nicht überschreiben, ggf. Fehler werfen oder einfach drauf achten!
 			libnamesMap.put(name, library);
 			progressHandler.increment();
 		}
